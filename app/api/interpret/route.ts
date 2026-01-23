@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get interpretation from Claude
-    const emotions = JSON.parse(dream.emotions) as string[];
+    const emotions = dream.emotions as string[];
     const interpretation = await interpretDream(dream.content, emotions, style);
 
     // Format interpretation as text for storage
@@ -58,17 +58,12 @@ export async function POST(request: NextRequest) {
       data: {
         interpretation: interpretationText,
         interpretedAt: new Date(),
-        symbols: JSON.stringify(symbols),
+        symbols: symbols,
       },
     });
 
     return NextResponse.json({
-      dream: {
-        ...updatedDream,
-        emotions: JSON.parse(updatedDream.emotions),
-        symbols,
-        tags: JSON.parse(updatedDream.tags),
-      },
+      dream: updatedDream,
       interpretation,
     });
   } catch (error) {

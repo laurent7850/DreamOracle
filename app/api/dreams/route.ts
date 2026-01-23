@@ -51,13 +51,8 @@ export async function GET(request: NextRequest) {
       prisma.dream.count({ where }),
     ]);
 
-    // Parse JSON strings for arrays
-    const parsedDreams = dreams.map((dream) => ({
-      ...dream,
-      emotions: JSON.parse(dream.emotions),
-      symbols: JSON.parse(dream.symbols),
-      tags: JSON.parse(dream.tags),
-    }));
+    // Dreams already have proper JSON types with PostgreSQL
+    const parsedDreams = dreams;
 
     return NextResponse.json({
       dreams: parsedDreams,
@@ -104,12 +99,12 @@ export async function POST(request: NextRequest) {
         title: data.title,
         content: data.content,
         dreamDate: data.dreamDate,
-        emotions: JSON.stringify(data.emotions),
+        emotions: data.emotions,
         lucidity: data.lucidity,
         mood: data.mood,
         sleepQuality: data.sleepQuality,
         isRecurring: data.isRecurring,
-        tags: JSON.stringify(data.tags),
+        tags: data.tags,
       },
     });
 

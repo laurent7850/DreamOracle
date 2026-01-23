@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DreamOracle
 
-## Getting Started
+Application d'interprétation des rêves avec IA - Explorez les mystères de votre subconscient.
 
-First, run the development server:
+## Fonctionnalités
+
+- **Journal de rêves** - Enregistrez vos rêves avec émotions, tags et niveau de lucidité
+- **Interprétation IA** - Analyse symbolique et psychologique via Claude (OpenRouter)
+- **Thème ésotérique** - Interface mystique avec animations et effets visuels
+- **Statistiques** - Suivez vos patterns de rêves et symboles récurrents
+- **Multi-style** - Interprétations spirituelles, psychologiques ou équilibrées
+
+## Stack Technique
+
+- **Frontend**: Next.js 16, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Database**: PostgreSQL (Vercel Postgres / Neon)
+- **Auth**: NextAuth.js v5
+- **AI**: OpenRouter API (Claude)
+
+## Installation
 
 ```bash
+# Cloner le repository
+git clone https://github.com/laurent7850/DreamOracle.git
+cd DreamOracle
+
+# Installer les dépendances
+npm install
+
+# Configurer les variables d'environnement
+cp .env.example .env
+# Éditer .env avec vos valeurs
+
+# Initialiser la base de données
+npx prisma generate
+npx prisma db push
+
+# Lancer en développement
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Variables d'Environnement
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+# Database PostgreSQL
+DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# NextAuth
+NEXTAUTH_SECRET="votre-secret"
+NEXTAUTH_URL="http://localhost:3000"
 
-## Learn More
+# OpenRouter API
+OPENROUTER_API_KEY="sk-or-..."
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Déploiement Vercel
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Connectez votre repo GitHub à Vercel
+2. Ajoutez une base de données PostgreSQL (Vercel Postgres ou Neon)
+3. Configurez les variables d'environnement
+4. Déployez
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/laurent7850/DreamOracle)
 
-## Deploy on Vercel
+## Licence
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT

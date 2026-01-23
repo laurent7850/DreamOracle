@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -32,12 +33,12 @@ model Dream {
   title           String
   content         String
   dreamDate       DateTime  @default(now())
-  emotions        String    @default("[]") // JSON array stored as string for SQLite
-  symbols         String    @default("[]") // JSON array stored as string for SQLite
+  emotions        Json      @default("[]")
+  symbols         Json      @default("[]")
   lucidity        Int       @default(0) // 0-5 scale
   interpretation  String?
   interpretedAt   DateTime?
-  tags            String    @default("[]") // JSON array stored as string for SQLite
+  tags            Json      @default("[]")
   isRecurring     Boolean   @default(false)
   recurringId     String?
   mood            String?
