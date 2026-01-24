@@ -53,3 +53,5 @@ prisma/dev.db
 # Environment
 .env
 .env.local
+.env.hostinger
+.env.production.local
