@@ -27,7 +27,13 @@ export async function GET(
       return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
 
-    return NextResponse.json(dream);
+    // Parse JSON strings for SQLite
+    return NextResponse.json({
+      ...dream,
+      emotions: JSON.parse(dream.emotions as string),
+      symbols: JSON.parse(dream.symbols as string),
+      tags: JSON.parse(dream.tags as string),
+    });
   } catch (error) {
     console.error("Error fetching dream:", error);
     return NextResponse.json(
@@ -70,21 +76,27 @@ export async function PATCH(
         ...(body.title && { title: body.title }),
         ...(body.content && { content: body.content }),
         ...(body.dreamDate && { dreamDate: new Date(body.dreamDate) }),
-        ...(body.emotions && { emotions: body.emotions }),
-        ...(body.symbols && { symbols: body.symbols }),
+        ...(body.emotions && { emotions: JSON.stringify(body.emotions) }),
+        ...(body.symbols && { symbols: JSON.stringify(body.symbols) }),
         ...(body.lucidity !== undefined && { lucidity: body.lucidity }),
         ...(body.interpretation && {
           interpretation: body.interpretation,
           interpretedAt: new Date(),
         }),
-        ...(body.tags && { tags: body.tags }),
+        ...(body.tags && { tags: JSON.stringify(body.tags) }),
         ...(body.isRecurring !== undefined && { isRecurring: body.isRecurring }),
         ...(body.mood && { mood: body.mood }),
         ...(body.sleepQuality && { sleepQuality: body.sleepQuality }),
       },
     });
 
-    return NextResponse.json(updatedDream);
+    // Parse JSON strings for response
+    return NextResponse.json({
+      ...updatedDream,
+      emotions: JSON.parse(updatedDream.emotions as string),
+      symbols: JSON.parse(updatedDream.symbols as string),
+      tags: JSON.parse(updatedDream.tags as string),
+    });
   } catch (error) {
     console.error("Error updating dream:", error);
     return NextResponse.json(

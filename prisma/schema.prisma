@@ -5,8 +5,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Use DATABASE_PROVIDER env var to switch between sqlite (dev) and postgresql (prod)
 datasource db {
-  provider  = "postgresql"
+  provider  = env("DATABASE_PROVIDER")
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
@@ -33,12 +34,12 @@ model Dream {
   title           String
   content         String
   dreamDate       DateTime  @default(now())
-  emotions        Json      @default("[]")
-  symbols         Json      @default("[]")
+  emotions        String    @default("[]")
+  symbols         String    @default("[]")
   lucidity        Int       @default(0) // 0-5 scale
   interpretation  String?
   interpretedAt   DateTime?
-  tags            Json      @default("[]")
+  tags            String    @default("[]")
   isRecurring     Boolean   @default(false)
   recurringId     String?
   mood            String?

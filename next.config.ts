@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Empty turbopack config to satisfy Next.js 16
   turbopack: {},
+  // Enable standalone output for Docker deployment
+  output: "standalone",
 };
 
 // PWA configuration - conditionally applied

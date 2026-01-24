@@ -51,8 +51,13 @@ export async function GET(request: NextRequest) {
       prisma.dream.count({ where }),
     ]);
 
-    // Dreams already have proper JSON types with PostgreSQL
-    const parsedDreams = dreams;
+    // Parse JSON strings for SQLite
+    const parsedDreams = dreams.map((dream) => ({
+      ...dream,
+      emotions: JSON.parse(dream.emotions as string),
+      symbols: JSON.parse(dream.symbols as string),
+      tags: JSON.parse(dream.tags as string),
+    }));
 
     return NextResponse.json({
       dreams: parsedDreams,
@@ -99,12 +104,12 @@ export async function POST(request: NextRequest) {
         title: data.title,
         content: data.content,
         dreamDate: data.dreamDate,
-        emotions: data.emotions,
+        emotions: JSON.stringify(data.emotions),
         lucidity: data.lucidity,
         mood: data.mood,
         sleepQuality: data.sleepQuality,
         isRecurring: data.isRecurring,
-        tags: data.tags,
+        tags: JSON.stringify(data.tags),
       },
     });
 
