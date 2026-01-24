@@ -1,0 +1,60 @@
+services:
+  dreamoracle:
+    image: node:20-alpine
+    working_dir: /app
+    restart: always
+    command: >
+      sh -c "
+        apk add --no-cache git &&
+        if [ ! -d /app/.git ]; then
+          git clone https://github.com/laurent7850/DreamOracle.git /app-tmp &&
+          mv /app-tmp/* /app/ &&
+          mv /app-tmp/.* /app/ 2>/dev/null || true &&
+          rm -rf /app-tmp
+        else
+          cd /app && git pull
+        fi &&
+        npm ci &&
+        npx prisma generate &&
+        npx prisma db push --skip-generate &&
+        npm run build &&
+        node .next/standalone/server.js
+      "
+    environment:
+      - NODE_ENV=production
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_URL=postgresql://dreamoracle:DreamPass2024Secure@postgres:5432/dreamoracle
+      - DIRECT_URL=postgresql://dreamoracle:DreamPass2024Secure@postgres:5432/dreamoracle
+      - NEXTAUTH_SECRET=YJ0jX0+leyjco/RKeWmww0pmLt21uk9Hf9d1N9TbOnM=
+      - NEXTAUTH_URL=https://dreams.srv767464.hstgr.cloud
+      - OPENROUTER_API_KEY=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
+    volumes:
+      - dreamoracle_app:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dreamoracle.rule=Host(`dreams.srv767464.hstgr.cloud`)"
+      - "traefik.http.routers.dreamoracle.entrypoints=websecure"
+      - "traefik.http.routers.dreamoracle.tls.certresolver=letsencrypt"
+      - "traefik.http.services.dreamoracle.loadbalancer.server.port=3000"
+
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=dreamoracle
+      - POSTGRES_PASSWORD=DreamPass2024Secure
+      - POSTGRES_DB=dreamoracle
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dreamoracle"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  dreamoracle_app:
+  postgres_data:
