@@ -12,6 +12,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,11 @@ const navItems = [
     href: "/settings",
     label: "Paramètres",
     icon: Settings,
+  },
+  {
+    href: "/help",
+    label: "Aide",
+    icon: HelpCircle,
   },
 ];
 

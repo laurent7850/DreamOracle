@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, BookOpen, PlusCircle, Settings } from "lucide-react";
+import { LayoutDashboard, BookOpen, PlusCircle, Settings, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -25,6 +25,11 @@ const navItems = [
     href: "/settings",
     label: "Options",
     icon: Settings,
+  },
+  {
+    href: "/help",
+    label: "Aide",
+    icon: HelpCircle,
   },
 ];
 
