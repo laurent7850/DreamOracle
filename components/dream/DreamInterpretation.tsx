@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Sparkles, Loader2, RefreshCw, Moon, MessageCircle, Lightbulb } from "lucide-react";
+import { Sparkles, Loader2, RefreshCw, Moon, MessageCircle, Lightbulb, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -28,16 +28,18 @@ export function DreamInterpretation({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [style, setStyle] = useState<"spiritual" | "psychological" | "balanced">("balanced");
+  const [currentStyle, setCurrentStyle] = useState<"spiritual" | "psychological" | "balanced" | null>(null);
   const [interpretation, setInterpretation] = useState<InterpretationType | null>(null);
 
-  const requestInterpretation = async () => {
+  const requestInterpretation = async (requestedStyle?: "spiritual" | "psychological" | "balanced") => {
+    const styleToUse = requestedStyle || style;
     setIsLoading(true);
 
     try {
       const response = await fetch("/api/interpret", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dreamId, style }),
+        body: JSON.stringify({ dreamId, style: styleToUse }),
       });
 
       const data = await response.json();
@@ -48,6 +50,7 @@ export function DreamInterpretation({
       }
 
       setInterpretation(data.interpretation);
+      setCurrentStyle(styleToUse);
       toast.success("L'Oracle a révélé le sens de votre rêve !");
       router.refresh();
     } catch {
@@ -57,15 +60,26 @@ export function DreamInterpretation({
     }
   };
 
+  // Get style label
+  const getStyleLabel = (styleValue: string) => {
+    const found = INTERPRETATION_STYLES.find(s => s.value === styleValue);
+    return found ? found.label : styleValue;
+  };
+
   // If we have a structured interpretation from the current session
   if (interpretation) {
     return (
       <Card className="glass-card border-gold/20">
         <CardHeader className="border-b border-mystic-700/30">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <CardTitle className="font-display text-xl text-gold flex items-center gap-2">
               <Sparkles className="w-5 h-5" />
               Révélation de l&apos;Oracle
+              {currentStyle && (
+                <span className="text-sm font-normal text-mystic-400">
+                  ({getStyleLabel(currentStyle)})
+                </span>
+              )}
             </CardTitle>
             <Button
               variant="ghost"
@@ -76,6 +90,32 @@ export function DreamInterpretation({
               <RefreshCw className="w-4 h-4 mr-1" />
               Nouvelle interprétation
             </Button>
+          </div>
+          {/* Style switcher for alternative interpretations */}
+          <div className="mt-4 pt-4 border-t border-mystic-700/30">
+            <p className="text-sm text-mystic-400 mb-3 flex items-center gap-2">
+              <Eye className="w-4 h-4" />
+              Voir cette interprétation sous un autre angle :
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {INTERPRETATION_STYLES.filter(s => s.value !== currentStyle).map((styleOption) => (
+                <Button
+                  key={styleOption.value}
+                  variant="outline"
+                  size="sm"
+                  disabled={isLoading}
+                  onClick={() => requestInterpretation(styleOption.value as "spiritual" | "psychological" | "balanced")}
+                  className="border-mystic-600/30 text-mystic-300 hover:text-gold hover:border-gold/50 bg-mystic-900/30"
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-3 h-3 mr-1" />
+                  )}
+                  {styleOption.label}
+                </Button>
+              ))}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="pt-6 space-y-6">
@@ -171,7 +211,7 @@ export function DreamInterpretation({
             <Button
               variant="ghost"
               size="sm"
-              onClick={requestInterpretation}
+              onClick={() => requestInterpretation()}
               disabled={isLoading}
               className="text-mystic-400 hover:text-mystic-300"
             >
@@ -182,6 +222,32 @@ export function DreamInterpretation({
               )}
               Réinterpréter
             </Button>
+          </div>
+          {/* Style switcher for alternative interpretations */}
+          <div className="mt-4 pt-4 border-t border-mystic-700/30">
+            <p className="text-sm text-mystic-400 mb-3 flex items-center gap-2">
+              <Eye className="w-4 h-4" />
+              Découvrir d&apos;autres perspectives :
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {INTERPRETATION_STYLES.map((styleOption) => (
+                <Button
+                  key={styleOption.value}
+                  variant="outline"
+                  size="sm"
+                  disabled={isLoading}
+                  onClick={() => requestInterpretation(styleOption.value as "spiritual" | "psychological" | "balanced")}
+                  className="border-mystic-600/30 text-mystic-300 hover:text-gold hover:border-gold/50 bg-mystic-900/30"
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-3 h-3 mr-1" />
+                  )}
+                  {styleOption.label}
+                </Button>
+              ))}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="pt-6">

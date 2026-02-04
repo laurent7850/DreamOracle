@@ -64,6 +64,33 @@ OPENROUTER_API_KEY="sk-or-..."
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/laurent7850/DreamOracle)
 
+## Déploiement Hostinger (VPS avec Docker)
+
+L'application peut être déployée sur un VPS Hostinger avec Docker Compose et Traefik.
+
+### Prérequis
+- VPS Hostinger avec Docker et Traefik configurés
+- Domaine pointant vers le VPS (enregistrement A)
+
+### Configuration
+
+1. Copier le fichier d'exemple:
+```bash
+cp .env.hostinger.example .env.hostinger
+```
+
+2. Remplir les variables dans `.env.hostinger`:
+```env
+DB_PASSWORD=your-secure-database-password
+NEXTAUTH_SECRET=your-nextauth-secret
+OPENROUTER_API_KEY=sk-or-v1-your-api-key
+```
+
+3. Déployer via l'API Hostinger ou manuellement avec `docker-compose.hostinger.yml`.
+
+### URL de production
+- https://dreamoracle.eu
+
 ## Licence
 
 MIT
