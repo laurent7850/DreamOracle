@@ -307,7 +307,7 @@ export function DreamInterpretation({
         </div>
 
         <Button
-          onClick={requestInterpretation}
+          onClick={() => requestInterpretation()}
           disabled={isLoading}
           className="w-full btn-mystic btn-gold"
         >
