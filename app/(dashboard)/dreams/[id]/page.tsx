@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DreamInterpretation } from "@/components/dream/DreamInterpretation";
+import { EditableDreamContent } from "@/components/dream/EditableDreamContent";
 import { DeleteDreamButton } from "./DeleteDreamButton";
 import { EMOTION_OPTIONS, MOOD_OPTIONS } from "@/types";
 
@@ -103,11 +104,12 @@ export default async function DreamDetailPage({
         </CardHeader>
 
         <CardContent className="pt-6 space-y-6">
-          {/* Dream Text */}
+          {/* Dream Text - Editable */}
           <div className="bg-mystic-900/30 p-6 rounded-lg border border-mystic-700/30">
-            <p className="text-lunar whitespace-pre-wrap leading-relaxed font-mystical text-lg">
-              {dream.content}
-            </p>
+            <EditableDreamContent
+              dreamId={dream.id}
+              initialContent={dream.content}
+            />
           </div>
 
           {/* Metadata Grid */}
