@@ -17,6 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { InstallButton } from "@/components/pwa/InstallButton";
 
 const navItems = [
   {
@@ -103,6 +104,13 @@ export function Sidebar() {
             );
           })}
         </nav>
+
+        {/* Install App Button */}
+        {!collapsed && (
+          <div className="px-3 py-2">
+            <InstallButton variant="sidebar" />
+          </div>
+        )}
 
         {/* Logout */}
         <div className="px-3 py-4 border-t border-mystic-700/30">
