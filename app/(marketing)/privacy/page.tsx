@@ -48,8 +48,9 @@ export default function PrivacyPage() {
           <section className="dream-card p-6">
             <h2 className="text-xl font-cinzel text-primary mb-4">Responsable du traitement</h2>
             <div className="space-y-2">
-              <p><strong>Société :</strong> Distr&apos;Action SRL</p>
-              <p><strong>Adresse :</strong> Belgique</p>
+              <p><strong>Société :</strong> Distr&apos;Action SPRL</p>
+              <p><strong>Adresse :</strong> Chaussée Brunehault 27, 7041 Givry, Belgique</p>
+              <p><strong>Numéro TVA :</strong> BE 0462.122.648</p>
               <p><strong>Email DPO :</strong> privacy@dreamoracle.eu</p>
             </div>
           </section>

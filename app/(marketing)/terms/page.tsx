@@ -53,10 +53,10 @@ export default function TermsPage() {
           <section className="dream-card p-6">
             <h2 className="text-xl font-cinzel text-primary mb-4">Article 2 - Éditeur du service</h2>
             <div className="space-y-2">
-              <p><strong>Raison sociale :</strong> Distr&apos;Action SRL</p>
-              <p><strong>Siège social :</strong> Belgique</p>
+              <p><strong>Raison sociale :</strong> Distr&apos;Action SPRL</p>
+              <p><strong>Siège social :</strong> Chaussée Brunehault 27, 7041 Givry, Belgique</p>
               <p><strong>Email :</strong> contact@dreamoracle.eu</p>
-              <p><strong>Numéro d&apos;entreprise :</strong> À compléter</p>
+              <p><strong>Numéro TVA :</strong> BE 0462.122.648</p>
             </div>
           </section>
 
