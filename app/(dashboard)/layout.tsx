@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { Header } from "@/components/layout/Header";
 import { StarField } from "@/components/shared/StarField";
+import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 
 export default async function DashboardLayout({
   children,
@@ -37,6 +38,9 @@ export default async function DashboardLayout({
 
         {/* Mobile Navigation */}
         <MobileNav />
+
+        {/* PWA Install Prompt */}
+        <InstallPrompt />
       </div>
     </AuthProvider>
   );
