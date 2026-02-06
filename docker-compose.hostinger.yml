@@ -53,6 +53,46 @@ services:
       - POSTGRES_USER=dreamoracle
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=dreamoracle
+      # PostgreSQL performance tuning (inline for Alpine)
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8 --locale=C
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=100"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "effective_cache_size=768MB"
+      - "-c"
+      - "work_mem=4MB"
+      - "-c"
+      - "maintenance_work_mem=64MB"
+      - "-c"
+      - "random_page_cost=1.1"
+      - "-c"
+      - "effective_io_concurrency=200"
+      - "-c"
+      - "checkpoint_completion_target=0.9"
+      - "-c"
+      - "wal_buffers=8MB"
+      - "-c"
+      - "max_wal_size=1GB"
+      - "-c"
+      - "min_wal_size=80MB"
+      - "-c"
+      - "log_min_duration_statement=1000"
+      - "-c"
+      - "autovacuum=on"
+      - "-c"
+      - "autovacuum_vacuum_scale_factor=0.1"
+      - "-c"
+      - "autovacuum_analyze_scale_factor=0.05"
+      - "-c"
+      - "statement_timeout=30000"
+      - "-c"
+      - "idle_in_transaction_session_timeout=60000"
+      - "-c"
+      - "timezone=Europe/Paris"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -60,6 +100,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    # Resource limits to prevent OOM
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
 
 networks:
   traefik:

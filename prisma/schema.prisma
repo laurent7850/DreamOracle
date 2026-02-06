@@ -34,12 +34,12 @@ model Dream {
   userId          String
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   title           String
-  content         String
+  content         String    @db.Text // Use TEXT type for long content
   dreamDate       DateTime  @default(now())
   emotions        String    @default("[]")
   symbols         String    @default("[]")
   lucidity        Int       @default(0) // 0-5 scale
-  interpretation  String?
+  interpretation  String?   @db.Text // Use TEXT type for long interpretations
   interpretedAt   DateTime?
   tags            String    @default("[]")
   isRecurring     Boolean   @default(false)
@@ -51,6 +51,8 @@ model Dream {
 
   @@index([userId])
   @@index([dreamDate])
+  @@index([userId, dreamDate(sort: Desc)]) // Composite index for user's dreams by date (most common query)
+  @@index([userId, createdAt(sort: Desc)]) // For listing user's recent dreams
 }
 
 model UserSettings {
@@ -63,6 +65,8 @@ model UserSettings {
   reminderTime          String? // Format: "HH:mm" (e.g., "07:00")
   reminderDays          String  @default("[1,2,3,4,5,6,0]") // JSON array of days (0=Sun, 1=Mon, etc.)
   theme                 String  @default("dark")
+
+  @@index([notificationsEnabled, reminderTime]) // For cron job querying users with notifications enabled
 }
 
 model PushSubscription {
@@ -85,16 +89,17 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -103,6 +108,9 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expires]) // For session cleanup
 }
 
 model VerificationToken {
