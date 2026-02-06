@@ -98,7 +98,7 @@ export default async function SettingsPage() {
       </Card>
 
       {/* Install App Section */}
-      <Card className="glass-card border-mystic-700/30 border-gold/20 bg-gradient-to-br from-mystic-900/80 to-gold/5">
+      <Card id="install-app" className="glass-card border-mystic-700/30 border-gold/20 bg-gradient-to-br from-mystic-900/80 to-gold/5 scroll-mt-20">
         <CardHeader className="border-b border-mystic-700/30">
           <CardTitle className="font-display text-lg text-lunar flex items-center gap-2">
             <Smartphone className="w-5 h-5 text-gold" />

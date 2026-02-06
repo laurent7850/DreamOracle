@@ -13,11 +13,11 @@ import {
   ChevronLeft,
   ChevronRight,
   HelpCircle,
+  Smartphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { InstallButton } from "@/components/pwa/InstallButton";
 
 const navItems = [
   {
@@ -105,10 +105,20 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* Install App Button */}
+        {/* Install App Link */}
         {!collapsed && (
           <div className="px-3 py-2">
-            <InstallButton variant="sidebar" />
+            <Link
+              href="/settings#install-app"
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 w-full rounded-lg",
+                "text-gold hover:bg-gold/10 transition-all",
+                "border border-gold/30 hover:border-gold/50"
+              )}
+            >
+              <Smartphone className="w-5 h-5 flex-shrink-0" />
+              <span className="text-sm">Installer l&apos;app</span>
+            </Link>
           </div>
         )}
 
