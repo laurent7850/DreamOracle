@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { Moon, PlusCircle, BookOpen, Sparkles, Calendar } from "lucide-react";
+import { Moon, PlusCircle, BookOpen, Sparkles, Calendar, BarChart3, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -143,6 +143,32 @@ export default async function DashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Analytics CTA */}
+      {dreamCount >= 3 && (
+        <Link href="/analytics">
+          <Card className="glass-card border-mystic-700/30 hover:border-mystic-600/50 transition-all cursor-pointer group">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-full bg-indigo-500/20">
+                    <BarChart3 className="w-6 h-6 text-indigo-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-display text-lg text-lunar mb-1">
+                      Découvrez vos statistiques
+                    </h3>
+                    <p className="text-mystic-400 text-sm">
+                      Analysez vos tendances oniriques, émotions récurrentes et symboles
+                    </p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-mystic-500 group-hover:text-lunar group-hover:translate-x-1 transition-all" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      )}
 
       {/* Quick Tips */}
       <Card className="glass-card border-mystic-700/30 border-gold/20">

@@ -14,6 +14,7 @@ import {
   ChevronRight,
   HelpCircle,
   Smartphone,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,11 @@ const navItems = [
     href: "/dreams/new",
     label: "Nouveau rêve",
     icon: PlusCircle,
+  },
+  {
+    href: "/analytics",
+    label: "Statistiques",
+    icon: BarChart3,
   },
   {
     href: "/settings",
