@@ -25,6 +25,7 @@ services:
       - NEXTAUTH_URL=https://dreamoracle.eu
       - AUTH_TRUST_HOST=true
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
     volumes:
       - dreamoracle_app:/app
     depends_on:
