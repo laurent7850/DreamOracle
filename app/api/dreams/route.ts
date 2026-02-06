@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { checkCredits, logUsage } from "@/lib/credits";
 
 const dreamSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
@@ -86,6 +87,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
+    // Check credits before processing
+    const creditCheck = await checkCredits(session.user.id, 'dream');
+    if (!creditCheck.allowed) {
+      return NextResponse.json({
+        error: creditCheck.message,
+        code: 'CREDITS_EXHAUSTED',
+        tier: creditCheck.tier,
+        used: creditCheck.used,
+        limit: creditCheck.limit,
+        upgradeRecommendation: creditCheck.upgradeRecommendation,
+      }, { status: 403 });
+    }
+
     const body = await request.json();
     const validation = dreamSchema.safeParse(body);
 
@@ -113,12 +127,21 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Log usage after successful creation
+    await logUsage(session.user.id, 'dream', { dreamId: dream.id });
+
     return NextResponse.json(
       {
         ...dream,
         emotions: data.emotions,
         symbols: [],
         tags: data.tags,
+        credits: {
+          used: creditCheck.used + 1,
+          limit: creditCheck.limit,
+          remaining: creditCheck.remaining - 1,
+          isUnlimited: creditCheck.isUnlimited,
+        },
       },
       { status: 201 }
     );

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { checkCredits, logUsage } from "@/lib/credits";
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
@@ -11,6 +13,25 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
+    // Check credits before processing
+    const creditCheck = await checkCredits(session.user.id, 'transcription');
+    if (!creditCheck.allowed) {
+      return NextResponse.json({
+        error: creditCheck.message,
+        code: 'CREDITS_EXHAUSTED',
+        tier: creditCheck.tier,
+        used: creditCheck.used,
+        limit: creditCheck.limit,
+        upgradeRecommendation: creditCheck.upgradeRecommendation,
+      }, { status: 403 });
+    }
+
     const formData = await request.formData();
     const audioFile = formData.get("audio") as File;
 
@@ -49,7 +70,18 @@ export async function POST(request: NextRequest) {
     // Extract the transcribed text
     const transcript = result.text || "";
 
-    return NextResponse.json({ transcript });
+    // Log usage after successful transcription
+    await logUsage(session.user.id, 'transcription');
+
+    return NextResponse.json({
+      transcript,
+      credits: {
+        used: creditCheck.used + 1,
+        limit: creditCheck.limit,
+        remaining: creditCheck.remaining - 1,
+        isUnlimited: creditCheck.isUnlimited,
+      },
+    });
   } catch (error) {
     console.error("Transcription error:", error);
     return NextResponse.json(

@@ -16,6 +16,7 @@ import {
   Smartphone,
   BarChart3,
   Calendar,
+  Crown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -117,9 +118,21 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* Install App Link */}
+        {/* Upgrade & Install App Links */}
         {!collapsed && (
-          <div className="px-3 py-2">
+          <div className="px-3 py-2 space-y-2">
+            <Link
+              href="/pricing"
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 w-full rounded-lg",
+                "bg-gradient-to-r from-indigo-600/20 to-purple-600/20",
+                "text-indigo-300 hover:text-indigo-200 transition-all",
+                "border border-indigo-500/30 hover:border-indigo-500/50"
+              )}
+            >
+              <Crown className="w-5 h-5 flex-shrink-0" />
+              <span className="text-sm">Voir les plans</span>
+            </Link>
             <Link
               href="/settings#install-app"
               className={cn(

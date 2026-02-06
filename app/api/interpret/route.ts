@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { interpretDream, formatInterpretationAsText } from "@/lib/claude";
+import { checkCredits, logUsage } from "@/lib/credits";
 
 const interpretSchema = z.object({
   dreamId: z.string(),
@@ -15,6 +16,19 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
+    // Check credits before processing
+    const creditCheck = await checkCredits(session.user.id, 'interpretation');
+    if (!creditCheck.allowed) {
+      return NextResponse.json({
+        error: creditCheck.message,
+        code: 'CREDITS_EXHAUSTED',
+        tier: creditCheck.tier,
+        used: creditCheck.used,
+        limit: creditCheck.limit,
+        upgradeRecommendation: creditCheck.upgradeRecommendation,
+      }, { status: 403 });
     }
 
     const body = await request.json();
@@ -62,9 +76,18 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Log usage after successful interpretation
+    await logUsage(session.user.id, 'interpretation', { dreamId });
+
     return NextResponse.json({
       dream: updatedDream,
       interpretation,
+      credits: {
+        used: creditCheck.used + 1,
+        limit: creditCheck.limit,
+        remaining: creditCheck.remaining - 1,
+        isUnlimited: creditCheck.isUnlimited,
+      },
     });
   } catch (error) {
     console.error("Error interpreting dream:", error);

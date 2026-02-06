@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { Moon, PlusCircle, BookOpen, Sparkles, Calendar, BarChart3, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DashboardUsage } from "@/components/subscription";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -169,6 +170,9 @@ export default async function DashboardPage() {
           </Card>
         </Link>
       )}
+
+      {/* Usage & Subscription */}
+      <DashboardUsage />
 
       {/* Quick Tips */}
       <Card className="glass-card border-mystic-700/30 border-gold/20">

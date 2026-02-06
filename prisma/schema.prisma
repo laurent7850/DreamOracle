@@ -13,6 +13,12 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum SubscriptionTier {
+  FREE
+  ESSENTIAL
+  PREMIUM
+}
+
 model User {
   id                String    @id @default(cuid())
   email             String    @unique
@@ -27,6 +33,29 @@ model User {
   accounts          Account[]
   sessions          Session[]
   pushSubscriptions PushSubscription[]
+
+  // Subscription & Billing
+  subscriptionTier      SubscriptionTier @default(FREE)
+  subscriptionStatus    String           @default("active") // active, canceled, past_due
+  subscriptionEnds      DateTime?
+  stripeCustomerId      String?          @unique
+  stripeSubscriptionId  String?          @unique
+
+  // Usage tracking
+  usageLogs             UsageLog[]
+  creditsResetAt        DateTime         @default(now())
+}
+
+model UsageLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String   // "interpretation", "transcription", "export", "dream"
+  metadata  String?  // JSON for additional data
+  createdAt DateTime @default(now())
+
+  @@index([userId, action, createdAt])
+  @@index([userId, createdAt])
 }
 
 model Dream {
