@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { Settings, User, Bell, Palette, Shield } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SettingsForm } from "./SettingsForm";
+import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 
 export const metadata = {
   title: "Paramètres",
@@ -71,6 +72,25 @@ export default async function SettingsPage() {
               language: settings?.language || "fr",
               notificationsEnabled: settings?.notificationsEnabled ?? true,
               theme: settings?.theme || "dark",
+            }}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Notifications Section */}
+      <Card className="glass-card border-mystic-700/30">
+        <CardHeader className="border-b border-mystic-700/30">
+          <CardTitle className="font-display text-lg text-lunar flex items-center gap-2">
+            <Bell className="w-5 h-5 text-mystic-400" />
+            Rappels Matinaux
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <NotificationSettings
+            initialSettings={{
+              notificationsEnabled: settings?.notificationsEnabled ?? true,
+              reminderTime: settings?.reminderTime || null,
+              reminderDays: settings?.reminderDays || "[0,1,2,3,4,5,6]",
             }}
           />
         </CardContent>

@@ -14,18 +14,19 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  password      String?
-  image         String?
-  emailVerified DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  dreams        Dream[]
-  settings      UserSettings?
-  accounts      Account[]
-  sessions      Session[]
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String?
+  password          String?
+  image             String?
+  emailVerified     DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  dreams            Dream[]
+  settings          UserSettings?
+  accounts          Account[]
+  sessions          Session[]
+  pushSubscriptions PushSubscription[]
 }
 
 model Dream {
@@ -59,8 +60,22 @@ model UserSettings {
   interpretationStyle   String  @default("balanced") // "spiritual", "psychological", "balanced"
   language              String  @default("fr")
   notificationsEnabled  Boolean @default(true)
-  reminderTime          String?
+  reminderTime          String? // Format: "HH:mm" (e.g., "07:00")
+  reminderDays          String  @default("[1,2,3,4,5,6,0]") // JSON array of days (0=Sun, 1=Mon, etc.)
   theme                 String  @default("dark")
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String   // Public key
+  auth      String   // Auth secret
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 // NextAuth.js Models

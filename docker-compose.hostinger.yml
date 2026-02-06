@@ -26,6 +26,10 @@ services:
       - AUTH_TRUST_HOST=true
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - NEXT_PUBLIC_VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}
+      - VAPID_SUBJECT=mailto:contact@dreamoracle.eu
+      - CRON_SECRET=${CRON_SECRET}
     volumes:
       - dreamoracle_app:/app
     depends_on:
