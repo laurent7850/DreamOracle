@@ -15,6 +15,7 @@ import {
   HelpCircle,
   Smartphone,
   BarChart3,
+  Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,11 @@ const navItems = [
     href: "/dreams/new",
     label: "Nouveau rêve",
     icon: PlusCircle,
+  },
+  {
+    href: "/calendar",
+    label: "Calendrier",
+    icon: Calendar,
   },
   {
     href: "/analytics",
