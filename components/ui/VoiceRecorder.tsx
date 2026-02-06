@@ -74,10 +74,12 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
   const [isSupported, setIsSupported] = useState(true);
   const [interimTranscript, setInterimTranscript] = useState("");
   const [isMobile, setIsMobile] = useState(false);
+  const [hasPermission, setHasPermission] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const shouldRestartRef = useRef(false);
   const restartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastResultTimeRef = useRef<number>(0);
+  const accumulatedTranscriptRef = useRef<string>("");
 
   // Check browser support and mobile
   useEffect(() => {
@@ -91,14 +93,15 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
   }, []);
 
   // Initialize speech recognition
-  const initRecognition = useCallback(() => {
+  const initRecognition = useCallback((forMobileHold: boolean = false) => {
     if (typeof window === "undefined") return null;
 
     const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) return null;
 
     const recognition = new SpeechRecognitionAPI();
-    recognition.continuous = true;
+    // On mobile with hold mode, don't use continuous to avoid auto-stop issues
+    recognition.continuous = !forMobileHold;
     recognition.interimResults = true;
     recognition.lang = "fr-FR";
 
@@ -119,7 +122,12 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
       lastResultTimeRef.current = Date.now();
 
       if (finalTranscript) {
-        onTranscript(finalTranscript.trim());
+        // On mobile hold mode, accumulate transcript
+        if (forMobileHold) {
+          accumulatedTranscriptRef.current += finalTranscript;
+        } else {
+          onTranscript(finalTranscript.trim());
+        }
         setInterimTranscript("");
       } else {
         setInterimTranscript(interim);
@@ -129,10 +137,16 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error("Speech recognition error:", event.error);
 
-      // On mobile, some errors are expected and we should try to restart
-      if (shouldRestartRef.current) {
+      // On mobile hold mode, some errors are expected
+      if (forMobileHold) {
         if (event.error === "no-speech" || event.error === "aborted") {
-          // Will try to restart in onend
+          return;
+        }
+      }
+
+      // On desktop, some errors are expected and we should try to restart
+      if (shouldRestartRef.current && !forMobileHold) {
+        if (event.error === "no-speech" || event.error === "aborted") {
           return;
         }
       }
@@ -142,6 +156,7 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
         shouldRestartRef.current = false;
         setIsListening(false);
         setInterimTranscript("");
+        setHasPermission(false);
         toast.error("Accès au microphone refusé. Veuillez autoriser l'accès dans les paramètres.");
         return;
       }
@@ -154,8 +169,8 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
         return;
       }
 
-      // For other errors on mobile, don't show toast but allow restart
-      if (!isMobileDevice()) {
+      // For other errors on mobile hold mode, don't show toast
+      if (!forMobileHold && !isMobileDevice()) {
         if (event.error !== "no-speech" && event.error !== "aborted") {
           toast.error("Erreur de reconnaissance vocale.");
         }
@@ -163,44 +178,45 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
     };
 
     recognition.onend = () => {
+      // On mobile hold mode, send accumulated transcript when recognition ends
+      if (forMobileHold) {
+        const accumulated = accumulatedTranscriptRef.current.trim();
+        const interim = interimTranscript.trim();
+        const finalText = accumulated || interim;
+
+        if (finalText) {
+          onTranscript(finalText);
+        }
+
+        accumulatedTranscriptRef.current = "";
+        setInterimTranscript("");
+        setIsListening(false);
+        return;
+      }
+
       setInterimTranscript("");
 
-      // Auto-restart logic
+      // Auto-restart logic (desktop only)
       if (shouldRestartRef.current) {
-        // Clear any existing restart timeout
         if (restartTimeoutRef.current) {
           clearTimeout(restartTimeoutRef.current);
         }
 
-        // On mobile, use a longer delay and create a new instance
-        const delay = isMobileDevice() ? 300 : 100;
+        const delay = 100;
 
         restartTimeoutRef.current = setTimeout(() => {
           if (shouldRestartRef.current) {
             try {
-              // On mobile, create a fresh instance each time
-              if (isMobileDevice()) {
-                recognitionRef.current = initRecognition();
-              }
-
               if (recognitionRef.current) {
                 recognitionRef.current.start();
               } else {
-                // If we can't restart, stop gracefully
                 shouldRestartRef.current = false;
                 setIsListening(false);
               }
             } catch (e) {
               console.error("Error restarting recognition:", e);
-              // On mobile, if restart fails, show a helpful message
-              if (isMobileDevice()) {
-                shouldRestartRef.current = false;
-                setIsListening(false);
-                toast.info("Appuyez à nouveau sur le micro pour continuer.");
-              } else {
-                shouldRestartRef.current = false;
-                setIsListening(false);
-              }
+              shouldRestartRef.current = false;
+              setIsListening(false);
             }
           }
         }, delay);
@@ -215,9 +231,62 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
     };
 
     return recognition;
-  }, [onTranscript]);
+  }, [onTranscript, interimTranscript]);
 
-  // Toggle listening
+  // Request microphone permission (for mobile, called once on first tap)
+  const requestPermission = useCallback(async () => {
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      setHasPermission(true);
+      return true;
+    } catch (err) {
+      console.error("Microphone permission error:", err);
+      toast.error("Impossible d'accéder au microphone. Vérifiez vos permissions.");
+      return false;
+    }
+  }, []);
+
+  // Start recording (for mobile hold mode)
+  const startRecording = useCallback(async () => {
+    if (!isSupported) {
+      toast.error("La reconnaissance vocale n'est pas supportée par votre navigateur.");
+      return;
+    }
+
+    if (isListening) return;
+
+    // Request permission if not already granted
+    if (!hasPermission) {
+      const granted = await requestPermission();
+      if (!granted) return;
+    }
+
+    // Create new recognition instance for mobile hold mode
+    accumulatedTranscriptRef.current = "";
+    recognitionRef.current = initRecognition(true);
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.start();
+      } catch (e) {
+        console.error("Error starting recognition:", e);
+        toast.error("Erreur lors du démarrage de l'enregistrement.");
+      }
+    }
+  }, [isSupported, isListening, hasPermission, requestPermission, initRecognition]);
+
+  // Stop recording (for mobile hold mode)
+  const stopRecording = useCallback(() => {
+    if (!isListening) return;
+
+    try {
+      recognitionRef.current?.stop();
+    } catch (e) {
+      // Ignore stop errors
+    }
+  }, [isListening]);
+
+  // Toggle listening (desktop mode)
   const toggleListening = useCallback(async () => {
     if (!isSupported) {
       toast.error("La reconnaissance vocale n'est pas supportée par votre navigateur.");
@@ -241,28 +310,19 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
       toast.info("Enregistrement arrêté.");
     } else {
       // Request microphone permission
-      try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
+      const granted = await requestPermission();
+      if (!granted) return;
 
-        // Create new recognition instance
-        recognitionRef.current = initRecognition();
+      // Create new recognition instance
+      recognitionRef.current = initRecognition(false);
 
-        if (recognitionRef.current) {
-          shouldRestartRef.current = true;
-          recognitionRef.current.start();
-
-          if (isMobile) {
-            toast.info("🎤 Parlez... Appuyez sur ⏹ pour arrêter.", { duration: 3000 });
-          } else {
-            toast.info("🎤 Parlez maintenant... Cliquez pour arrêter.", { duration: 3000 });
-          }
-        }
-      } catch (err) {
-        console.error("Microphone permission error:", err);
-        toast.error("Impossible d'accéder au microphone. Vérifiez vos permissions.");
+      if (recognitionRef.current) {
+        shouldRestartRef.current = true;
+        recognitionRef.current.start();
+        toast.info("🎤 Parlez maintenant... Cliquez pour arrêter.", { duration: 3000 });
       }
     }
-  }, [isListening, isSupported, initRecognition, isMobile]);
+  }, [isListening, isSupported, initRecognition, requestPermission]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -299,6 +359,74 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
     );
   }
 
+  // Mobile: Press and hold mode
+  if (isMobile) {
+    return (
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          disabled={disabled}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            startRecording();
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            stopRecording();
+          }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            startRecording();
+          }}
+          onMouseUp={(e) => {
+            e.preventDefault();
+            stopRecording();
+          }}
+          onMouseLeave={() => {
+            if (isListening) stopRecording();
+          }}
+          onContextMenu={(e) => e.preventDefault()}
+          className={cn(
+            "transition-all select-none touch-none",
+            isListening
+              ? "bg-red-500/20 border-red-500 text-red-400 scale-110 shadow-lg shadow-red-500/20"
+              : "border-mystic-600/30 text-mystic-400 hover:border-mystic-500 hover:text-mystic-300",
+            className
+          )}
+          title="Maintenez appuyé pour dicter"
+        >
+          {isListening ? (
+            <Mic className="w-5 h-5 animate-pulse" />
+          ) : (
+            <Mic className="w-5 h-5" />
+          )}
+        </Button>
+
+        {interimTranscript && (
+          <span className="text-sm text-mystic-400 italic animate-pulse max-w-[120px] truncate">
+            {interimTranscript}
+          </span>
+        )}
+
+        {isListening && !interimTranscript && (
+          <span className="text-xs text-red-400 animate-pulse flex items-center gap-1">
+            <span className="inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            Parlez...
+          </span>
+        )}
+
+        {!isListening && !interimTranscript && (
+          <span className="text-xs text-mystic-500">
+            Maintenez
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  // Desktop: Click to toggle mode
   return (
     <div className="flex items-center gap-2">
       <Button

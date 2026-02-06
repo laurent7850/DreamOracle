@@ -140,15 +140,31 @@ export default function HelpPage() {
             Idéal pour capturer rapidement vos rêves dès le réveil.
           </p>
 
-          <div className="space-y-3">
-            <h4 className="text-lunar font-medium">Comment utiliser le micro :</h4>
-            <ol className="space-y-2 text-mystic-300 list-decimal list-inside">
-              <li>Repérez le bouton <Badge variant="outline" className="border-mystic-600 text-mystic-300"><Mic className="w-3 h-3 inline" /></Badge> à côté du champ de description</li>
-              <li>Cliquez dessus pour <strong className="text-lunar">commencer l&apos;enregistrement</strong></li>
-              <li>Parlez clairement en français</li>
-              <li>Le texte s&apos;ajoute automatiquement à votre description</li>
-              <li>Cliquez à nouveau pour <strong className="text-lunar">arrêter</strong></li>
-            </ol>
+          <div className="space-y-4">
+            <div className="bg-mystic-900/30 p-4 rounded-lg border border-mystic-700/30">
+              <h4 className="text-lunar font-medium mb-3">💻 Sur ordinateur :</h4>
+              <ol className="space-y-2 text-mystic-300 list-decimal list-inside">
+                <li>Repérez le bouton <Badge variant="outline" className="border-mystic-600 text-mystic-300"><Mic className="w-3 h-3 inline" /></Badge> à côté du champ de description</li>
+                <li>Cliquez dessus pour <strong className="text-lunar">commencer l&apos;enregistrement</strong></li>
+                <li>Parlez clairement en français</li>
+                <li>Le texte s&apos;ajoute automatiquement à votre description</li>
+                <li>Cliquez sur ⏹ pour <strong className="text-lunar">arrêter</strong></li>
+              </ol>
+            </div>
+
+            <div className="bg-gold/10 p-4 rounded-lg border border-gold/20">
+              <h4 className="text-gold font-medium mb-3">📱 Sur téléphone :</h4>
+              <ol className="space-y-2 text-mystic-300 list-decimal list-inside">
+                <li>Repérez le bouton <Badge variant="outline" className="border-mystic-600 text-mystic-300"><Mic className="w-3 h-3 inline" /></Badge> à côté du champ de description</li>
+                <li><strong className="text-gold">Maintenez le bouton appuyé</strong> pendant que vous parlez</li>
+                <li>Parlez clairement en français</li>
+                <li><strong className="text-gold">Relâchez le bouton</strong> quand vous avez terminé</li>
+                <li>Le texte s&apos;ajoute automatiquement à votre description</li>
+              </ol>
+              <p className="text-mystic-400 text-sm mt-3 italic">
+                Le mode &quot;maintenir appuyé&quot; offre une meilleure fiabilité sur les appareils mobiles.
+              </p>
+            </div>
           </div>
 
           <div className="bg-mystic-900/30 p-4 rounded-lg border border-mystic-700/30">
