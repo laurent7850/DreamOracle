@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Mic, MicOff, Loader2 } from "lucide-react";
+import { Mic, MicOff, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -61,20 +61,32 @@ declare global {
   }
 }
 
+// Detect if we're on a mobile device
+function isMobileDevice(): boolean {
+  if (typeof window === "undefined") return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+}
+
 export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecorderProps) {
   const [isListening, setIsListening] = useState(false);
   const [isSupported, setIsSupported] = useState(true);
   const [interimTranscript, setInterimTranscript] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const shouldRestartRef = useRef(false); // Track if we should auto-restart
+  const shouldRestartRef = useRef(false);
+  const restartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastResultTimeRef = useRef<number>(0);
 
-  // Check browser support
+  // Check browser support and mobile
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognitionAPI) {
         setIsSupported(false);
       }
+      setIsMobile(isMobileDevice());
     }
   }, []);
 
@@ -88,7 +100,7 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
     const recognition = new SpeechRecognitionAPI();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = "fr-FR"; // French language
+    recognition.lang = "fr-FR";
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let finalTranscript = "";
@@ -103,6 +115,9 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
         }
       }
 
+      // Track last result time for mobile restart logic
+      lastResultTimeRef.current = Date.now();
+
       if (finalTranscript) {
         onTranscript(finalTranscript.trim());
         setInterimTranscript("");
@@ -114,52 +129,81 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error("Speech recognition error:", event.error);
 
-      // Don't show error for no-speech if we're in continuous mode - just restart
-      if (event.error === "no-speech" && shouldRestartRef.current) {
-        // Will auto-restart in onend
+      // On mobile, some errors are expected and we should try to restart
+      if (shouldRestartRef.current) {
+        if (event.error === "no-speech" || event.error === "aborted") {
+          // Will try to restart in onend
+          return;
+        }
+      }
+
+      // For critical errors, stop completely
+      if (event.error === "not-allowed") {
+        shouldRestartRef.current = false;
+        setIsListening(false);
+        setInterimTranscript("");
+        toast.error("Accès au microphone refusé. Veuillez autoriser l'accès dans les paramètres.");
         return;
       }
 
-      // For other errors, stop completely
-      shouldRestartRef.current = false;
-      setIsListening(false);
-      setInterimTranscript("");
+      if (event.error === "network") {
+        shouldRestartRef.current = false;
+        setIsListening(false);
+        setInterimTranscript("");
+        toast.error("Erreur réseau. Vérifiez votre connexion internet.");
+        return;
+      }
 
-      switch (event.error) {
-        case "not-allowed":
-          toast.error("Accès au microphone refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.");
-          break;
-        case "no-speech":
-          // Only show if user manually stopped
-          break;
-        case "network":
-          toast.error("Erreur réseau. Vérifiez votre connexion internet.");
-          break;
-        case "aborted":
-          // User aborted, don't show error
-          break;
-        default:
-          toast.error("Erreur de reconnaissance vocale. Réessayez.");
+      // For other errors on mobile, don't show toast but allow restart
+      if (!isMobileDevice()) {
+        if (event.error !== "no-speech" && event.error !== "aborted") {
+          toast.error("Erreur de reconnaissance vocale.");
+        }
       }
     };
 
     recognition.onend = () => {
       setInterimTranscript("");
 
-      // Auto-restart if user hasn't clicked to stop
+      // Auto-restart logic
       if (shouldRestartRef.current) {
-        try {
-          // Small delay before restarting to avoid rapid restarts
-          setTimeout(() => {
-            if (shouldRestartRef.current && recognitionRef.current) {
-              recognitionRef.current.start();
-            }
-          }, 100);
-        } catch (e) {
-          console.error("Error restarting recognition:", e);
-          shouldRestartRef.current = false;
-          setIsListening(false);
+        // Clear any existing restart timeout
+        if (restartTimeoutRef.current) {
+          clearTimeout(restartTimeoutRef.current);
         }
+
+        // On mobile, use a longer delay and create a new instance
+        const delay = isMobileDevice() ? 300 : 100;
+
+        restartTimeoutRef.current = setTimeout(() => {
+          if (shouldRestartRef.current) {
+            try {
+              // On mobile, create a fresh instance each time
+              if (isMobileDevice()) {
+                recognitionRef.current = initRecognition();
+              }
+
+              if (recognitionRef.current) {
+                recognitionRef.current.start();
+              } else {
+                // If we can't restart, stop gracefully
+                shouldRestartRef.current = false;
+                setIsListening(false);
+              }
+            } catch (e) {
+              console.error("Error restarting recognition:", e);
+              // On mobile, if restart fails, show a helpful message
+              if (isMobileDevice()) {
+                shouldRestartRef.current = false;
+                setIsListening(false);
+                toast.info("Appuyez à nouveau sur le micro pour continuer.");
+              } else {
+                shouldRestartRef.current = false;
+                setIsListening(false);
+              }
+            }
+          }
+        }, delay);
       } else {
         setIsListening(false);
       }
@@ -167,6 +211,7 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
 
     recognition.onstart = () => {
       setIsListening(true);
+      lastResultTimeRef.current = Date.now();
     };
 
     return recognition;
@@ -180,38 +225,58 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
     }
 
     if (isListening) {
-      // User wants to stop - disable auto-restart
+      // User wants to stop
       shouldRestartRef.current = false;
-      recognitionRef.current?.stop();
+      if (restartTimeoutRef.current) {
+        clearTimeout(restartTimeoutRef.current);
+        restartTimeoutRef.current = null;
+      }
+      try {
+        recognitionRef.current?.stop();
+      } catch (e) {
+        // Ignore stop errors
+      }
       setIsListening(false);
+      setInterimTranscript("");
       toast.info("Enregistrement arrêté.");
     } else {
       // Request microphone permission
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true });
 
-        // Create new recognition instance each time for cleaner state
+        // Create new recognition instance
         recognitionRef.current = initRecognition();
 
         if (recognitionRef.current) {
-          // Enable auto-restart
           shouldRestartRef.current = true;
           recognitionRef.current.start();
-          toast.info("🎤 Parlez maintenant... L'enregistrement continue jusqu'à ce que vous cliquiez pour arrêter.");
+
+          if (isMobile) {
+            toast.info("🎤 Parlez... Appuyez sur ⏹ pour arrêter.", { duration: 3000 });
+          } else {
+            toast.info("🎤 Parlez maintenant... Cliquez pour arrêter.", { duration: 3000 });
+          }
         }
       } catch (err) {
         console.error("Microphone permission error:", err);
         toast.error("Impossible d'accéder au microphone. Vérifiez vos permissions.");
       }
     }
-  }, [isListening, isSupported, initRecognition]);
+  }, [isListening, isSupported, initRecognition, isMobile]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       shouldRestartRef.current = false;
+      if (restartTimeoutRef.current) {
+        clearTimeout(restartTimeoutRef.current);
+      }
       if (recognitionRef.current) {
-        recognitionRef.current.abort();
+        try {
+          recognitionRef.current.abort();
+        } catch (e) {
+          // Ignore abort errors
+        }
       }
     };
   }, []);
@@ -252,15 +317,21 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
         title={isListening ? "Arrêter l'enregistrement" : "Dicter votre rêve"}
       >
         {isListening ? (
-          <Loader2 className="w-5 h-5 animate-spin" />
+          <Square className="w-4 h-4 fill-current" />
         ) : (
           <Mic className="w-5 h-5" />
         )}
       </Button>
 
       {interimTranscript && (
-        <span className="text-sm text-mystic-400 italic animate-pulse">
-          {interimTranscript.substring(0, 50)}...
+        <span className="text-sm text-mystic-400 italic animate-pulse max-w-[150px] truncate">
+          {interimTranscript}
+        </span>
+      )}
+
+      {isListening && !interimTranscript && (
+        <span className="text-xs text-red-400 animate-pulse">
+          ● REC
         </span>
       )}
     </div>
