@@ -22,7 +22,7 @@ services:
       - DATABASE_URL=postgresql://dreamoracle:${DB_PASSWORD}@postgres:5432/dreamoracle
       - DIRECT_URL=postgresql://dreamoracle:${DB_PASSWORD}@postgres:5432/dreamoracle
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-      - NEXTAUTH_URL=https://dreams.srv767464.hstgr.cloud
+      - NEXTAUTH_URL=https://dreamoracle.eu
       - AUTH_TRUST_HOST=true
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
     volumes:
@@ -35,7 +35,7 @@ services:
       - traefik
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dreamoracle.rule=Host(`dreams.srv767464.hstgr.cloud`)"
+      - "traefik.http.routers.dreamoracle.rule=Host(`dreamoracle.eu`) || Host(`www.dreamoracle.eu`) || Host(`dreams.srv767464.hstgr.cloud`)"
       - "traefik.http.routers.dreamoracle.entrypoints=websecure"
       - "traefik.http.routers.dreamoracle.tls.certresolver=letsencrypt"
       - "traefik.http.services.dreamoracle.loadbalancer.server.port=3000"
