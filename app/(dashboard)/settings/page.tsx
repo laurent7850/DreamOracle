@@ -4,7 +4,7 @@ import { Settings, User, Bell, Palette, Shield, Smartphone } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SettingsForm } from "./SettingsForm";
 import { NotificationSettings } from "@/components/notifications/NotificationSettings";
-import { InstallButton } from "@/components/pwa/InstallButton";
+import { InstallSection } from "@/components/pwa/InstallSection";
 
 export const metadata = {
   title: "Paramètres",
@@ -106,13 +106,7 @@ export default async function SettingsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="space-y-4">
-            <p className="text-mystic-300">
-              Installez DreamOracle sur votre téléphone pour noter vos rêves
-              dès le réveil et recevoir des rappels.
-            </p>
-            <InstallButton />
-          </div>
+          <InstallSection />
         </CardContent>
       </Card>
 
