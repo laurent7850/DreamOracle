@@ -126,7 +126,19 @@ export function NotificationSettings({
       }
 
       setIsSubscribed(true);
-      toast.success("Notifications activées !");
+
+      // Also save the reminder settings automatically
+      await fetch("/api/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          notificationsEnabled: true,
+          reminderTime: settings.reminderTime,
+          reminderDays: JSON.stringify(settings.reminderDays),
+        }),
+      });
+
+      toast.success("Notifications activées ! Configurez l'heure ci-dessous.");
     } catch (error) {
       console.error("Error subscribing to push:", error);
       toast.error("Erreur lors de l'activation des notifications");
@@ -264,63 +276,61 @@ export function NotificationSettings({
         )}
       </div>
 
-      {/* Reminder Time Settings */}
+      {/* Reminder Time Settings - Always show when subscribed */}
       {isSubscribed && (
-        <>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-lunar flex items-center gap-2">
-                <Clock className="w-4 h-4 text-mystic-400" />
-                Heure du rappel
-              </Label>
-              <Select
-                value={settings.reminderTime}
-                onValueChange={(value) =>
-                  setSettings({ ...settings, reminderTime: value })
-                }
-              >
-                <SelectTrigger className="bg-mystic-900/30 border-mystic-600/30 text-lunar">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-night-light border-mystic-700">
-                  {HOURS.map((hour) => (
-                    <SelectItem
-                      key={hour.value}
-                      value={hour.value}
-                      className="text-lunar hover:bg-mystic-800"
-                    >
-                      {hour.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-mystic-500">
-                Choisissez l&apos;heure à laquelle vous souhaitez être rappelé(e)
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-lunar">Jours de rappel</Label>
-              <div className="flex gap-2 flex-wrap">
-                {DAYS.map((day) => (
-                  <button
-                    key={day.value}
-                    type="button"
-                    onClick={() => toggleDay(day.value)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      settings.reminderDays.includes(day.value)
-                        ? "bg-mystic-500 text-white"
-                        : "bg-mystic-900/30 text-mystic-400 hover:bg-mystic-800/50"
-                    }`}
+        <div className="space-y-4 pt-2">
+          <div className="space-y-2">
+            <Label className="text-lunar flex items-center gap-2">
+              <Clock className="w-4 h-4 text-mystic-400" />
+              Heure du rappel
+            </Label>
+            <Select
+              value={settings.reminderTime}
+              onValueChange={(value) =>
+                setSettings({ ...settings, reminderTime: value })
+              }
+            >
+              <SelectTrigger className="bg-mystic-900/30 border-mystic-600/30 text-lunar">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-night-light border-mystic-700 max-h-60">
+                {HOURS.map((hour) => (
+                  <SelectItem
+                    key={hour.value}
+                    value={hour.value}
+                    className="text-lunar hover:bg-mystic-800"
                   >
-                    {day.label}
-                  </button>
+                    {hour.label}
+                  </SelectItem>
                 ))}
-              </div>
-              <p className="text-xs text-mystic-500">
-                Sélectionnez les jours où vous souhaitez recevoir un rappel
-              </p>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-mystic-500">
+              Choisissez l&apos;heure à laquelle vous souhaitez être rappelé(e)
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-lunar">Jours de rappel</Label>
+            <div className="flex gap-2 flex-wrap">
+              {DAYS.map((day) => (
+                <button
+                  key={day.value}
+                  type="button"
+                  onClick={() => toggleDay(day.value)}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    settings.reminderDays.includes(day.value)
+                      ? "bg-mystic-500 text-white"
+                      : "bg-mystic-900/30 text-mystic-400 hover:bg-mystic-800/50"
+                  }`}
+                >
+                  {day.label}
+                </button>
+              ))}
             </div>
+            <p className="text-xs text-mystic-500">
+              Sélectionnez les jours où vous souhaitez recevoir un rappel
+            </p>
           </div>
 
           <div className="flex gap-3">
@@ -335,7 +345,7 @@ export function NotificationSettings({
                   Sauvegarde...
                 </>
               ) : (
-                "Sauvegarder"
+                "Sauvegarder les rappels"
               )}
             </Button>
             <Button
@@ -360,7 +370,7 @@ export function NotificationSettings({
               Tester
             </Button>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

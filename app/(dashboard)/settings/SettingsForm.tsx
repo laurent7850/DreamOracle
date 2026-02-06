@@ -129,34 +129,6 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
         </Select>
       </div>
 
-      {/* Notifications */}
-      <div className="flex items-center justify-between">
-        <div>
-          <Label className="text-lunar">Rappels quotidiens</Label>
-          <p className="text-sm text-mystic-500">
-            Recevoir un rappel pour noter vos rêves
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() =>
-            setSettings({
-              ...settings,
-              notificationsEnabled: !settings.notificationsEnabled,
-            })
-          }
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            settings.notificationsEnabled ? "bg-mystic-500" : "bg-mystic-800"
-          }`}
-        >
-          <span
-            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-              settings.notificationsEnabled ? "translate-x-6" : "translate-x-1"
-            }`}
-          />
-        </button>
-      </div>
-
       {/* Save Button */}
       <Button
         onClick={handleSave}
