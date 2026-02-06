@@ -66,6 +66,7 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
   const [isSupported, setIsSupported] = useState(true);
   const [interimTranscript, setInterimTranscript] = useState("");
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const shouldRestartRef = useRef(false); // Track if we should auto-restart
 
   // Check browser support
   useEffect(() => {
@@ -112,6 +113,15 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error("Speech recognition error:", event.error);
+
+      // Don't show error for no-speech if we're in continuous mode - just restart
+      if (event.error === "no-speech" && shouldRestartRef.current) {
+        // Will auto-restart in onend
+        return;
+      }
+
+      // For other errors, stop completely
+      shouldRestartRef.current = false;
       setIsListening(false);
       setInterimTranscript("");
 
@@ -120,10 +130,13 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
           toast.error("Accès au microphone refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.");
           break;
         case "no-speech":
-          toast.info("Aucune parole détectée. Réessayez.");
+          // Only show if user manually stopped
           break;
         case "network":
           toast.error("Erreur réseau. Vérifiez votre connexion internet.");
+          break;
+        case "aborted":
+          // User aborted, don't show error
           break;
         default:
           toast.error("Erreur de reconnaissance vocale. Réessayez.");
@@ -131,8 +144,25 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
     };
 
     recognition.onend = () => {
-      setIsListening(false);
       setInterimTranscript("");
+
+      // Auto-restart if user hasn't clicked to stop
+      if (shouldRestartRef.current) {
+        try {
+          // Small delay before restarting to avoid rapid restarts
+          setTimeout(() => {
+            if (shouldRestartRef.current && recognitionRef.current) {
+              recognitionRef.current.start();
+            }
+          }, 100);
+        } catch (e) {
+          console.error("Error restarting recognition:", e);
+          shouldRestartRef.current = false;
+          setIsListening(false);
+        }
+      } else {
+        setIsListening(false);
+      }
     };
 
     recognition.onstart = () => {
@@ -150,20 +180,24 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
     }
 
     if (isListening) {
+      // User wants to stop - disable auto-restart
+      shouldRestartRef.current = false;
       recognitionRef.current?.stop();
       setIsListening(false);
+      toast.info("Enregistrement arrêté.");
     } else {
       // Request microphone permission
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true });
 
-        if (!recognitionRef.current) {
-          recognitionRef.current = initRecognition();
-        }
+        // Create new recognition instance each time for cleaner state
+        recognitionRef.current = initRecognition();
 
         if (recognitionRef.current) {
+          // Enable auto-restart
+          shouldRestartRef.current = true;
           recognitionRef.current.start();
-          toast.info("Parlez maintenant... Cliquez à nouveau pour arrêter.");
+          toast.info("🎤 Parlez maintenant... L'enregistrement continue jusqu'à ce que vous cliquiez pour arrêter.");
         }
       } catch (err) {
         console.error("Microphone permission error:", err);
@@ -175,6 +209,7 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      shouldRestartRef.current = false;
       if (recognitionRef.current) {
         recognitionRef.current.abort();
       }
