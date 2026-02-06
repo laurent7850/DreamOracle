@@ -8,6 +8,7 @@ import {
   Lightbulb,
   HelpCircle,
   ChevronRight,
+  Mic,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -121,6 +122,50 @@ export default function HelpPage() {
                 </span>
               </li>
             </ul>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Voice Recording */}
+      <Card className="glass-card border-gold/20">
+        <CardHeader>
+          <CardTitle className="font-display text-xl text-gold flex items-center gap-2">
+            <Mic className="w-5 h-5" />
+            Dictée vocale
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-mystic-300">
+            Vous pouvez <strong className="text-lunar">dicter votre rêve</strong> au lieu de le taper !
+            Idéal pour capturer rapidement vos rêves dès le réveil.
+          </p>
+
+          <div className="space-y-3">
+            <h4 className="text-lunar font-medium">Comment utiliser le micro :</h4>
+            <ol className="space-y-2 text-mystic-300 list-decimal list-inside">
+              <li>Repérez le bouton <Badge variant="outline" className="border-mystic-600 text-mystic-300"><Mic className="w-3 h-3 inline" /></Badge> à côté du champ de description</li>
+              <li>Cliquez dessus pour <strong className="text-lunar">commencer l&apos;enregistrement</strong></li>
+              <li>Parlez clairement en français</li>
+              <li>Le texte s&apos;ajoute automatiquement à votre description</li>
+              <li>Cliquez à nouveau pour <strong className="text-lunar">arrêter</strong></li>
+            </ol>
+          </div>
+
+          <div className="bg-mystic-900/30 p-4 rounded-lg border border-mystic-700/30">
+            <h4 className="text-lunar font-medium mb-2">Compatibilité</h4>
+            <p className="text-mystic-400 text-sm">
+              La dictée vocale fonctionne sur la plupart des navigateurs modernes
+              (Chrome, Edge, Safari). Vous devrez autoriser l&apos;accès au microphone
+              lors de la première utilisation.
+            </p>
+          </div>
+
+          <div className="bg-gold/10 p-4 rounded-lg border border-gold/20">
+            <p className="text-mystic-200 text-sm">
+              <strong className="text-gold">💡 Astuce :</strong> La dictée vocale est
+              aussi disponible lors de la <strong>modification</strong> d&apos;un rêve existant.
+              Pratique pour ajouter des détails que vous auriez oubliés !
+            </p>
           </div>
         </CardContent>
       </Card>

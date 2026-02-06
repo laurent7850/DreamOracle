@@ -58,6 +58,16 @@ C'est le champ le plus important. Décrivez votre rêve avec le plus de détails
 
 > **Conseil** : Notez votre rêve dès le réveil, avant que les détails ne s'effacent !
 
+#### 🎤 Dictée vocale
+Vous pouvez **dicter votre rêve** au lieu de le taper ! Cliquez sur le bouton micro 🎤 à côté du champ de description :
+1. Cliquez sur le bouton micro
+2. Autorisez l'accès au microphone (première fois uniquement)
+3. Parlez clairement en français
+4. Le texte s'ajoute automatiquement
+5. Cliquez à nouveau pour arrêter
+
+> **Note** : Fonctionne sur Chrome, Edge et Safari. Idéal pour capturer vos rêves au réveil sans effort !
+
 #### Date du rêve
 Sélectionnez la date à laquelle vous avez fait ce rêve.
 

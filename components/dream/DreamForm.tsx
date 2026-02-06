@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Calendar, Moon, Sparkles, Loader2, Tag, X } from "lucide-react";
+import { Calendar, Moon, Sparkles, Loader2, Tag, X, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { VoiceRecorder } from "@/components/ui/VoiceRecorder";
 import { EMOTION_OPTIONS, MOOD_OPTIONS } from "@/types";
 
 const dreamFormSchema = z.object({
@@ -57,6 +58,13 @@ export function DreamForm() {
 
   const lucidity = watch("lucidity");
   const sleepQuality = watch("sleepQuality");
+  const currentContent = watch("content");
+
+  // Handle voice transcript - append to existing content
+  const handleVoiceTranscript = (text: string) => {
+    const newContent = currentContent ? `${currentContent} ${text}` : text;
+    setValue("content", newContent);
+  };
 
   const toggleEmotion = (value: string) => {
     setSelectedEmotions((prev) =>
@@ -142,13 +150,25 @@ export function DreamForm() {
 
       {/* Content */}
       <div className="space-y-2">
-        <Label htmlFor="content" className="text-lunar flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-mystic-400" />
-          Décrivez votre rêve
-        </Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="content" className="text-lunar flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-mystic-400" />
+            Décrivez votre rêve
+          </Label>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-mystic-500 hidden sm:inline">
+              <Mic className="w-3 h-3 inline mr-1" />
+              Dictez votre rêve
+            </span>
+            <VoiceRecorder
+              onTranscript={handleVoiceTranscript}
+              disabled={isLoading}
+            />
+          </div>
+        </div>
         <Textarea
           id="content"
-          placeholder="Décrivez votre rêve en détail... Que s'est-il passé ? Quels personnages étaient présents ? Quels lieux avez-vous visités ?"
+          placeholder="Décrivez votre rêve en détail... Que s'est-il passé ? Quels personnages étaient présents ? Quels lieux avez-vous visités ? Vous pouvez aussi utiliser le micro pour dicter."
           {...register("content")}
           rows={8}
           className="bg-mystic-900/30 border-mystic-600/30 text-lunar placeholder:text-mystic-500 focus:border-mystic-500 resize-none"

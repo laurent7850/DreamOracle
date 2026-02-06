@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Pencil, Save, X, Loader2 } from "lucide-react";
+import { Pencil, Save, X, Loader2, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { VoiceRecorder } from "@/components/ui/VoiceRecorder";
 
 interface EditableDreamContentProps {
   dreamId: string;
@@ -57,14 +58,29 @@ export function EditableDreamContent({
     setIsEditing(false);
   };
 
+  // Handle voice transcript - append to existing content
+  const handleVoiceTranscript = (text: string) => {
+    setContent((prev) => (prev ? `${prev} ${text}` : text));
+  };
+
   if (isEditing) {
     return (
       <div className="space-y-3">
+        <div className="flex items-center justify-end gap-2 mb-2">
+          <span className="text-xs text-mystic-500">
+            <Mic className="w-3 h-3 inline mr-1" />
+            Ajouter des détails par dictée
+          </span>
+          <VoiceRecorder
+            onTranscript={handleVoiceTranscript}
+            disabled={isSaving}
+          />
+        </div>
         <Textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="min-h-[200px] bg-mystic-900/50 border-mystic-600/30 text-lunar font-mystical text-lg leading-relaxed resize-y"
-          placeholder="Décrivez votre rêve..."
+          placeholder="Décrivez votre rêve... Vous pouvez aussi utiliser le micro pour dicter."
           autoFocus
         />
         <div className="flex justify-end gap-2">
