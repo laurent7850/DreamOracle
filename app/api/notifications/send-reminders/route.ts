@@ -19,7 +19,6 @@ export async function POST(request: NextRequest) {
     const currentHour = now.getHours().toString().padStart(2, "0");
     const currentMinute = now.getMinutes().toString().padStart(2, "0");
     const currentTime = `${currentHour}:${currentMinute}`;
-    const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
 
     // Find all users with reminders enabled at this time
     const usersWithReminders = await prisma.userSettings.findMany({
@@ -41,12 +40,6 @@ export async function POST(request: NextRequest) {
     const invalidSubscriptions: string[] = [];
 
     for (const settings of usersWithReminders) {
-      // Check if today is in the reminder days
-      const reminderDays = JSON.parse(settings.reminderDays || "[0,1,2,3,4,5,6]");
-      if (!reminderDays.includes(currentDay)) {
-        continue;
-      }
-
       // Send notification to all user's subscriptions
       for (const subscription of settings.user.pushSubscriptions) {
         try {
@@ -99,7 +92,6 @@ export async function POST(request: NextRequest) {
       failed,
       cleaned: invalidSubscriptions.length,
       time: currentTime,
-      day: currentDay,
     });
   } catch (error) {
     console.error("Error sending reminders:", error);

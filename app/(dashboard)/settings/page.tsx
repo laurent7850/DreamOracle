@@ -91,7 +91,6 @@ export default async function SettingsPage() {
             initialSettings={{
               notificationsEnabled: settings?.notificationsEnabled ?? true,
               reminderTime: settings?.reminderTime || null,
-              reminderDays: settings?.reminderDays || "[0,1,2,3,4,5,6]",
             }}
           />
         </CardContent>

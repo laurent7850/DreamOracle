@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Mic, MicOff, Square, Loader2 } from "lucide-react";
+import { Mic, Square, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -12,31 +12,15 @@ interface VoiceRecorderProps {
   disabled?: boolean;
 }
 
-// Detect if we're on a mobile device
-function isMobileDevice(): boolean {
-  if (typeof window === "undefined") return false;
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  );
-}
-
 export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Check if mobile on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setIsMobile(isMobileDevice());
-    }
-  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -56,7 +40,9 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
 
     try {
       const formData = new FormData();
-      formData.append("audio", audioBlob, "recording.webm");
+      const extension = audioBlob.type.includes("mp4") ? "m4a" :
+                       audioBlob.type.includes("wav") ? "wav" : "webm";
+      formData.append("audio", audioBlob, `recording.${extension}`);
 
       const response = await fetch("/api/transcribe", {
         method: "POST",
@@ -64,7 +50,9 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
       });
 
       if (!response.ok) {
-        throw new Error("Transcription failed");
+        const errorData = await response.json().catch(() => ({}));
+        toast.error(errorData.error || "Transcription échouée");
+        throw new Error(errorData.error || "Transcription failed");
       }
 
       const result = await response.json();
@@ -76,8 +64,7 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
         toast.info("Aucune parole détectée.");
       }
     } catch (error) {
-      console.error("Transcription error:", error);
-      toast.error("Erreur lors de la transcription. Réessayez.");
+      toast.error(`Erreur: ${error instanceof Error ? error.message : "Réessayez."}`);
     } finally {
       setIsTranscribing(false);
     }
@@ -92,21 +79,36 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          sampleRate: 44100,
         }
       });
 
       streamRef.current = stream;
       audioChunksRef.current = [];
 
-      // Try webm first, fallback to mp4 for Safari
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-        ? "audio/webm;codecs=opus"
-        : MediaRecorder.isTypeSupported("audio/webm")
-        ? "audio/webm"
-        : "audio/mp4";
+      // Try different mime types for compatibility (iOS, Android, Desktop)
+      let mimeType = "";
+      const supportedTypes = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/mp4;codecs=mp4a.40.2",
+        "audio/mp4",
+        "audio/aac",
+        "audio/wav",
+        "audio/ogg;codecs=opus",
+        "audio/ogg",
+        "",
+      ];
 
-      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+      for (const type of supportedTypes) {
+        if (type === "" || MediaRecorder.isTypeSupported(type)) {
+          mimeType = type;
+          break;
+        }
+      }
+
+      const mediaRecorder = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
 
       mediaRecorder.ondataavailable = (event) => {
@@ -116,33 +118,37 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
       };
 
       mediaRecorder.onstop = async () => {
-        // Stop all tracks
+        const actualMimeType = mediaRecorder.mimeType || mimeType || "audio/webm";
         stream.getTracks().forEach(track => track.stop());
 
-        // Clear timer
         if (timerRef.current) {
           clearInterval(timerRef.current);
           timerRef.current = null;
         }
         setRecordingTime(0);
 
-        // Create blob and transcribe
         if (audioChunksRef.current.length > 0) {
-          const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+          const audioBlob = new Blob(audioChunksRef.current, { type: actualMimeType });
           await transcribeAudio(audioBlob);
+        } else {
+          toast.error("Aucun audio enregistré. Réessayez.");
         }
       };
 
-      mediaRecorder.start(100); // Collect data every 100ms
+      mediaRecorder.onerror = () => {
+        toast.error("Erreur d'enregistrement");
+      };
+
+      mediaRecorder.start(500);
       setIsRecording(true);
 
-      // Start timer
       timerRef.current = setInterval(() => {
         setRecordingTime(prev => prev + 1);
       }, 1000);
 
-    } catch (error) {
-      console.error("Error starting recording:", error);
+      toast.info("Enregistrement en cours... Appuyez à nouveau pour arrêter.");
+
+    } catch {
       toast.error("Impossible d'accéder au microphone. Vérifiez vos permissions.");
     }
   }, [isRecording, isTranscribing, transcribeAudio]);
@@ -154,11 +160,19 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
     try {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
-    } catch (error) {
-      console.error("Error stopping recording:", error);
+    } catch {
       setIsRecording(false);
     }
   }, [isRecording]);
+
+  // Toggle recording
+  const toggleRecording = useCallback(() => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  }, [isRecording, startRecording, stopRecording]);
 
   // Format recording time
   const formatTime = (seconds: number) => {
@@ -167,82 +181,6 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Mobile: Press and hold mode
-  if (isMobile) {
-    return (
-      <div className="flex items-center gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          disabled={disabled || isTranscribing}
-          onTouchStart={(e) => {
-            e.preventDefault();
-            startRecording();
-          }}
-          onTouchEnd={(e) => {
-            e.preventDefault();
-            stopRecording();
-          }}
-          onTouchCancel={(e) => {
-            e.preventDefault();
-            stopRecording();
-          }}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            startRecording();
-          }}
-          onMouseUp={(e) => {
-            e.preventDefault();
-            stopRecording();
-          }}
-          onMouseLeave={() => {
-            if (isRecording) stopRecording();
-          }}
-          onContextMenu={(e) => e.preventDefault()}
-          className={cn(
-            "transition-all select-none touch-none",
-            isRecording
-              ? "bg-red-500/20 border-red-500 text-red-400 scale-110 shadow-lg shadow-red-500/20"
-              : isTranscribing
-              ? "bg-gold/20 border-gold text-gold"
-              : "border-mystic-600/30 text-mystic-400 hover:border-mystic-500 hover:text-mystic-300",
-            className
-          )}
-          title="Maintenez appuyé pour dicter"
-        >
-          {isTranscribing ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : isRecording ? (
-            <Mic className="w-5 h-5 animate-pulse" />
-          ) : (
-            <Mic className="w-5 h-5" />
-          )}
-        </Button>
-
-        {isRecording && (
-          <span className="text-xs text-red-400 animate-pulse flex items-center gap-1">
-            <span className="inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-            {formatTime(recordingTime)}
-          </span>
-        )}
-
-        {isTranscribing && (
-          <span className="text-xs text-gold animate-pulse">
-            Transcription...
-          </span>
-        )}
-
-        {!isRecording && !isTranscribing && (
-          <span className="text-xs text-mystic-500">
-            Maintenez
-          </span>
-        )}
-      </div>
-    );
-  }
-
-  // Desktop: Click to toggle mode
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -250,17 +188,11 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
         variant="outline"
         size="icon"
         disabled={disabled || isTranscribing}
-        onClick={() => {
-          if (isRecording) {
-            stopRecording();
-          } else {
-            startRecording();
-          }
-        }}
+        onClick={toggleRecording}
         className={cn(
           "transition-all",
           isRecording
-            ? "bg-red-500/20 border-red-500 text-red-400 hover:bg-red-500/30 hover:text-red-300 animate-pulse"
+            ? "bg-red-500/20 border-red-500 text-red-400 hover:bg-red-500/30 hover:text-red-300"
             : isTranscribing
             ? "bg-gold/20 border-gold text-gold"
             : "border-mystic-600/30 text-mystic-400 hover:border-mystic-500 hover:text-mystic-300",

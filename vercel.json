@@ -6,8 +6,10 @@
   "regions": ["cdg1"],
   "env": {
     "DATABASE_URL": "@database-url",
+    "DIRECT_URL": "@direct-url",
     "NEXTAUTH_SECRET": "@nextauth-secret",
     "NEXTAUTH_URL": "@nextauth-url",
-    "OPENROUTER_API_KEY": "@openrouter-api-key"
+    "OPENROUTER_API_KEY": "@openrouter-api-key",
+    "ELEVENLABS_API_KEY": "@elevenlabs-api-key"
   }
 }

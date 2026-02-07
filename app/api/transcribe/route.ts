@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
 
     // Check credits before processing
     const creditCheck = await checkCredits(session.user.id, 'transcription');
+
     if (!creditCheck.allowed) {
       return NextResponse.json({
         error: creditCheck.message,
@@ -42,11 +43,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (audioFile.size === 0) {
+      return NextResponse.json(
+        { error: "Audio file is empty" },
+        { status: 400 }
+      );
+    }
+
+    // Convert File to Blob for ElevenLabs
+    const arrayBuffer = await audioFile.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { type: audioFile.type || 'audio/webm' });
+
     // Create form data for ElevenLabs API
     const elevenLabsFormData = new FormData();
     elevenLabsFormData.append("model_id", "scribe_v1");
-    elevenLabsFormData.append("file", audioFile);
-    elevenLabsFormData.append("language_code", "fra"); // French
+    elevenLabsFormData.append("file", blob, audioFile.name || "recording.webm");
+    elevenLabsFormData.append("language_code", "fra");
 
     const response = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
       method: "POST",
@@ -58,16 +70,13 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("ElevenLabs API error:", errorText);
       return NextResponse.json(
-        { error: "Transcription failed" },
+        { error: "Transcription failed", details: errorText },
         { status: response.status }
       );
     }
 
     const result = await response.json();
-
-    // Extract the transcribed text
     const transcript = result.text || "";
 
     // Log usage after successful transcription

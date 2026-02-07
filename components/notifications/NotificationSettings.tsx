@@ -17,7 +17,7 @@ interface NotificationSettingsProps {
   initialSettings: {
     notificationsEnabled: boolean;
     reminderTime: string | null;
-    reminderDays: string;
+    reminderDays?: string;
   };
 }
 

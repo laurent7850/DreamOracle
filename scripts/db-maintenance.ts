@@ -49,7 +49,7 @@ async function cleanupOrphanedPushSubscriptions() {
 
   const result = await prisma.pushSubscription.deleteMany({
     where: {
-      updatedAt: {
+      createdAt: {
         lt: ninetyDaysAgo,
       },
     },

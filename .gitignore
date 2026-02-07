@@ -55,3 +55,5 @@ prisma/dev.db
 .env.local
 .env.hostinger
 .env.production.local
+
+certificates

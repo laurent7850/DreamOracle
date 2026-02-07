@@ -14,6 +14,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/login",
     newUser: "/register",
   },
+  // Allow requests from local network IP
+  trustHost: true,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,

@@ -26,9 +26,6 @@ export async function PATCH(request: NextRequest) {
         ...(body.reminderTime !== undefined && {
           reminderTime: body.reminderTime,
         }),
-        ...(body.reminderDays !== undefined && {
-          reminderDays: body.reminderDays,
-        }),
       },
       create: {
         userId: session.user.id,
@@ -37,7 +34,6 @@ export async function PATCH(request: NextRequest) {
         notificationsEnabled: body.notificationsEnabled ?? true,
         theme: body.theme || "dark",
         reminderTime: body.reminderTime,
-        reminderDays: body.reminderDays || "[0,1,2,3,4,5,6]",
       },
     });
 

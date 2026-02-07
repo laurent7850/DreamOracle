@@ -41,7 +41,7 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
   FREE: {
     dreams: 5,
     interpretations: 2,
-    transcriptions: 0,
+    transcriptions: 3,  // 3 transcriptions for free tier
     exports: 0,
     features: {
       calendar: true,
@@ -104,6 +104,7 @@ export const TIERS: Record<SubscriptionTier, TierInfo> = {
     features: [
       '5 rêves par mois',
       '2 interprétations IA par mois',
+      '3 transcriptions vocales par mois',
       'Calendrier des rêves',
       'Statistiques de base (streak)',
     ],

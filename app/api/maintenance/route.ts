@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     const stalePushSubs = await prisma.pushSubscription.deleteMany({
       where: {
-        updatedAt: {
+        createdAt: {
           lt: ninetyDaysAgo,
         },
       },
