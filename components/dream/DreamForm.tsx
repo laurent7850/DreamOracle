@@ -116,11 +116,11 @@ export function DreamForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
       {/* Title */}
       <div className="space-y-2">
-        <Label htmlFor="title" className="text-lunar flex items-center gap-2">
-          <Moon className="w-4 h-4 text-mystic-400" />
+        <Label htmlFor="title" className="text-lunar flex items-center gap-2 text-sm sm:text-base">
+          <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-mystic-400" />
           Titre du rêve
         </Label>
         <Input
@@ -136,8 +136,8 @@ export function DreamForm() {
 
       {/* Date */}
       <div className="space-y-2">
-        <Label htmlFor="dreamDate" className="text-lunar flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-mystic-400" />
+        <Label htmlFor="dreamDate" className="text-lunar flex items-center gap-2 text-sm sm:text-base">
+          <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-mystic-400" />
           Date du rêve
         </Label>
         <Input
@@ -150,13 +150,14 @@ export function DreamForm() {
 
       {/* Content */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="content" className="text-lunar flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-mystic-400" />
-            Décrivez votre rêve
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="content" className="text-lunar flex items-center gap-2 text-sm sm:text-base">
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-mystic-400" />
+            <span className="hidden sm:inline">Décrivez votre rêve</span>
+            <span className="sm:hidden">Description</span>
           </Label>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-mystic-500 hidden sm:inline">
+            <span className="text-xs text-mystic-500 hidden md:inline">
               <Mic className="w-3 h-3 inline mr-1" />
               Dictez votre rêve
             </span>
@@ -168,10 +169,10 @@ export function DreamForm() {
         </div>
         <Textarea
           id="content"
-          placeholder="Décrivez votre rêve en détail... Que s'est-il passé ? Quels personnages étaient présents ? Quels lieux avez-vous visités ? Vous pouvez aussi utiliser le micro pour dicter."
+          placeholder="Décrivez votre rêve en détail..."
           {...register("content")}
-          rows={8}
-          className="bg-mystic-900/30 border-mystic-600/30 text-lunar placeholder:text-mystic-500 focus:border-mystic-500 resize-none"
+          rows={6}
+          className="bg-mystic-900/30 border-mystic-600/30 text-lunar placeholder:text-mystic-500 focus:border-mystic-500 resize-none text-sm sm:text-base"
         />
         {errors.content && (
           <p className="text-red-400 text-sm">{errors.content.message}</p>
@@ -179,21 +180,21 @@ export function DreamForm() {
       </div>
 
       {/* Emotions */}
-      <div className="space-y-3">
-        <Label className="text-lunar">Émotions ressenties</Label>
-        <div className="flex flex-wrap gap-2">
+      <div className="space-y-2 sm:space-y-3">
+        <Label className="text-lunar text-sm sm:text-base">Émotions ressenties</Label>
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {EMOTION_OPTIONS.map((emotion) => (
             <button
               key={emotion.value}
               type="button"
               onClick={() => toggleEmotion(emotion.value)}
-              className={`px-3 py-2 rounded-full text-sm transition-all ${
+              className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm transition-all ${
                 selectedEmotions.includes(emotion.value)
                   ? "bg-mystic-600 text-white border border-mystic-500"
                   : "bg-mystic-900/30 text-mystic-300 border border-mystic-700/30 hover:border-mystic-600/50"
               }`}
             >
-              {emotion.emoji} {emotion.label}
+              {emotion.emoji} <span className="hidden xs:inline">{emotion.label}</span>
             </button>
           ))}
         </div>
@@ -201,9 +202,9 @@ export function DreamForm() {
 
       {/* Mood */}
       <div className="space-y-2">
-        <Label className="text-lunar">Humeur au réveil</Label>
+        <Label className="text-lunar text-sm sm:text-base">Humeur au réveil</Label>
         <Select onValueChange={(value) => setValue("mood", value)}>
-          <SelectTrigger className="bg-mystic-900/30 border-mystic-600/30 text-lunar">
+          <SelectTrigger className="bg-mystic-900/30 border-mystic-600/30 text-lunar text-sm sm:text-base">
             <SelectValue placeholder="Sélectionnez votre humeur" />
           </SelectTrigger>
           <SelectContent className="bg-night-light border-mystic-700">
@@ -211,7 +212,7 @@ export function DreamForm() {
               <SelectItem
                 key={mood.value}
                 value={mood.value}
-                className="text-lunar hover:bg-mystic-800"
+                className="text-lunar hover:bg-mystic-800 text-sm sm:text-base"
               >
                 {mood.label}
               </SelectItem>
@@ -221,15 +222,15 @@ export function DreamForm() {
       </div>
 
       {/* Sleep Quality */}
-      <div className="space-y-3">
-        <Label className="text-lunar">Qualité du sommeil</Label>
-        <div className="flex gap-2">
+      <div className="space-y-2 sm:space-y-3">
+        <Label className="text-lunar text-sm sm:text-base">Qualité du sommeil</Label>
+        <div className="flex gap-1.5 sm:gap-2">
           {[1, 2, 3, 4, 5].map((level) => (
             <button
               key={level}
               type="button"
               onClick={() => setValue("sleepQuality", level)}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all text-sm sm:text-base ${
                 sleepQuality === level
                   ? "bg-gold text-night"
                   : "bg-mystic-900/30 text-mystic-400 border border-mystic-700/30 hover:border-mystic-600/50"
@@ -239,19 +240,19 @@ export function DreamForm() {
             </button>
           ))}
         </div>
-        <p className="text-xs text-mystic-500">1 = Mauvais, 5 = Excellent</p>
+        <p className="text-[10px] sm:text-xs text-mystic-500">1 = Mauvais, 5 = Excellent</p>
       </div>
 
       {/* Lucidity */}
-      <div className="space-y-3">
-        <Label className="text-lunar">Niveau de lucidité</Label>
-        <div className="flex gap-2">
+      <div className="space-y-2 sm:space-y-3">
+        <Label className="text-lunar text-sm sm:text-base">Niveau de lucidité</Label>
+        <div className="flex gap-1.5 sm:gap-2 flex-wrap">
           {[0, 1, 2, 3, 4, 5].map((level) => (
             <button
               key={level}
               type="button"
               onClick={() => setValue("lucidity", level)}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all text-sm sm:text-base ${
                 lucidity === level
                   ? "bg-mystic-500 text-white"
                   : "bg-mystic-900/30 text-mystic-400 border border-mystic-700/30 hover:border-mystic-600/50"
@@ -261,8 +262,8 @@ export function DreamForm() {
             </button>
           ))}
         </div>
-        <p className="text-xs text-mystic-500">
-          0 = Pas lucide, 5 = Totalement conscient de rêver
+        <p className="text-[10px] sm:text-xs text-mystic-500">
+          0 = Pas lucide, 5 = Conscient de rêver
         </p>
       </div>
 
@@ -280,9 +281,9 @@ export function DreamForm() {
       </div>
 
       {/* Tags */}
-      <div className="space-y-3">
-        <Label className="text-lunar flex items-center gap-2">
-          <Tag className="w-4 h-4 text-mystic-400" />
+      <div className="space-y-2 sm:space-y-3">
+        <Label className="text-lunar flex items-center gap-2 text-sm sm:text-base">
+          <Tag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-mystic-400" />
           Tags personnalisés
         </Label>
         <div className="flex gap-2">
@@ -291,15 +292,16 @@ export function DreamForm() {
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
             placeholder="Ajouter un tag..."
-            className="bg-mystic-900/30 border-mystic-600/30 text-lunar placeholder:text-mystic-500"
+            className="bg-mystic-900/30 border-mystic-600/30 text-lunar placeholder:text-mystic-500 text-sm sm:text-base"
           />
           <Button
             type="button"
             onClick={addTag}
             variant="outline"
-            className="border-mystic-600/30 text-mystic-300"
+            className="border-mystic-600/30 text-mystic-300 text-sm sm:text-base px-3 sm:px-4"
           >
-            Ajouter
+            <span className="hidden sm:inline">Ajouter</span>
+            <span className="sm:hidden">+</span>
           </Button>
         </div>
         {tags.length > 0 && (
@@ -324,21 +326,23 @@ export function DreamForm() {
       </div>
 
       {/* Submit */}
-      <div className="flex gap-4">
+      <div className="flex gap-4 pt-2">
         <Button
           type="submit"
           disabled={isLoading}
-          className="flex-1 btn-mystic btn-gold"
+          className="flex-1 btn-mystic btn-gold text-sm sm:text-base py-2.5 sm:py-3"
         >
           {isLoading ? (
             <>
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              Enregistrement...
+              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+              <span className="hidden sm:inline">Enregistrement...</span>
+              <span className="sm:hidden">Envoi...</span>
             </>
           ) : (
             <>
-              <Sparkles className="w-5 h-5 mr-2" />
-              Enregistrer le rêve
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+              <span className="hidden sm:inline">Enregistrer le rêve</span>
+              <span className="sm:hidden">Enregistrer</span>
             </>
           )}
         </Button>

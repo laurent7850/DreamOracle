@@ -53,18 +53,18 @@ export default async function DreamsPage({
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 px-1">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="font-display text-3xl text-lunar mb-2">Mes rêves</h1>
-          <p className="text-mystic-400">
+          <h1 className="font-display text-2xl sm:text-3xl text-lunar mb-1 sm:mb-2">Mes rêves</h1>
+          <p className="text-mystic-400 text-sm sm:text-base">
             {total} rêve{total !== 1 ? "s" : ""} enregistré{total !== 1 ? "s" : ""}
           </p>
         </div>
-        <Link href="/dreams/new">
-          <Button className="btn-mystic btn-gold">
-            <PlusCircle className="w-5 h-5 mr-2" />
+        <Link href="/dreams/new" className="w-full sm:w-auto">
+          <Button className="btn-mystic btn-gold w-full sm:w-auto">
+            <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
             Nouveau rêve
           </Button>
         </Link>
@@ -83,38 +83,39 @@ export default async function DreamsPage({
 
       {/* Dreams List */}
       {dreams.length === 0 ? (
-        <div className="text-center py-16 glass-card">
-          <Moon className="w-20 h-20 text-mystic-600 mx-auto mb-6" />
+        <div className="text-center py-10 sm:py-16 glass-card px-4">
+          <Moon className="w-14 h-14 sm:w-20 sm:h-20 text-mystic-600 mx-auto mb-4 sm:mb-6" />
           {search ? (
             <>
-              <p className="text-mystic-400 text-lg mb-2">
+              <p className="text-mystic-400 text-sm sm:text-lg mb-2">
                 Aucun rêve trouvé pour &quot;{search}&quot;
               </p>
               <Link href="/dreams">
-                <Button variant="ghost" className="text-mystic-300">
+                <Button variant="ghost" className="text-mystic-300 text-sm">
                   Voir tous les rêves
                 </Button>
               </Link>
             </>
           ) : (
             <>
-              <p className="text-mystic-400 text-lg mb-4">
+              <p className="text-mystic-400 text-sm sm:text-lg mb-2 sm:mb-4">
                 Votre journal de rêves est vide
               </p>
-              <p className="text-mystic-500 mb-6">
+              <p className="text-mystic-500 mb-4 sm:mb-6 text-xs sm:text-base">
                 Commencez à enregistrer vos rêves pour explorer leur signification
               </p>
               <Link href="/dreams/new">
-                <Button className="btn-mystic">
-                  <PlusCircle className="w-5 h-5 mr-2" />
-                  Enregistrer mon premier rêve
+                <Button className="btn-mystic text-sm sm:text-base">
+                  <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  <span className="hidden sm:inline">Enregistrer mon premier rêve</span>
+                  <span className="sm:hidden">Premier rêve</span>
                 </Button>
               </Link>
             </>
           )}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {dreams.map((dream) => (
             <DreamCard key={dream.id} dream={dream} />
           ))}
@@ -123,29 +124,31 @@ export default async function DreamsPage({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2">
+        <div className="flex justify-center items-center gap-1 sm:gap-2 flex-wrap">
           {page > 1 && (
             <Link href={`/dreams?page=${page - 1}${search ? `&search=${search}` : ""}`}>
               <Button
                 variant="outline"
-                className="border-mystic-600/30 text-mystic-300"
+                className="border-mystic-600/30 text-mystic-300 text-xs sm:text-sm px-2 sm:px-4"
               >
-                Précédent
+                <span className="hidden sm:inline">Précédent</span>
+                <span className="sm:hidden">←</span>
               </Button>
             </Link>
           )}
 
-          <span className="flex items-center px-4 text-mystic-400">
-            Page {page} sur {totalPages}
+          <span className="flex items-center px-2 sm:px-4 text-mystic-400 text-xs sm:text-sm">
+            {page}/{totalPages}
           </span>
 
           {page < totalPages && (
             <Link href={`/dreams?page=${page + 1}${search ? `&search=${search}` : ""}`}>
               <Button
                 variant="outline"
-                className="border-mystic-600/30 text-mystic-300"
+                className="border-mystic-600/30 text-mystic-300 text-xs sm:text-sm px-2 sm:px-4"
               >
-                Suivant
+                <span className="hidden sm:inline">Suivant</span>
+                <span className="sm:hidden">→</span>
               </Button>
             </Link>
           )}

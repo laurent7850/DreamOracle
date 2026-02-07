@@ -55,28 +55,28 @@ export default async function CalendarPage() {
   ).length;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 px-1">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="font-display text-3xl text-lunar mb-2 flex items-center gap-3">
-            <Calendar className="w-8 h-8 text-mystic-400" />
+          <h1 className="font-display text-xl sm:text-2xl md:text-3xl text-lunar mb-1 sm:mb-2 flex items-center gap-2 sm:gap-3">
+            <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-mystic-400" />
             Calendrier des rêves
           </h1>
-          <p className="text-mystic-400">
+          <p className="text-mystic-400 text-sm sm:text-base">
             Visualisez vos rêves jour par jour
           </p>
         </div>
-        <Link href="/dreams/new">
-          <Button className="btn-mystic btn-gold">
-            <PlusCircle className="w-5 h-5 mr-2" />
+        <Link href="/dreams/new" className="w-full sm:w-auto">
+          <Button className="btn-mystic btn-gold w-full sm:w-auto">
+            <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
             Nouveau rêve
           </Button>
         </Link>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
         <QuickStat label="Total des rêves" value={totalDreams} />
         <QuickStat label="Jours avec rêves" value={uniqueDays} />
         <QuickStat label="Ce mois-ci" value={dreamsThisMonth} />
@@ -94,9 +94,9 @@ export default async function CalendarPage() {
 
 function QuickStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="bg-mystic-900/30 rounded-lg border border-mystic-700/30 p-4 text-center">
-      <p className="text-2xl font-display text-lunar">{value}</p>
-      <p className="text-xs text-mystic-500 mt-1">{label}</p>
+    <div className="bg-mystic-900/30 rounded-lg border border-mystic-700/30 p-3 sm:p-4 text-center">
+      <p className="text-xl sm:text-2xl font-display text-lunar">{value}</p>
+      <p className="text-[10px] sm:text-xs text-mystic-500 mt-1">{label}</p>
     </div>
   );
 }

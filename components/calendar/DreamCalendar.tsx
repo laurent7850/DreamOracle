@@ -120,50 +120,50 @@ export function DreamCalendar({ dreams }: DreamCalendarProps) {
   const selectedDreams = selectedDate ? dreamsByDate[selectedDate] || [] : [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Calendar Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h2 className="text-xl font-display text-lunar">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+          <h2 className="text-base sm:text-xl font-display text-lunar">
             {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
           </h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={goToToday}
-            className="text-mystic-400 hover:text-lunar text-xs"
+            className="text-mystic-400 hover:text-lunar text-[10px] sm:text-xs px-2 py-1"
           >
             Aujourd&apos;hui
           </Button>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={goToPreviousMonth}
-            className="text-mystic-400 hover:text-lunar"
+            className="text-mystic-400 hover:text-lunar h-8 w-8 sm:h-10 sm:w-10"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={goToNextMonth}
-            className="text-mystic-400 hover:text-lunar"
+            className="text-mystic-400 hover:text-lunar h-8 w-8 sm:h-10 sm:w-10"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </Button>
         </div>
       </div>
 
       {/* Calendar Grid */}
-      <div className="bg-mystic-900/30 rounded-xl border border-mystic-700/30 overflow-hidden">
+      <div className="bg-mystic-900/30 rounded-lg sm:rounded-xl border border-mystic-700/30 overflow-hidden">
         {/* Days of week header */}
         <div className="grid grid-cols-7 border-b border-mystic-700/30">
           {DAYS_OF_WEEK.map((day) => (
             <div
               key={day}
-              className="p-3 text-center text-sm font-medium text-mystic-500"
+              className="p-1.5 sm:p-3 text-center text-[10px] sm:text-sm font-medium text-mystic-500"
             >
               {day}
             </div>
@@ -184,7 +184,7 @@ export function DreamCalendar({ dreams }: DreamCalendarProps) {
                 key={index}
                 onClick={() => setSelectedDate(isSelected ? null : dateKey)}
                 className={cn(
-                  "relative min-h-[80px] p-2 border-b border-r border-mystic-700/20 transition-all text-left",
+                  "relative min-h-[50px] sm:min-h-[80px] p-1 sm:p-2 border-b border-r border-mystic-700/20 transition-all text-left",
                   "hover:bg-mystic-800/30",
                   !day.isCurrentMonth && "opacity-40",
                   isToday(day.date) && "bg-mystic-800/50",
@@ -193,7 +193,7 @@ export function DreamCalendar({ dreams }: DreamCalendarProps) {
               >
                 <span
                   className={cn(
-                    "inline-flex items-center justify-center w-7 h-7 rounded-full text-sm",
+                    "inline-flex items-center justify-center w-5 h-5 sm:w-7 sm:h-7 rounded-full text-[10px] sm:text-sm",
                     isToday(day.date)
                       ? "bg-gold text-mystic-950 font-bold"
                       : "text-mystic-300"
@@ -202,8 +202,9 @@ export function DreamCalendar({ dreams }: DreamCalendarProps) {
                   {day.date.getDate()}
                 </span>
 
+                {/* Show titles only on larger screens */}
                 {hasDreams && (
-                  <div className="mt-1 space-y-1">
+                  <div className="mt-1 space-y-1 hidden sm:block">
                     {dayDreams.slice(0, 2).map((dream) => (
                       <div
                         key={dream.id}
@@ -227,12 +228,12 @@ export function DreamCalendar({ dreams }: DreamCalendarProps) {
 
                 {/* Dream indicator dots */}
                 {hasDreams && (
-                  <div className="absolute bottom-1 right-1 flex gap-0.5">
+                  <div className="absolute bottom-0.5 sm:bottom-1 right-0.5 sm:right-1 flex gap-0.5">
                     {dayDreams.slice(0, 3).map((dream, i) => (
                       <div
                         key={i}
                         className={cn(
-                          "w-1.5 h-1.5 rounded-full",
+                          "w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full",
                           dream.interpretation ? "bg-gold" : "bg-mystic-500"
                         )}
                       />
@@ -247,37 +248,38 @@ export function DreamCalendar({ dreams }: DreamCalendarProps) {
 
       {/* Selected Date Dreams */}
       {selectedDate && (
-        <div className="bg-mystic-900/30 rounded-xl border border-mystic-700/30 p-4">
-          <h3 className="font-display text-lg text-lunar mb-4 flex items-center gap-2">
-            <Moon className="w-5 h-5 text-mystic-400" />
-            {new Date(selectedDate).toLocaleDateString("fr-FR", {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
+        <div className="bg-mystic-900/30 rounded-lg sm:rounded-xl border border-mystic-700/30 p-3 sm:p-4">
+          <h3 className="font-display text-sm sm:text-lg text-lunar mb-3 sm:mb-4 flex items-center gap-2">
+            <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-mystic-400" />
+            <span className="truncate">
+              {new Date(selectedDate).toLocaleDateString("fr-FR", {
+                weekday: "short",
+                day: "numeric",
+                month: "long",
+              })}
+            </span>
           </h3>
 
           {selectedDreams.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-mystic-500 mb-4">Aucun rêve enregistré ce jour</p>
+            <div className="text-center py-6 sm:py-8">
+              <p className="text-mystic-500 mb-3 sm:mb-4 text-sm">Aucun rêve enregistré ce jour</p>
               <Link href="/dreams/new">
-                <Button className="btn-mystic">
+                <Button className="btn-mystic text-sm">
                   Ajouter un rêve
                 </Button>
               </Link>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {selectedDreams.map((dream) => (
                 <Link key={dream.id} href={`/dreams/${dream.id}`}>
-                  <div className="p-4 rounded-lg bg-mystic-800/30 border border-mystic-700/30 hover:border-mystic-600/50 transition-all cursor-pointer">
-                    <div className="flex items-start justify-between gap-4">
+                  <div className="p-3 sm:p-4 rounded-lg bg-mystic-800/30 border border-mystic-700/30 hover:border-mystic-600/50 transition-all cursor-pointer">
+                    <div className="flex items-start justify-between gap-2 sm:gap-4">
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-display text-lunar truncate">
+                        <h4 className="font-display text-sm sm:text-base text-lunar truncate">
                           {dream.title}
                         </h4>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-mystic-500">
+                        <div className="flex items-center gap-2 sm:gap-3 mt-1 text-[10px] sm:text-xs text-mystic-500">
                           {dream.mood && (
                             <span className="capitalize">{dream.mood}</span>
                           )}
@@ -287,9 +289,10 @@ export function DreamCalendar({ dreams }: DreamCalendarProps) {
                         </div>
                       </div>
                       {dream.interpretation && (
-                        <span className="inline-flex items-center gap-1 text-xs text-gold flex-shrink-0">
-                          <Sparkles className="w-3 h-3" />
-                          Interprété
+                        <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-gold flex-shrink-0">
+                          <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                          <span className="hidden sm:inline">Interprété</span>
+                          <span className="sm:hidden">✓</span>
                         </span>
                       )}
                     </div>
@@ -302,17 +305,17 @@ export function DreamCalendar({ dreams }: DreamCalendarProps) {
       )}
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-6 text-xs text-mystic-500">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-mystic-500" />
-          <span>Rêve non interprété</span>
+      <div className="flex items-center justify-center gap-3 sm:gap-6 text-[10px] sm:text-xs text-mystic-500 flex-wrap">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-mystic-500" />
+          <span>Non interprété</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-gold" />
-          <span>Rêve interprété</span>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-gold" />
+          <span>Interprété</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-gold text-mystic-950 text-xs flex items-center justify-center font-bold">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-gold text-mystic-950 text-[10px] sm:text-xs flex items-center justify-center font-bold">
             {new Date().getDate()}
           </div>
           <span>Aujourd&apos;hui</span>

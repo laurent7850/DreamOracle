@@ -85,17 +85,17 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="glass-card p-8">
-      <div className="text-center mb-8">
-        <Link href="/" className="inline-flex items-center gap-2 mb-6">
-          <Moon className="w-10 h-10 text-mystic-400" />
-          <span className="font-display text-2xl text-lunar">DreamOracle</span>
+    <div className="glass-card p-4 sm:p-6 md:p-8 w-full max-w-md mx-auto">
+      <div className="text-center mb-6 sm:mb-8">
+        <Link href="/" className="inline-flex items-center gap-2 mb-4 sm:mb-6">
+          <Moon className="w-8 h-8 sm:w-10 sm:h-10 text-mystic-400" />
+          <span className="font-display text-xl sm:text-2xl text-lunar">DreamOracle</span>
         </Link>
-        <h1 className="font-display text-2xl text-lunar mb-2">Créer un compte</h1>
-        <p className="text-mystic-400">Commencez votre voyage onirique</p>
+        <h1 className="font-display text-xl sm:text-2xl text-lunar mb-2">Créer un compte</h1>
+        <p className="text-sm sm:text-base text-mystic-400">Commencez votre voyage onirique</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 md:space-y-5">
         <div className="space-y-2">
           <Label htmlFor="name" className="text-lunar">Nom</Label>
           <div className="relative">
@@ -216,7 +216,7 @@ export default function RegisterPage() {
         S&apos;inscrire avec Google
       </Button>
 
-      <p className="text-center mt-6 text-mystic-400">
+      <p className="text-center mt-4 sm:mt-6 text-sm sm:text-base text-mystic-400">
         Déjà un compte ?{" "}
         <Link href="/login" className="text-mystic-300 hover:text-gold">
           Se connecter

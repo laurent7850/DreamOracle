@@ -32,8 +32,8 @@ export default async function DashboardLayout({
         <Header />
 
         {/* Main Content */}
-        <main className="relative z-10 pt-16 pb-20 md:pb-6 md:pl-64">
-          <div className="p-6">{children}</div>
+        <main className="relative z-10 pt-14 sm:pt-16 pb-20 md:pb-6 md:pl-64">
+          <div className="p-3 sm:p-4 md:p-6">{children}</div>
         </main>
 
         {/* Mobile Navigation */}
