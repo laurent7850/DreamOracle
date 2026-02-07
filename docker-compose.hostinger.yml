@@ -10,6 +10,7 @@ services:
         git clone https://github.com/laurent7850/DreamOracle.git /app-tmp &&
         cp -r /app-tmp/. /app/ &&
         rm -rf /app-tmp &&
+        cp prisma/schema.prod.prisma prisma/schema.prisma &&
         npm ci &&
         npx prisma generate &&
         npx prisma db push --skip-generate &&
