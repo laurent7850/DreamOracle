@@ -50,6 +50,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate file size (max 25MB for ElevenLabs)
+    const MAX_FILE_SIZE = 25 * 1024 * 1024;
+    if (audioFile.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: "Le fichier audio est trop volumineux (max 25MB)" },
+        { status: 400 }
+      );
+    }
+
+    // Validate MIME type
+    const allowedMimeTypes = [
+      'audio/webm',
+      'audio/mp3',
+      'audio/mpeg',
+      'audio/wav',
+      'audio/ogg',
+      'audio/mp4',
+      'audio/m4a',
+      'audio/x-m4a',
+    ];
+    const fileType = audioFile.type || 'audio/webm';
+    if (!allowedMimeTypes.some(mime => fileType.startsWith(mime.split('/')[0]))) {
+      return NextResponse.json(
+        { error: "Format audio non supporté" },
+        { status: 400 }
+      );
+    }
+
     // Convert File to Blob for ElevenLabs
     const arrayBuffer = await audioFile.arrayBuffer();
     const blob = new Blob([arrayBuffer], { type: audioFile.type || 'audio/webm' });
@@ -60,13 +88,20 @@ export async function POST(request: NextRequest) {
     elevenLabsFormData.append("file", blob, audioFile.name || "recording.webm");
     elevenLabsFormData.append("language_code", "fra");
 
+    // Call ElevenLabs API with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
     const response = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
       method: "POST",
       headers: {
         "xi-api-key": ELEVENLABS_API_KEY,
       },
       body: elevenLabsFormData,
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();

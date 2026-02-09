@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+
+// Schema for PATCH updates
+const updateDreamSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  content: z.string().min(10).max(10000).optional(),
+  dreamDate: z.string().datetime().optional(),
+  emotions: z.array(z.string().max(50)).max(20).optional(),
+  symbols: z.array(z.string().max(100)).max(50).optional(),
+  lucidity: z.number().min(0).max(5).optional(),
+  interpretation: z.string().max(20000).optional(),
+  tags: z.array(z.string().max(50)).max(30).optional(),
+  isRecurring: z.boolean().optional(),
+  mood: z.string().max(50).optional(),
+  sleepQuality: z.number().min(1).max(5).optional(),
+});
 
 // GET - Get a single dream
 export async function GET(
@@ -70,23 +86,34 @@ export async function PATCH(
 
     const body = await request.json();
 
+    // Validate request body
+    const validation = updateDreamSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error.issues[0].message },
+        { status: 400 }
+      );
+    }
+
+    const data = validation.data;
+
     const updatedDream = await prisma.dream.update({
       where: { id },
       data: {
-        ...(body.title && { title: body.title }),
-        ...(body.content && { content: body.content }),
-        ...(body.dreamDate && { dreamDate: new Date(body.dreamDate) }),
-        ...(body.emotions && { emotions: JSON.stringify(body.emotions) }),
-        ...(body.symbols && { symbols: JSON.stringify(body.symbols) }),
-        ...(body.lucidity !== undefined && { lucidity: body.lucidity }),
-        ...(body.interpretation && {
-          interpretation: body.interpretation,
+        ...(data.title && { title: data.title }),
+        ...(data.content && { content: data.content }),
+        ...(data.dreamDate && { dreamDate: new Date(data.dreamDate) }),
+        ...(data.emotions && { emotions: JSON.stringify(data.emotions) }),
+        ...(data.symbols && { symbols: JSON.stringify(data.symbols) }),
+        ...(data.lucidity !== undefined && { lucidity: data.lucidity }),
+        ...(data.interpretation && {
+          interpretation: data.interpretation,
           interpretedAt: new Date(),
         }),
-        ...(body.tags && { tags: JSON.stringify(body.tags) }),
-        ...(body.isRecurring !== undefined && { isRecurring: body.isRecurring }),
-        ...(body.mood && { mood: body.mood }),
-        ...(body.sleepQuality && { sleepQuality: body.sleepQuality }),
+        ...(data.tags && { tags: JSON.stringify(data.tags) }),
+        ...(data.isRecurring !== undefined && { isRecurring: data.isRecurring }),
+        ...(data.mood && { mood: data.mood }),
+        ...(data.sleepQuality && { sleepQuality: data.sleepQuality }),
       },
     });
 

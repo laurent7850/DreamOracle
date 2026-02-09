@@ -25,7 +25,7 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
+    <div className="max-w-3xl mx-auto space-y-8 px-3 sm:px-4 md:px-0">
       <div>
         <h1 className="font-display text-3xl text-lunar mb-2 flex items-center gap-3">
           <Settings className="w-8 h-8 text-mystic-400" />

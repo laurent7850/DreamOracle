@@ -5,7 +5,15 @@ const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "";
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || "";
 const VAPID_SUBJECT = process.env.VAPID_SUBJECT || "mailto:contact@dreamoracle.app";
 
-if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+// Warn if VAPID keys are not configured in production
+if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+  if (process.env.NODE_ENV === "production") {
+    console.warn(
+      "⚠️ VAPID keys not configured. Push notifications will not work. " +
+      "Generate keys with: npx web-push generate-vapid-keys"
+    );
+  }
+} else {
   webPush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 }
 
