@@ -225,16 +225,16 @@ Pose-moi une question sur tes rêves, ou choisis une suggestion ci-dessous !`,
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-0 flex flex-col h-[calc(100vh-8rem)]">
+    <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-0 flex flex-col h-[calc(100vh-10rem)] sm:h-[calc(100vh-8rem)]">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-full bg-gradient-to-br from-gold/30 to-purple-600/30">
-            <Brain className="w-6 h-6 text-gold" />
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="p-1.5 sm:p-2 rounded-full bg-gradient-to-br from-gold/30 to-purple-600/30">
+            <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-gold" />
           </div>
           <div>
-            <h1 className="font-display text-2xl text-lunar">Dream Coach</h1>
-            <p className="text-sm text-mystic-400">
+            <h1 className="font-display text-xl sm:text-2xl text-lunar">Dream Coach</h1>
+            <p className="text-xs sm:text-sm text-mystic-400 hidden sm:block">
               Ton guide personnel des rêves
             </p>
           </div>
@@ -243,35 +243,35 @@ Pose-moi une question sur tes rêves, ou choisis une suggestion ci-dessous !`,
           variant="ghost"
           size="sm"
           onClick={resetConversation}
-          className="text-mystic-400 hover:text-mystic-200"
+          className="text-mystic-400 hover:text-mystic-200 px-2 sm:px-3"
         >
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Nouvelle conversation
+          <RefreshCw className="w-4 h-4 sm:mr-2" />
+          <span className="hidden sm:inline">Nouvelle conversation</span>
         </Button>
       </div>
 
       {/* Messages */}
-      <Card className="glass-card border-mystic-700/30 flex-1 overflow-hidden flex flex-col">
-        <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+      <Card className="glass-card border-mystic-700/30 flex-1 overflow-hidden flex flex-col min-h-0">
+        <CardContent className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
           {messages.map((message) => (
             <div
               key={message.id}
               className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+                className={`max-w-[90%] sm:max-w-[85%] rounded-2xl px-3 sm:px-4 py-2 sm:py-3 ${
                   message.role === "user"
                     ? "bg-indigo-600 text-white rounded-br-md"
                     : "bg-mystic-800/70 text-mystic-100 rounded-bl-md"
                 }`}
               >
                 {message.role === "assistant" && (
-                  <div className="flex items-center gap-2 mb-2 text-gold text-sm">
-                    <Sparkles className="w-4 h-4" />
+                  <div className="flex items-center gap-2 mb-1.5 sm:mb-2 text-gold text-xs sm:text-sm">
+                    <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span className="font-medium">Oracle</span>
                   </div>
                 )}
-                <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed">
                   {message.content}
                 </p>
               </div>
@@ -294,17 +294,17 @@ Pose-moi une question sur tes rêves, ou choisis une suggestion ci-dessous !`,
 
         {/* Suggested questions */}
         {messages.length <= 1 && (
-          <div className="px-4 pb-2">
+          <div className="px-3 sm:px-4 pb-2">
             <p className="text-xs text-mystic-500 mb-2">
               Suggestions :
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {SUGGESTED_QUESTIONS.map((q, i) => (
                 <button
                   key={i}
                   onClick={() => sendMessage(q)}
                   disabled={isLoading}
-                  className="text-xs px-3 py-1.5 rounded-full bg-mystic-800/50 text-mystic-300 hover:bg-mystic-700/50 transition-colors disabled:opacity-50"
+                  className="text-[10px] sm:text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-mystic-800/50 text-mystic-300 hover:bg-mystic-700/50 transition-colors disabled:opacity-50"
                 >
                   {q}
                 </button>
@@ -316,26 +316,27 @@ Pose-moi une question sur tes rêves, ou choisis une suggestion ci-dessous !`,
         {/* Input */}
         <form
           onSubmit={handleSubmit}
-          className="p-4 border-t border-mystic-700/30"
+          className="p-2 sm:p-4 border-t border-mystic-700/30"
         >
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 sm:gap-2 items-center">
             <VoiceRecorder
               onTranscript={(text) => setInput(prev => prev ? `${prev} ${text}` : text)}
               disabled={isLoading}
-              className="rounded-full"
+              className="rounded-full shrink-0"
             />
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Pose une question sur tes rêves..."
+              placeholder="Pose une question..."
               disabled={isLoading}
-              className="flex-1 bg-mystic-900/50 border border-mystic-700/50 rounded-full px-4 py-2 text-lunar placeholder-mystic-500 focus:outline-none focus:ring-2 focus:ring-gold/50 disabled:opacity-50"
+              className="flex-1 min-w-0 bg-mystic-900/50 border border-mystic-700/50 rounded-full px-3 sm:px-4 py-2 text-sm sm:text-base text-lunar placeholder-mystic-500 focus:outline-none focus:ring-2 focus:ring-gold/50 disabled:opacity-50"
             />
             <Button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="rounded-full bg-gold hover:bg-gold/90 text-night px-4"
+              size="icon"
+              className="rounded-full bg-gold hover:bg-gold/90 text-night shrink-0 w-9 h-9 sm:w-10 sm:h-10"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
