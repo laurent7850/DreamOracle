@@ -1,24 +1,72 @@
-# DreamOracle
+# 🌙 DreamOracle
 
-Application d'interprétation des rêves avec IA - Explorez les mystères de votre subconscient.
+**Application d'interprétation des rêves avec IA** - Explorez les mystères de votre subconscient.
 
-## Fonctionnalités
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-6-2D3748)](https://www.prisma.io/)
+[![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8)](https://web.dev/progressive-web-apps/)
 
-- **Journal de rêves** - Enregistrez vos rêves avec émotions, tags et niveau de lucidité
-- **Interprétation IA** - Analyse symbolique et psychologique via Claude (OpenRouter)
-- **Thème ésotérique** - Interface mystique avec animations et effets visuels
-- **Statistiques** - Suivez vos patterns de rêves et symboles récurrents
-- **Multi-style** - Interprétations spirituelles, psychologiques ou équilibrées
+🔗 **Production**: [dreamoracle.eu](https://dreamoracle.eu)
 
-## Stack Technique
+---
 
-- **Frontend**: Next.js 16, TypeScript, Tailwind CSS, shadcn/ui
-- **Backend**: Next.js API Routes, Prisma ORM
-- **Database**: PostgreSQL (Vercel Postgres / Neon)
-- **Auth**: NextAuth.js v5
-- **AI**: OpenRouter API (Claude)
+## ✨ Fonctionnalités
 
-## Installation
+### Journal de rêves
+- 📝 Enregistrez vos rêves avec titre, contenu et métadonnées
+- 🎭 Taguez les émotions ressenties
+- 🌟 Évaluez le niveau de lucidité (0-5)
+- 🔄 Marquez les rêves récurrents
+- 😴 Notez la qualité de sommeil
+
+### Interprétation IA
+- 🧠 Analyse symbolique et psychologique via Claude (OpenRouter)
+- 🔮 Trois styles : Spirituel, Psychologique, Équilibré
+- 🏷️ Extraction automatique des symboles clés
+
+### Transcription vocale
+- 🎙️ Dictez vos rêves au réveil
+- 🗣️ Conversion voix → texte via ElevenLabs
+- ⚡ Transcription instantanée
+
+### PWA & Notifications
+- 📱 Installable sur mobile et desktop
+- 🔔 Rappels matinaux personnalisables
+- 📴 Mode hors-ligne (service worker)
+
+### Statistiques
+- 📊 Graphiques d'émotions et lucidité
+- ☁️ Nuage de symboles récurrents
+- 📅 Heatmap d'activité
+- 🔥 Suivi des séries (streaks)
+
+### Abonnements
+- 💳 Paiements sécurisés via Stripe
+- 📈 3 tiers : Free, Essential, Premium
+- 💰 Système de crédits mensuels
+
+---
+
+## 🛠️ Stack Technique
+
+| Couche | Technologies |
+|--------|-------------|
+| **Frontend** | Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/ui |
+| **Animations** | Framer Motion |
+| **State** | Zustand |
+| **Backend** | Next.js API Routes |
+| **Auth** | NextAuth.js v5 |
+| **Database** | Prisma ORM, PostgreSQL |
+| **IA** | OpenRouter API (Claude) |
+| **Voix** | ElevenLabs API |
+| **Paiements** | Stripe |
+| **PWA** | next-pwa, Web Push |
+| **Déploiement** | Docker, Traefik, Hostinger VPS |
+
+---
+
+## 🚀 Installation
 
 ```bash
 # Cloner le repository
@@ -40,57 +88,90 @@ npx prisma db push
 npm run dev
 ```
 
-## Variables d'Environnement
+---
+
+## ⚙️ Variables d'Environnement
 
 ```env
 # Database PostgreSQL
 DATABASE_URL="postgresql://..."
-DIRECT_URL="postgresql://..."
 
 # NextAuth
-NEXTAUTH_SECRET="votre-secret"
+NEXTAUTH_SECRET="votre-secret-32-chars"
 NEXTAUTH_URL="http://localhost:3000"
 
-# OpenRouter API
+# OpenRouter API (interprétation IA)
 OPENROUTER_API_KEY="sk-or-..."
+
+# ElevenLabs (transcription vocale) - optionnel
+ELEVENLABS_API_KEY="..."
+
+# Push Notifications - optionnel
+NEXT_PUBLIC_VAPID_PUBLIC_KEY="..."
+VAPID_PRIVATE_KEY="..."
+
+# Stripe (paiements) - optionnel
+STRIPE_SECRET_KEY="sk_..."
 ```
 
-## Déploiement Vercel
+Voir `.env.example` pour la liste complète.
 
-1. Connectez votre repo GitHub à Vercel
-2. Ajoutez une base de données PostgreSQL (Vercel Postgres ou Neon)
-3. Configurez les variables d'environnement
-4. Déployez
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Architecture technique complète |
+| [docs/API.md](docs/API.md) | Documentation API REST |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Guide de déploiement |
+| [CHANGELOG.md](CHANGELOG.md) | Historique des changements |
+
+---
+
+## 🚢 Déploiement
+
+### Vercel (recommandé pour débuter)
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/laurent7850/DreamOracle)
 
-## Déploiement Hostinger (VPS avec Docker)
+1. Connectez votre repo GitHub à Vercel
+2. Ajoutez une base de données PostgreSQL
+3. Configurez les variables d'environnement
+4. Déployez
 
-L'application peut être déployée sur un VPS Hostinger avec Docker Compose et Traefik.
+### Hostinger VPS (production)
 
-### Prérequis
-- VPS Hostinger avec Docker et Traefik configurés
-- Domaine pointant vers le VPS (enregistrement A)
+L'application est déployée sur un VPS Hostinger avec Docker Compose et Traefik.
 
-### Configuration
+Voir [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) pour le guide complet.
 
-1. Copier le fichier d'exemple:
-```bash
-cp .env.hostinger.example .env.hostinger
-```
+**URL de production**: https://dreamoracle.eu
 
-2. Remplir les variables dans `.env.hostinger`:
-```env
-DB_PASSWORD=your-secure-database-password
-NEXTAUTH_SECRET=your-nextauth-secret
-OPENROUTER_API_KEY=sk-or-v1-your-api-key
-```
+---
 
-3. Déployer via l'API Hostinger ou manuellement avec `docker-compose.hostinger.yml`.
+## 🔐 Sécurité
 
-### URL de production
-- https://dreamoracle.eu
+- ✅ Authentification NextAuth.js avec sessions sécurisées
+- ✅ Validation Zod sur tous les endpoints PATCH/POST
+- ✅ Protection CRON avec secret obligatoire
+- ✅ Limite de pagination (max 100 items)
+- ✅ Validation taille/type fichiers audio
+- ✅ Signature Stripe pour webhooks
 
-## Licence
+---
 
-MIT
+## 📱 PWA
+
+DreamOracle est une Progressive Web App complète :
+
+- **Installation** : Ajoutez à l'écran d'accueil depuis le navigateur
+- **Notifications** : Rappels matinaux configurables
+- **Raccourcis** : "Nouveau rêve" et "Mes rêves" depuis l'icône
+- **Hors-ligne** : Service worker pour mode déconnecté
+
+---
+
+## 📄 Licence
+
+MIT © 2026 Laurent
