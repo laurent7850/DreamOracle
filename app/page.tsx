@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Moon, Star, Sparkles, BookOpen, Brain, Lock } from "lucide-react";
+import { Moon, Star, Sparkles, BookOpen, Brain, Lock, Check, ArrowRight, Crown, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StarField } from "@/components/shared/StarField";
 import { OracleIcon, CrystalIcon, DreamCatcherIcon } from "@/components/shared/MysticIcons";
+import { TIERS, formatPrice } from "@/lib/subscription";
 
 export default function LandingPage() {
   return (
@@ -16,6 +17,11 @@ export default function LandingPage() {
           <span className="font-display text-lg sm:text-xl text-lunar">DreamOracle</span>
         </Link>
         <div className="flex items-center gap-2 sm:gap-4">
+          <Link href="/pricing" className="hidden sm:block">
+            <Button variant="ghost" className="text-lunar hover:text-mystic-300 hover:bg-mystic-900/30 text-sm sm:text-base px-2 sm:px-4">
+              Tarifs
+            </Button>
+          </Link>
           <Link href="/login">
             <Button variant="ghost" className="text-lunar hover:text-mystic-300 hover:bg-mystic-900/30 text-sm sm:text-base px-2 sm:px-4">
               Connexion
@@ -156,6 +162,128 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="relative z-10 px-4 sm:px-6 py-12 sm:py-16 md:py-24 md:px-12 lg:px-20">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-lunar mb-3 sm:mb-4">
+            Choisissez votre voyage
+          </h2>
+          <div className="divider-ornament max-w-xs mx-auto mb-4">
+            <Star className="w-4 h-4" />
+          </div>
+          <p className="text-mystic-300 font-mystical text-sm sm:text-base max-w-2xl mx-auto">
+            Commencez gratuitement et évoluez selon vos besoins
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto">
+          {/* Free Tier */}
+          <div className="glass-card p-5 sm:p-6 flex flex-col">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-mystic-800/50">
+                <Moon className="h-5 w-5 text-mystic-400" />
+              </div>
+              <div>
+                <h3 className="font-display text-lg text-lunar">{TIERS.FREE.displayName}</h3>
+                <p className="text-xs text-mystic-400">{TIERS.FREE.description}</p>
+              </div>
+            </div>
+            <div className="text-2xl sm:text-3xl font-bold text-lunar mb-4">Gratuit</div>
+            <ul className="space-y-2 mb-6 flex-grow">
+              {TIERS.FREE.features.slice(0, 4).map((feature, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-mystic-300">
+                  <Check className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <Link href="/register" className="w-full">
+              <Button variant="outline" className="w-full border-mystic-600 text-mystic-300 hover:bg-mystic-800/50">
+                Commencer gratuitement
+              </Button>
+            </Link>
+          </div>
+
+          {/* Essential Tier - Highlighted */}
+          <div className="glass-card p-5 sm:p-6 flex flex-col border-mystic-500/50 relative">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+              <span className="bg-gradient-to-r from-mystic-500 to-purple-500 text-white text-xs font-medium px-3 py-1 rounded-full">
+                Populaire
+              </span>
+            </div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-mystic-700/50">
+                <Star className="h-5 w-5 text-mystic-300" />
+              </div>
+              <div>
+                <h3 className="font-display text-lg text-lunar">{TIERS.ESSENTIAL.displayName}</h3>
+                <p className="text-xs text-mystic-400">{TIERS.ESSENTIAL.description}</p>
+              </div>
+            </div>
+            <div className="mb-4">
+              <span className="text-2xl sm:text-3xl font-bold text-lunar">{formatPrice(TIERS.ESSENTIAL.monthlyPrice)}</span>
+              <span className="text-mystic-400 text-sm">/mois</span>
+            </div>
+            <ul className="space-y-2 mb-4 flex-grow">
+              {TIERS.ESSENTIAL.features.slice(0, 5).map((feature, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-mystic-300">
+                  <Check className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="flex items-center justify-center gap-1.5 text-xs text-mystic-400 mb-4">
+              <Mic className="h-3 w-3" />
+              <span>Inclut la transcription vocale</span>
+            </div>
+            <Link href="/pricing" className="w-full">
+              <Button className="w-full btn-mystic">
+                Essai gratuit 7 jours
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+
+          {/* Premium Tier */}
+          <div className="glass-card p-5 sm:p-6 flex flex-col sm:col-span-2 lg:col-span-1">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-gold/20">
+                <Crown className="h-5 w-5 text-gold" />
+              </div>
+              <div>
+                <h3 className="font-display text-lg text-lunar">{TIERS.PREMIUM.displayName}</h3>
+                <p className="text-xs text-mystic-400">{TIERS.PREMIUM.description}</p>
+              </div>
+            </div>
+            <div className="mb-4">
+              <span className="text-2xl sm:text-3xl font-bold text-lunar">{formatPrice(TIERS.PREMIUM.monthlyPrice)}</span>
+              <span className="text-mystic-400 text-sm">/mois</span>
+            </div>
+            <ul className="space-y-2 mb-6 flex-grow">
+              {TIERS.PREMIUM.features.slice(0, 5).map((feature, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-mystic-300">
+                  <Check className="h-4 w-4 text-gold flex-shrink-0 mt-0.5" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <Link href="/pricing" className="w-full">
+              <Button className="w-full btn-mystic btn-gold">
+                Débloquer l&apos;Oracle
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        <div className="text-center mt-8">
+          <Link href="/pricing" className="text-mystic-400 hover:text-mystic-300 text-sm inline-flex items-center gap-1">
+            Voir tous les détails et comparer les plans
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </section>
 
