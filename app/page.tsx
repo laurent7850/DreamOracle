@@ -9,8 +9,20 @@ import { TIERS, formatPrice } from "@/lib/subscription";
 export default function LandingPage() {
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Hero Background Image */}
-      <div className="absolute inset-0 z-0">
+      {/* Hero Background Image - Mobile */}
+      <div className="absolute inset-0 z-0 md:hidden">
+        <Image
+          src="/images/hero-mobile.jpg"
+          alt="DreamOracle - Portail onirique"
+          fill
+          className="object-cover object-center"
+          priority
+          quality={90}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-night/60 via-night/40 to-night" />
+      </div>
+      {/* Hero Background Image - Desktop */}
+      <div className="absolute inset-0 z-0 hidden md:block">
         <Image
           src="/images/hero-bg.png"
           alt="DreamOracle - Portail onirique"
