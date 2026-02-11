@@ -1,7 +1,7 @@
 {
   "name": "DreamOracle - Journal de Rêves",
   "short_name": "DreamOracle",
-  "description": "Explorez et interprétez vos rêves grâce à l'intelligence artificielle",
+  "description": "Explorez et interprétez vos rêves grâce à l'Oracle",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#0a0a1a",

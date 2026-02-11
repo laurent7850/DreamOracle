@@ -36,6 +36,7 @@ model User {
   sessions      Session[]
   usageLogs     UsageLog[]
   pushSubscriptions PushSubscription[]
+  symbols       UserSymbol[]
 }
 
 model Dream {
@@ -129,5 +130,20 @@ model PushSubscription {
   auth      String
   createdAt DateTime @default(now())
 
+  @@index([userId])
+}
+
+model UserSymbol {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  meaning      String
+  personalNote String?
+  occurrences  Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, name])
   @@index([userId])
 }

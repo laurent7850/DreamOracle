@@ -16,6 +16,9 @@ import {
   Smartphone,
   LogOut,
   X,
+  Brain,
+  Sparkles,
+  Cloud,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -44,6 +47,21 @@ const mainNavItems = [
 ];
 
 const moreNavItems = [
+  {
+    href: "/coach",
+    label: "Dream Coach",
+    icon: Brain,
+  },
+  {
+    href: "/symbols",
+    label: "Symboles",
+    icon: Sparkles,
+  },
+  {
+    href: "/backup",
+    label: "Sauvegarde",
+    icon: Cloud,
+  },
   {
     href: "/calendar",
     label: "Calendrier",

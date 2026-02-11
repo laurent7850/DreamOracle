@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Lock, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -13,6 +13,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { INTERPRETATION_STYLES } from "@/types";
+import Link from "next/link";
+
+// Theme definitions
+const THEMES = [
+  { value: "dark", label: "Nuit Étoilée", premium: false, emoji: "🌙" },
+  { value: "midnight", label: "Minuit Profond", premium: false, emoji: "🌑" },
+  { value: "aurora", label: "Aurore Boréale", premium: true, emoji: "🌌" },
+  { value: "cosmic", label: "Cosmos Violet", premium: true, emoji: "💜" },
+  { value: "ocean", label: "Océan Profond", premium: true, emoji: "🌊" },
+  { value: "sunset", label: "Crépuscule Doré", premium: true, emoji: "🌅" },
+];
 
 interface SettingsFormProps {
   initialSettings: {
@@ -21,11 +32,27 @@ interface SettingsFormProps {
     notificationsEnabled: boolean;
     theme: string;
   };
+  isPremium?: boolean;
 }
 
-export function SettingsForm({ initialSettings }: SettingsFormProps) {
+export function SettingsForm({ initialSettings, isPremium = false }: SettingsFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [settings, setSettings] = useState(initialSettings);
+  const [userTier, setUserTier] = useState<string>("FREE");
+
+  // Check user tier on mount
+  useEffect(() => {
+    const checkTier = async () => {
+      try {
+        const res = await fetch("/api/usage");
+        const data = await res.json();
+        setUserTier(data.tier || "FREE");
+      } catch {
+        // Ignore
+      }
+    };
+    checkTier();
+  }, []);
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -105,26 +132,46 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
       {/* Theme */}
       <div className="space-y-2">
-        <Label className="text-lunar">Thème visuel</Label>
+        <div className="flex items-center justify-between">
+          <Label className="text-lunar">Thème visuel</Label>
+          {userTier !== "PREMIUM" && (
+            <Link href="/pricing" className="text-xs text-gold flex items-center gap-1 hover:underline">
+              <Crown className="w-3 h-3" />
+              Plus de thèmes
+            </Link>
+          )}
+        </div>
         <Select
           value={settings.theme}
-          onValueChange={(value) =>
-            setSettings({ ...settings, theme: value })
-          }
+          onValueChange={(value) => {
+            const theme = THEMES.find(t => t.value === value);
+            if (theme?.premium && userTier !== "PREMIUM") {
+              toast.error("Ce thème est réservé aux abonnés Oracle+");
+              return;
+            }
+            setSettings({ ...settings, theme: value });
+          }}
         >
           <SelectTrigger className="bg-mystic-900/30 border-mystic-600/30 text-lunar">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-night-light border-mystic-700">
-            <SelectItem value="dark" className="text-lunar hover:bg-mystic-800">
-              Nuit Étoilée (par défaut)
-            </SelectItem>
-            <SelectItem value="midnight" className="text-lunar hover:bg-mystic-800">
-              Minuit Profond
-            </SelectItem>
-            <SelectItem value="aurora" className="text-lunar hover:bg-mystic-800">
-              Aurore Boréale
-            </SelectItem>
+            {THEMES.map((theme) => (
+              <SelectItem
+                key={theme.value}
+                value={theme.value}
+                className="text-lunar hover:bg-mystic-800"
+                disabled={theme.premium && userTier !== "PREMIUM"}
+              >
+                <div className="flex items-center gap-2">
+                  <span>{theme.emoji}</span>
+                  <span>{theme.label}</span>
+                  {theme.premium && userTier !== "PREMIUM" && (
+                    <Lock className="w-3 h-3 text-mystic-500 ml-auto" />
+                  )}
+                </div>
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

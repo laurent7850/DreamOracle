@@ -220,3 +220,22 @@ export function getUpgradeRecommendation(
 
   return null;
 }
+
+// Check if user has access to a feature (async - fetches user tier from DB)
+export async function hasFeatureAccess(
+  userId: string,
+  feature: keyof TierLimits['features']
+): Promise<boolean> {
+  // Import prisma here to avoid circular dependencies
+  const { prisma } = await import('@/lib/db');
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { subscriptionTier: true },
+  });
+
+  if (!user) return false;
+
+  const tier = user.subscriptionTier as SubscriptionTier;
+  return hasFeature(tier, feature);
+}

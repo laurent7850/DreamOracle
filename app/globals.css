@@ -134,6 +134,85 @@
   --sidebar-ring: #8b5cf6;
 }
 
+/* Theme: Midnight (Darker, more minimal) */
+[data-theme="midnight"] {
+  --background: #050510;
+  --card: rgba(10, 10, 26, 0.9);
+  --popover: #0a0a1a;
+  --secondary: #0a0a1a;
+  --muted: #12122a;
+  --border: rgba(100, 100, 150, 0.15);
+  --input: rgba(100, 100, 150, 0.1);
+}
+
+[data-theme="midnight"] body {
+  background: linear-gradient(180deg, #050510 0%, #0a0a1a 100%);
+}
+
+/* Theme: Aurora (Green-blue northern lights) - PREMIUM */
+[data-theme="aurora"] {
+  --primary: #4ecdc4;
+  --ring: #4ecdc4;
+  --accent: #7fff7f;
+  --chart-1: #4ecdc4;
+  --chart-2: #7fff7f;
+  --chart-3: #00d9ff;
+  --border: rgba(78, 205, 196, 0.2);
+  --input: rgba(78, 205, 196, 0.1);
+}
+
+[data-theme="aurora"] body {
+  background: linear-gradient(135deg, #0a1a1a 0%, #1a3a3a 50%, #0d2d2d 100%);
+}
+
+/* Theme: Cosmic (Deep purple galaxy) - PREMIUM */
+[data-theme="cosmic"] {
+  --primary: #9b59b6;
+  --ring: #9b59b6;
+  --accent: #e91e63;
+  --chart-1: #9b59b6;
+  --chart-2: #e91e63;
+  --chart-3: #ff6b9d;
+  --border: rgba(155, 89, 182, 0.25);
+  --input: rgba(155, 89, 182, 0.1);
+}
+
+[data-theme="cosmic"] body {
+  background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #4a1a6b 100%);
+}
+
+/* Theme: Ocean (Deep blue sea) - PREMIUM */
+[data-theme="ocean"] {
+  --primary: #0077b6;
+  --ring: #0077b6;
+  --accent: #00b4d8;
+  --chart-1: #0077b6;
+  --chart-2: #00b4d8;
+  --chart-3: #90e0ef;
+  --border: rgba(0, 119, 182, 0.2);
+  --input: rgba(0, 119, 182, 0.1);
+}
+
+[data-theme="ocean"] body {
+  background: linear-gradient(135deg, #03071e 0%, #0a1628 50%, #0d2137 100%);
+}
+
+/* Theme: Sunset (Warm golden/orange) - PREMIUM */
+[data-theme="sunset"] {
+  --primary: #f77f00;
+  --ring: #f77f00;
+  --accent: #fcbf49;
+  --chart-1: #f77f00;
+  --chart-2: #fcbf49;
+  --chart-3: #d62828;
+  --border: rgba(247, 127, 0, 0.2);
+  --input: rgba(247, 127, 0, 0.1);
+}
+
+[data-theme="sunset"] body {
+  background: linear-gradient(135deg, #1a0a0a 0%, #2d1b1b 50%, #3d1a1a 100%);
+}
+
 /* Keyframes */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }

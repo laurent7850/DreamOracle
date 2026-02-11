@@ -102,6 +102,103 @@ Réponds avec un JSON valide uniquement.`;
   }
 }
 
+// Dream Coach - personalized conversation about dreams
+const DREAM_COACH_SYSTEM_PROMPT = `Tu es le Dream Coach de DreamOracle, un guide bienveillant et sage spécialisé dans l'exploration des rêves.
+
+Tu as accès à l'historique des rêves de l'utilisateur et tu peux:
+- Identifier des patterns récurrents dans leurs rêves
+- Expliquer la signification des symboles personnels
+- Aider à comprendre les messages du subconscient
+- Suggérer des techniques pour mieux se souvenir des rêves
+- Guider vers une meilleure compréhension de soi
+
+Style de communication:
+- Chaleureux et empathique
+- Mystique mais accessible
+- Jamais alarmiste ou anxiogène
+- Utilise des métaphores liées aux étoiles, à la lune, au voyage intérieur
+- Réponds en français
+
+Tu t'appelles "Oracle" et tu tutoies l'utilisateur comme un ami bienveillant.`;
+
+export interface DreamCoachMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export async function chatWithDreamCoach(
+  messages: DreamCoachMessage[],
+  dreamContext?: {
+    recentDreams?: Array<{
+      title: string;
+      content: string;
+      dreamDate: Date;
+      interpretation?: string | null;
+      symbols: string[];
+    }>;
+    userName?: string;
+  }
+): Promise<string> {
+  // Build context about user's dreams
+  let contextPrompt = "";
+
+  if (dreamContext?.userName) {
+    contextPrompt += `L'utilisateur s'appelle ${dreamContext.userName}.\n\n`;
+  }
+
+  if (dreamContext?.recentDreams && dreamContext.recentDreams.length > 0) {
+    contextPrompt += "Voici les rêves récents de l'utilisateur pour contexte:\n\n";
+    for (const dream of dreamContext.recentDreams.slice(0, 5)) {
+      contextPrompt += `📅 ${new Date(dream.dreamDate).toLocaleDateString("fr-FR")} - "${dream.title}"\n`;
+      contextPrompt += `Contenu: ${dream.content.substring(0, 300)}${dream.content.length > 300 ? "..." : ""}\n`;
+      if (dream.symbols.length > 0) {
+        contextPrompt += `Symboles: ${dream.symbols.join(", ")}\n`;
+      }
+      contextPrompt += "\n";
+    }
+  }
+
+  const systemMessage = DREAM_COACH_SYSTEM_PROMPT + (contextPrompt ? `\n\nContexte:\n${contextPrompt}` : "");
+
+  try {
+    const response = await fetch(OPENROUTER_API_URL, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": process.env.NEXTAUTH_URL || "http://localhost:3000",
+        "X-Title": "DreamOracle - Dream Coach",
+      },
+      body: JSON.stringify({
+        model: "anthropic/claude-sonnet-4",
+        max_tokens: 1000,
+        messages: [
+          {
+            role: "system",
+            content: systemMessage,
+          },
+          ...messages.map((m) => ({
+            role: m.role,
+            content: m.content,
+          })),
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("OpenRouter API error:", error);
+      throw new Error(`OpenRouter API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || "Je suis désolé, je n'ai pas pu répondre. Réessaie !";
+  } catch (error) {
+    console.error("Error in Dream Coach:", error);
+    throw new Error("Erreur de communication avec le Dream Coach");
+  }
+}
+
 export function formatInterpretationAsText(
   interpretation: DreamInterpretation
 ): string {

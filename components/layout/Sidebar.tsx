@@ -17,6 +17,9 @@ import {
   BarChart3,
   Calendar,
   Crown,
+  Brain,
+  Sparkles,
+  Cloud,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -37,6 +40,24 @@ const navItems = [
     href: "/dreams/new",
     label: "Nouveau rêve",
     icon: PlusCircle,
+  },
+  {
+    href: "/coach",
+    label: "Dream Coach",
+    icon: Brain,
+    premium: true,
+  },
+  {
+    href: "/symbols",
+    label: "Symboles",
+    icon: Sparkles,
+    premium: true,
+  },
+  {
+    href: "/backup",
+    label: "Sauvegarde",
+    icon: Cloud,
+    premium: true,
   },
   {
     href: "/calendar",
