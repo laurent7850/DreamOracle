@@ -103,7 +103,7 @@ export const TIERS: Record<SubscriptionTier, TierInfo> = {
     limits: TIER_LIMITS.FREE,
     features: [
       'Journal de rêves illimité',
-      '3 interprétations IA par mois',
+      '3 interprétations Oracle par mois',
       'Calendrier des rêves',
       'Statistiques de base',
       'Tags et émotions',
@@ -120,7 +120,7 @@ export const TIERS: Record<SubscriptionTier, TierInfo> = {
     highlighted: true,
     features: [
       'Tout de Rêveur +',
-      '30 interprétations IA par mois',
+      '30 interprétations Oracle par mois',
       '🎙️ Transcription vocale (20/mois)',
       'Détection des patterns récurrents',
       'Statistiques avancées',
@@ -132,8 +132,8 @@ export const TIERS: Record<SubscriptionTier, TierInfo> = {
   },
   PREMIUM: {
     name: 'PREMIUM',
-    displayName: 'Oracle',
-    description: 'L\'expérience ultime avec Dream Coach IA',
+    displayName: 'Oracle+',
+    description: 'L\'expérience ultime avec Dream Coach',
     monthlyPrice: 1399, // 13.99€
     yearlyPrice: 10788, // 109.88€ (9.16€/mois - 35% discount)
     yearlyDiscount: 35,
@@ -142,7 +142,7 @@ export const TIERS: Record<SubscriptionTier, TierInfo> = {
       'Tout de Explorateur +',
       'Interprétations illimitées',
       '🎙️ Transcription vocale illimitée',
-      '🧠 Dream Coach IA personnalisé',
+      '🧠 Dream Coach personnalisé',
       'Dictionnaire de symboles personnel',
       'Thèmes personnalisés',
       'Export PDF illimité',

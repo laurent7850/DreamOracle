@@ -47,7 +47,7 @@ export default function TermsPage() {
             <p className="leading-relaxed text-sm sm:text-base">
               Les présentes Conditions Générales d&apos;Utilisation (CGU) régissent l&apos;utilisation
               du service DreamOracle, une application web d&apos;enregistrement et d&apos;interprétation
-              de rêves par intelligence artificielle, accessible à l&apos;adresse{" "}
+              de rêves, accessible à l&apos;adresse{" "}
               <a
                 href="https://dreamoracle.eu"
                 className="text-primary hover:underline break-all"
@@ -92,7 +92,7 @@ export default function TermsPage() {
             </p>
             <ul className="list-disc pl-5 sm:pl-6 space-y-1.5 sm:space-y-2 text-sm sm:text-base">
               <li>Enregistrement et stockage sécurisé de vos rêves</li>
-              <li>Interprétation des rêves par intelligence artificielle</li>
+              <li>Interprétation des rêves par l&apos;Oracle</li>
               <li>Transcription vocale de vos récits de rêves</li>
               <li>Suivi statistique et calendrier de vos rêves</li>
               <li>Export de vos données personnelles</li>

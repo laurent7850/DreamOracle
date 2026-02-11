@@ -127,7 +127,7 @@ export default function PrivacyPage() {
             <ul className="list-disc pl-5 sm:pl-6 space-y-2 text-sm sm:text-base">
               <li>
                 <strong>Fournir le service :</strong> Stockage et affichage de vos rêves,
-                génération d&apos;interprétations par IA
+                génération d&apos;interprétations Oracle
               </li>
               <li>
                 <strong>Gestion du compte :</strong> Authentification, gestion des abonnements

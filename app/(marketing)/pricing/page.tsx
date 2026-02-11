@@ -127,7 +127,7 @@ function PricingContent() {
             </span>
           </h1>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto px-2">
-            Explorez vos rêves avec l&apos;intelligence artificielle.
+            Explorez vos rêves avec l&apos;Oracle.
             Commencez gratuitement et évoluez selon vos besoins.
           </p>
         </div>
@@ -332,7 +332,7 @@ function PricingContent() {
                     Explorateur
                   </th>
                   <th className="text-center py-3 sm:py-4 px-2 sm:px-4 text-amber-400 font-medium text-xs sm:text-sm md:text-base">
-                    Oracle
+                    Oracle+
                   </th>
                 </tr>
               </thead>
@@ -344,7 +344,7 @@ function PricingContent() {
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
                 </tr>
                 <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Interprétations IA</td>
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Interprétations Oracle</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-slate-400">3/mois</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">30/mois</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
@@ -375,7 +375,7 @@ function PricingContent() {
                 <tr className="border-b border-slate-800 bg-amber-500/5">
                   <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300 flex items-center gap-2">
                     <Brain className="h-4 w-4 text-amber-400" />
-                    Dream Coach IA
+                    Dream Coach
                   </td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
                     <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
@@ -493,11 +493,11 @@ function PricingContent() {
 
             <div className="bg-slate-800/50 rounded-lg sm:rounded-xl p-4 sm:p-6">
               <h3 className="text-sm sm:text-lg font-medium text-white mb-1.5 sm:mb-2">
-                Qu&apos;est-ce que le Dream Coach IA ?
+                Qu&apos;est-ce que le Dream Coach ?
               </h3>
               <p className="text-slate-400 text-xs sm:text-base">
                 Le Dream Coach est votre guide personnel dans l&apos;exploration de vos rêves.
-                Exclusif au plan Oracle, il analyse l&apos;ensemble de votre journal pour
+                Exclusif au plan Oracle+, il analyse l&apos;ensemble de votre journal pour
                 identifier des patterns, des thèmes récurrents et vous offre des
                 conseils personnalisés pour mieux comprendre votre monde onirique.
               </p>

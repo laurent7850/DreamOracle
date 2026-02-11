@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Moon, Star, Sparkles, BookOpen, Brain, Lock, Check, ArrowRight, Crown, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StarField } from "@/components/shared/StarField";
@@ -8,7 +9,19 @@ import { TIERS, formatPrice } from "@/lib/subscription";
 export default function LandingPage() {
   return (
     <div className="relative min-h-screen overflow-hidden">
-      <StarField count={150} />
+      {/* Hero Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/hero-bg.png"
+          alt="DreamOracle - Portail onirique"
+          fill
+          className="object-cover object-center"
+          priority
+          quality={90}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-night/70 via-night/50 to-night" />
+      </div>
+      <StarField count={80} />
 
       {/* Navigation */}
       <nav className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 md:px-12 lg:px-20">
@@ -89,7 +102,7 @@ export default function LandingPage() {
           <FeatureCard
             icon={<OracleIcon className="w-10 h-10" />}
             title="Interprétez"
-            description="Notre Oracle IA analyse vos rêves selon la symbolique jungienne et ésotérique pour révéler leur signification."
+            description="Notre Oracle analyse vos rêves selon la symbolique jungienne et ésotérique pour révéler leur signification."
           />
           <FeatureCard
             icon={<Brain className="w-10 h-10" />}

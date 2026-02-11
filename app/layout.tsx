@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | DreamOracle",
   },
   description:
-    "Explorez les mystères de vos rêves avec DreamOracle. Enregistrez, analysez et interprétez vos rêves grâce à l'intelligence artificielle.",
+    "Explorez les mystères de vos rêves avec DreamOracle. Enregistrez, analysez et interprétez vos rêves grâce à l'Oracle.",
   keywords: [
     "rêves",
     "interprétation",

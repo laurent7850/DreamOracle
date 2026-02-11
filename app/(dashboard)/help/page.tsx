@@ -33,7 +33,7 @@ export default function HelpPage() {
         </h1>
         <p className="text-mystic-400 max-w-2xl mx-auto">
           Bienvenue dans DreamOracle, votre oracle personnel pour explorer et
-          comprendre vos rêves grâce à l&apos;intelligence artificielle.
+          comprendre vos rêves grâce à l&apos;Oracle.
         </p>
       </div>
 
