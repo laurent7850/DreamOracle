@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { VoiceRecorder } from "@/components/ui/VoiceRecorder";
 
 interface Message {
   id: string;
@@ -318,6 +319,11 @@ Pose-moi une question sur tes rêves, ou choisis une suggestion ci-dessous !`,
           className="p-4 border-t border-mystic-700/30"
         >
           <div className="flex gap-2">
+            <VoiceRecorder
+              onTranscript={(text) => setInput(prev => prev ? `${prev} ${text}` : text)}
+              disabled={isLoading}
+              className="rounded-full"
+            />
             <input
               type="text"
               value={input}
