@@ -71,6 +71,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token;
     },
+    async signIn({ user }) {
+      // Update lastLoginAt on sign in
+      if (user.id) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { lastLoginAt: new Date() },
+        }).catch(() => {
+          // Ignore errors (e.g., field doesn't exist yet)
+        });
+      }
+      return true;
+    },
   },
 });
 
