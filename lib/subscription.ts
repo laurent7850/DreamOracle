@@ -39,9 +39,9 @@ export interface TierInfo {
 // Limits configuration by tier
 export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
   FREE: {
-    dreams: 5,
-    interpretations: 2,
-    transcriptions: 3,  // 3 transcriptions for free tier
+    dreams: -1, // unlimited journal (recommandation audit)
+    interpretations: 3,
+    transcriptions: 0, // transcription reserved for paid tiers
     exports: 0,
     features: {
       calendar: true,
@@ -57,9 +57,9 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
   },
   ESSENTIAL: {
     dreams: -1, // unlimited
-    interpretations: 15,
-    transcriptions: 10,
-    exports: 5,
+    interpretations: 30,
+    transcriptions: 20,
+    exports: 10,
     features: {
       calendar: true,
       basicStats: true,
@@ -67,7 +67,7 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
       notifications: true,
       themes: false,
       symbolDictionary: false,
-      patternAnalysis: false,
+      patternAnalysis: true, // patterns moved to Essential (audit)
       prioritySupport: false,
       cloudBackup: false,
     },
@@ -96,35 +96,36 @@ export const TIERS: Record<SubscriptionTier, TierInfo> = {
   FREE: {
     name: 'FREE',
     displayName: 'Rêveur',
-    description: 'Parfait pour découvrir DreamOracle',
+    description: 'Votre journal de rêves personnel',
     monthlyPrice: 0,
     yearlyPrice: 0,
     yearlyDiscount: 0,
     limits: TIER_LIMITS.FREE,
     features: [
-      '5 rêves par mois',
-      '2 interprétations IA par mois',
-      '3 transcriptions vocales par mois',
+      'Journal de rêves illimité',
+      '3 interprétations IA par mois',
       'Calendrier des rêves',
-      'Statistiques de base (streak)',
+      'Statistiques de base',
+      'Tags et émotions',
     ],
   },
   ESSENTIAL: {
     name: 'ESSENTIAL',
     displayName: 'Explorateur',
-    description: 'Pour les explorateurs de rêves réguliers',
-    monthlyPrice: 499, // 4.99€
-    yearlyPrice: 3999, // 39.99€ (33% discount)
-    yearlyDiscount: 33,
+    description: 'Explorez vos rêves en profondeur',
+    monthlyPrice: 799, // 7.99€
+    yearlyPrice: 5988, // 59.88€ (4.99€/mois - 37% discount)
+    yearlyDiscount: 37,
     limits: TIER_LIMITS.ESSENTIAL,
     highlighted: true,
     features: [
-      'Rêves illimités',
-      '15 interprétations IA par mois',
-      '10 transcriptions vocales par mois',
-      'Statistiques complètes',
+      'Tout de Rêveur +',
+      '30 interprétations IA par mois',
+      '🎙️ Transcription vocale (20/mois)',
+      'Détection des patterns récurrents',
+      'Statistiques avancées',
       'Notifications de rappel',
-      '5 exports PDF par mois',
+      'Export PDF (10/mois)',
     ],
     stripePriceIdMonthly: process.env.STRIPE_PRICE_ESSENTIAL_MONTHLY,
     stripePriceIdYearly: process.env.STRIPE_PRICE_ESSENTIAL_YEARLY,
@@ -132,22 +133,21 @@ export const TIERS: Record<SubscriptionTier, TierInfo> = {
   PREMIUM: {
     name: 'PREMIUM',
     displayName: 'Oracle',
-    description: 'L\'expérience ultime d\'exploration onirique',
-    monthlyPrice: 999, // 9.99€
-    yearlyPrice: 7999, // 79.99€ (33% discount)
-    yearlyDiscount: 33,
+    description: 'L\'expérience ultime avec Dream Coach IA',
+    monthlyPrice: 1399, // 13.99€
+    yearlyPrice: 10788, // 109.88€ (9.16€/mois - 35% discount)
+    yearlyDiscount: 35,
     limits: TIER_LIMITS.PREMIUM,
     features: [
-      'Tout de Explorateur',
+      'Tout de Explorateur +',
       'Interprétations illimitées',
-      'Transcriptions illimitées',
-      'Exports PDF illimités',
-      'Analyse des patterns récurrents',
+      '🎙️ Transcription vocale illimitée',
+      '🧠 Dream Coach IA personnalisé',
       'Dictionnaire de symboles personnel',
       'Thèmes personnalisés',
+      'Export PDF illimité',
       'Sauvegarde cloud',
       'Support prioritaire',
-      'Accès anticipé aux nouveautés',
     ],
     stripePriceIdMonthly: process.env.STRIPE_PRICE_PREMIUM_MONTHLY,
     stripePriceIdYearly: process.env.STRIPE_PRICE_PREMIUM_YEARLY,

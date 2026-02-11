@@ -14,6 +14,9 @@ import {
   Zap,
   ArrowRight,
   Loader2,
+  Mic,
+  Brain,
+  Shield,
 } from "lucide-react";
 import { TIERS, formatPrice, SubscriptionTier } from "@/lib/subscription";
 
@@ -190,6 +193,15 @@ function PricingContent() {
                     </div>
                   )}
 
+                  {tierKey === "PREMIUM" && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium px-4 py-1 rounded-full flex items-center gap-1">
+                        <Crown className="h-3 w-3" />
+                        Expérience complète
+                      </div>
+                    </div>
+                  )}
+
                   {/* Tier icon and name */}
                   <div className="flex items-center gap-3 mb-4">
                     <div
@@ -236,15 +248,25 @@ function PricingContent() {
                     ))}
                   </ul>
 
+                  {/* Trial badge for Essential */}
+                  {tierKey === "ESSENTIAL" && (
+                    <div className="mb-4 text-center">
+                      <span className="inline-flex items-center gap-1.5 text-xs text-indigo-300 bg-indigo-500/10 px-3 py-1 rounded-full">
+                        <Shield className="h-3 w-3" />
+                        7 jours d&apos;essai gratuit
+                      </span>
+                    </div>
+                  )}
+
                   {/* CTA Button */}
                   <button
                     onClick={() => handleSubscribe(tierKey)}
                     disabled={loadingTier === tierKey}
                     className={`w-full py-3 px-6 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${
                       isPopular
-                        ? "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white"
+                        ? "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg shadow-indigo-500/25"
                         : tierKey === "PREMIUM"
-                        ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+                        ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/25"
                         : "bg-slate-700 hover:bg-slate-600 text-white"
                     }`}
                   >
@@ -252,9 +274,9 @@ function PricingContent() {
                       <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
                       <>
-                        {tierKey === "FREE"
-                          ? "Commencer gratuitement"
-                          : "S'abonner"}
+                        {tierKey === "FREE" && "Commencer gratuitement"}
+                        {tierKey === "ESSENTIAL" && "Essayer 7 jours gratuit"}
+                        {tierKey === "PREMIUM" && "Débloquer l'Oracle"}
                         <ArrowRight className="h-4 w-4" />
                       </>
                     )}
@@ -263,6 +285,31 @@ function PricingContent() {
               );
             }
           )}
+        </div>
+
+        {/* Voice transcription highlight */}
+        <div className="mt-12 sm:mt-16 md:mt-20 max-w-4xl mx-auto">
+          <div className="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 border border-indigo-500/30 rounded-2xl p-6 sm:p-8">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                  <Mic className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+                </div>
+              </div>
+              <div className="text-center md:text-left">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">
+                  🎙️ Dictez vos rêves au réveil
+                </h3>
+                <p className="text-slate-300 text-sm sm:text-base mb-3">
+                  Capturez vos rêves instantanément avec la transcription vocale.
+                  Plus besoin de taper — parlez et DreamOracle transcrit automatiquement.
+                </p>
+                <p className="text-indigo-300 text-sm">
+                  Disponible dès le plan Explorateur
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Feature comparison */}
@@ -291,31 +338,61 @@ function PricingContent() {
               </thead>
               <tbody className="text-xs sm:text-sm md:text-base">
                 <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Rêves par mois</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-slate-400">5</td>
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Journal de rêves</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
                 </tr>
                 <tr className="border-b border-slate-800">
                   <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Interprétations IA</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-slate-400">2</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">15</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-slate-400">3/mois</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">30/mois</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
                 </tr>
-                <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Transcription vocale</td>
+                <tr className="border-b border-slate-800 bg-indigo-500/5">
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300 flex items-center gap-2">
+                    <Mic className="h-4 w-4 text-indigo-400" />
+                    Transcription vocale
+                  </td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
                     <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
                   </td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">10/mois</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">20/mois</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
+                </tr>
+                <tr className="border-b border-slate-800">
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Détection patterns</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
+                </tr>
+                <tr className="border-b border-slate-800 bg-amber-500/5">
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300 flex items-center gap-2">
+                    <Brain className="h-4 w-4 text-amber-400" />
+                    Dream Coach IA
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
                 </tr>
                 <tr className="border-b border-slate-800">
                   <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Export PDF</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
                     <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
                   </td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">5/mois</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">10/mois</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
                 </tr>
                 <tr className="border-b border-slate-800">
@@ -343,7 +420,7 @@ function PricingContent() {
                   </td>
                 </tr>
                 <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Notifications</td>
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Notifications rappel</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
                     <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
                   </td>
@@ -355,7 +432,7 @@ function PricingContent() {
                   </td>
                 </tr>
                 <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Analyse patterns</td>
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Dictionnaire symboles</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
                     <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
                   </td>
@@ -392,6 +469,42 @@ function PricingContent() {
           <div className="space-y-3 sm:space-y-4">
             <div className="bg-slate-800/50 rounded-lg sm:rounded-xl p-4 sm:p-6">
               <h3 className="text-sm sm:text-lg font-medium text-white mb-1.5 sm:mb-2">
+                Comment fonctionne l&apos;essai gratuit de 7 jours ?
+              </h3>
+              <p className="text-slate-400 text-xs sm:text-base">
+                En choisissant le plan Explorateur, vous bénéficiez de 7 jours d&apos;essai
+                complet sans engagement. Vous ne serez facturé qu&apos;à la fin de la période
+                d&apos;essai si vous décidez de continuer. Annulez à tout moment avant la fin
+                des 7 jours et vous ne paierez rien.
+              </p>
+            </div>
+
+            <div className="bg-slate-800/50 rounded-lg sm:rounded-xl p-4 sm:p-6">
+              <h3 className="text-sm sm:text-lg font-medium text-white mb-1.5 sm:mb-2">
+                Comment fonctionne la transcription vocale ?
+              </h3>
+              <p className="text-slate-400 text-xs sm:text-base">
+                La transcription vocale vous permet de dicter vos rêves au réveil.
+                Appuyez sur le bouton micro, parlez naturellement, et DreamOracle
+                convertit votre voix en texte automatiquement. Idéal pour capturer
+                vos rêves avant qu&apos;ils ne s&apos;effacent !
+              </p>
+            </div>
+
+            <div className="bg-slate-800/50 rounded-lg sm:rounded-xl p-4 sm:p-6">
+              <h3 className="text-sm sm:text-lg font-medium text-white mb-1.5 sm:mb-2">
+                Qu&apos;est-ce que le Dream Coach IA ?
+              </h3>
+              <p className="text-slate-400 text-xs sm:text-base">
+                Le Dream Coach est votre guide personnel dans l&apos;exploration de vos rêves.
+                Exclusif au plan Oracle, il analyse l&apos;ensemble de votre journal pour
+                identifier des patterns, des thèmes récurrents et vous offre des
+                conseils personnalisés pour mieux comprendre votre monde onirique.
+              </p>
+            </div>
+
+            <div className="bg-slate-800/50 rounded-lg sm:rounded-xl p-4 sm:p-6">
+              <h3 className="text-sm sm:text-lg font-medium text-white mb-1.5 sm:mb-2">
                 Puis-je changer de plan à tout moment ?
               </h3>
               <p className="text-slate-400 text-xs sm:text-base">
@@ -404,12 +517,12 @@ function PricingContent() {
 
             <div className="bg-slate-800/50 rounded-lg sm:rounded-xl p-4 sm:p-6">
               <h3 className="text-sm sm:text-lg font-medium text-white mb-1.5 sm:mb-2">
-                Que se passe-t-il si j&apos;atteins ma limite ?
+                Que se passe-t-il si j&apos;atteins ma limite mensuelle ?
               </h3>
               <p className="text-slate-400 text-xs sm:text-base">
                 Vous recevrez une notification et pourrez choisir de mettre à
                 niveau votre plan ou d&apos;attendre le renouvellement mensuel de vos
-                crédits.
+                crédits. Vos rêves enregistrés restent toujours accessibles.
               </p>
             </div>
 
@@ -418,9 +531,9 @@ function PricingContent() {
                 Y a-t-il un engagement ?
               </h3>
               <p className="text-slate-400 text-xs sm:text-base">
-                Non, vous pouvez annuler votre abonnement à tout moment. Avec
-                l&apos;abonnement annuel, vous bénéficiez d&apos;une réduction mais restez
-                libre d&apos;annuler.
+                Non, aucun engagement ! Vous pouvez annuler votre abonnement à tout moment.
+                Avec l&apos;abonnement annuel, vous bénéficiez d&apos;une réduction importante
+                mais restez libre d&apos;annuler quand vous le souhaitez.
               </p>
             </div>
 
@@ -429,9 +542,9 @@ function PricingContent() {
                 Mes données sont-elles sécurisées ?
               </h3>
               <p className="text-slate-400 text-xs sm:text-base">
-                Absolument. Vos rêves sont privés et chiffrés. Nous ne partageons
-                jamais vos données avec des tiers et vous pouvez les supprimer à
-                tout moment.
+                Absolument. Vos rêves sont privés et sécurisés. Nous ne partageons
+                jamais vos données avec des tiers et vous pouvez les exporter ou
+                les supprimer à tout moment. Vos rêves vous appartiennent.
               </p>
             </div>
           </div>
