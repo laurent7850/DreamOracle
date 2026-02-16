@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { stripe, priceIdToTier, mapStripeStatus } from '@/lib/stripe';
 import { prisma } from '@/lib/db';
+import { createAndSendInvoice, getInvoiceDescription } from '@/lib/invoice';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -217,5 +218,41 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
     });
 
     console.log(`Payment succeeded, restored active status for user ${user.id}`);
+  }
+
+  // Generate and send invoice PDF
+  // Skip $0 invoices (free tier) and draft/void invoices
+  const amountPaid = invoice.amount_paid ?? 0;
+  if (amountPaid > 0 && invoice.status === 'paid') {
+    try {
+      // Determine subscription tier and interval from line items
+      const lineItem = invoice.lines?.data?.[0];
+      const pricing = lineItem?.pricing;
+      // Extract price ID from pricing.price_details.price (string or Price object)
+      const priceRef = pricing?.price_details?.price;
+      const priceId = typeof priceRef === 'string' ? priceRef : priceRef?.id || '';
+      const priceObj = typeof priceRef === 'object' ? priceRef : null;
+      const interval = priceObj?.recurring?.interval || 'month';
+      const tier = priceIdToTier(priceId) || user.subscriptionTier || 'ESSENTIAL';
+      const description = getInvoiceDescription(tier, interval);
+
+      const result = await createAndSendInvoice({
+        userId: user.id,
+        stripeInvoiceId: invoice.id,
+        amountTTC: amountPaid,
+        description,
+        customerName: user.name,
+        customerEmail: user.email,
+      });
+
+      if (result.success) {
+        console.log(`Invoice ${result.invoiceNumber} sent to ${user.email}`);
+      } else {
+        console.error(`Failed to create/send invoice for user ${user.id}`);
+      }
+    } catch (error) {
+      console.error('Invoice generation error:', error);
+      // Don't fail the webhook - invoice generation is non-critical
+    }
   }
 }
