@@ -26,15 +26,15 @@ export async function GET(request: NextRequest) {
     // Calculate today's biorhythm
     const cycles = calculateBiorhythm(user.birthDate, targetDate);
 
-    // Calculate 30-day range for chart (15 days before, 15 days after)
+    // Calculate 60-day range for chart (30 days before, 30 days after)
     const startDate = new Date(targetDate);
-    startDate.setDate(startDate.getDate() - 15);
+    startDate.setDate(startDate.getDate() - 30);
     const endDate = new Date(targetDate);
-    endDate.setDate(endDate.getDate() + 15);
+    endDate.setDate(endDate.getDate() + 30);
     const chartData = calculateBiorhythmRange(user.birthDate, startDate, endDate);
 
-    // Find upcoming critical days
-    const criticalDays = findCriticalDays(user.birthDate, targetDate, 14);
+    // Find upcoming critical days (within 30 days)
+    const criticalDays = findCriticalDays(user.birthDate, targetDate, 30);
 
     return NextResponse.json({
       cycles,

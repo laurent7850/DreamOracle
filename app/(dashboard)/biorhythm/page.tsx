@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   Activity,
   Heart,
@@ -13,6 +13,7 @@ import {
   TrendingDown,
   Minus,
   Calendar,
+  GripHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -84,25 +85,23 @@ const cycleIcons: Record<string, React.ReactNode> = {
   Intellectuel: <Brain className="w-5 h-5" />,
 };
 
-// SVG Chart component
+// SVG Chart component with interactive slider
 function BiorhythmChart({
   chartData,
-  targetDate,
+  selectedIndex,
+  onIndexChange,
 }: {
   chartData: ChartDay[];
-  targetDate: string;
+  selectedIndex: number;
+  onIndexChange: (index: number) => void;
 }) {
   const width = 700;
   const height = 280;
   const padding = { top: 20, right: 15, bottom: 30, left: 35 };
   const chartW = width - padding.left - padding.right;
   const chartH = height - padding.top - padding.bottom;
-
-  const todayIndex = chartData.findIndex((d) => {
-    const dd = new Date(d.date).toDateString();
-    const td = new Date(targetDate).toDateString();
-    return dd === td;
-  });
+  const svgRef = useRef<SVGSVGElement>(null);
+  const isDragging = useRef(false);
 
   const lines = useMemo(() => {
     const keys = ["physical", "emotional", "intellectual"] as const;
@@ -111,8 +110,7 @@ function BiorhythmChart({
     return keys.map((key, ki) => {
       const points = chartData.map((d, i) => {
         const x = padding.left + (i / (chartData.length - 1)) * chartW;
-        const y =
-          padding.top + chartH / 2 - (d[key] * chartH) / 2;
+        const y = padding.top + chartH / 2 - (d[key] * chartH) / 2;
         return `${x},${y}`;
       });
       return { key, color: colors[ki], points: points.join(" ") };
@@ -125,25 +123,71 @@ function BiorhythmChart({
     label: `${Math.round(v * 100)}%`,
   }));
 
-  // X-axis labels (every 5 days)
+  // X-axis labels (every 10 days for 61-day range)
   const xLabels = chartData
-    .filter((_, i) => i % 5 === 0)
-    .map((d, i) => ({
-      x: padding.left + ((i * 5) / (chartData.length - 1)) * chartW,
+    .filter((_, i) => i % 10 === 0)
+    .map((d, idx) => ({
+      x: padding.left + ((idx * 10) / (chartData.length - 1)) * chartW,
       label: formatShortDate(d.date),
     }));
 
-  // Today line
-  const todayX =
-    todayIndex >= 0
-      ? padding.left + (todayIndex / (chartData.length - 1)) * chartW
+  // Selected day line X position
+  const selectedX =
+    selectedIndex >= 0 && selectedIndex < chartData.length
+      ? padding.left + (selectedIndex / (chartData.length - 1)) * chartW
       : -1;
+
+  // Convert client X to chart index
+  const clientXToIndex = useCallback(
+    (clientX: number) => {
+      if (!svgRef.current) return selectedIndex;
+      const rect = svgRef.current.getBoundingClientRect();
+      const svgX = ((clientX - rect.left) / rect.width) * width;
+      const ratio = (svgX - padding.left) / chartW;
+      const idx = Math.round(ratio * (chartData.length - 1));
+      return Math.max(0, Math.min(chartData.length - 1, idx));
+    },
+    [chartData.length, chartW, padding.left, selectedIndex, width]
+  );
+
+  // Mouse/touch handlers for dragging on the chart
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<SVGSVGElement>) => {
+      isDragging.current = true;
+      svgRef.current?.setPointerCapture(e.pointerId);
+      const idx = clientXToIndex(e.clientX);
+      onIndexChange(idx);
+    },
+    [clientXToIndex, onIndexChange]
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<SVGSVGElement>) => {
+      if (!isDragging.current) return;
+      const idx = clientXToIndex(e.clientX);
+      onIndexChange(idx);
+    },
+    [clientXToIndex, onIndexChange]
+  );
+
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent<SVGSVGElement>) => {
+      isDragging.current = false;
+      svgRef.current?.releasePointerCapture(e.pointerId);
+    },
+    []
+  );
 
   return (
     <svg
+      ref={svgRef}
       viewBox={`0 0 ${width} ${height}`}
-      className="w-full h-auto"
+      className="w-full h-auto cursor-crosshair touch-none"
       preserveAspectRatio="xMidYMid meet"
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
     >
       {/* Grid */}
       {gridYPositions.map((g, i) => (
@@ -183,27 +227,28 @@ function BiorhythmChart({
         </text>
       ))}
 
-      {/* Today line */}
-      {todayX > 0 && (
+      {/* Selected day line */}
+      {selectedX > 0 && (
         <>
           <line
-            x1={todayX}
+            x1={selectedX}
             y1={padding.top}
-            x2={todayX}
+            x2={selectedX}
             y2={height - padding.bottom}
-            stroke="rgba(212,175,55,0.5)"
+            stroke="rgba(212,175,55,0.6)"
             strokeWidth={2}
-            strokeDasharray="6,4"
           />
           <text
-            x={todayX}
+            x={selectedX}
             y={padding.top - 5}
             textAnchor="middle"
-            fill="rgba(212,175,55,0.8)"
+            fill="rgba(212,175,55,0.9)"
             fontSize="10"
             fontWeight="bold"
           >
-            Aujourd&apos;hui
+            {chartData[selectedIndex]
+              ? formatShortDate(chartData[selectedIndex].date)
+              : ""}
           </text>
         </>
       )}
@@ -222,12 +267,13 @@ function BiorhythmChart({
         />
       ))}
 
-      {/* Today dots */}
-      {todayIndex >= 0 &&
+      {/* Selected day dots */}
+      {selectedIndex >= 0 &&
+        selectedIndex < chartData.length &&
         lines.map((line) => {
-          const todayData = chartData[todayIndex];
-          const val = todayData[line.key as keyof ChartDay] as number;
-          const cx = todayX;
+          const dayData = chartData[selectedIndex];
+          const val = dayData[line.key as keyof ChartDay] as number;
+          const cx = selectedX;
           const cy = padding.top + chartH / 2 - (val * chartH) / 2;
           return (
             <circle
@@ -314,16 +360,72 @@ function BirthDateForm({ onSaved }: { onSaved: () => void }) {
   );
 }
 
+// Compute cycle info from chart data for a given index (client-side)
+function computeCyclesFromChart(chartData: ChartDay[], index: number): BiorhythmCycle[] {
+  if (!chartData[index]) return [];
+  const day = chartData[index];
+  const nextDay = chartData[index + 1] || chartData[index];
+
+  const cycles = [
+    { nameEn: "physical", name: "Physique", period: 23, color: "#ef4444", value: day.physical, nextValue: nextDay.physical },
+    { nameEn: "emotional", name: "Émotionnel", period: 28, color: "#3b82f6", value: day.emotional, nextValue: nextDay.emotional },
+    { nameEn: "intellectual", name: "Intellectuel", period: 33, color: "#22c55e", value: day.intellectual, nextValue: nextDay.intellectual },
+  ];
+
+  const descriptions: Record<string, Record<string, string>> = {
+    Physique: {
+      high: "Excellente vitalité et endurance. Moment idéal pour l'exercice intense.",
+      low: "Énergie basse. Privilégiez le repos et la récupération.",
+      critical: "Jour critique physique. Soyez prudent avec les efforts intenses.",
+      rising: "Énergie montante. Votre corps reprend des forces.",
+      falling: "Énergie déclinante. Ralentissez progressivement.",
+    },
+    Émotionnel: {
+      high: "Harmonie émotionnelle. Créativité et empathie au sommet.",
+      low: "Sensibilité accrue. Prenez soin de votre bien-être intérieur.",
+      critical: "Jour critique émotionnel. Les émotions peuvent être instables.",
+      rising: "Humeur en amélioration. Ouverture aux relations sociales.",
+      falling: "Repli émotionnel progressif. Accordez-vous du temps calme.",
+    },
+    Intellectuel: {
+      high: "Clarté mentale maximale. Parfait pour les décisions importantes.",
+      low: "Concentration réduite. Évitez les tâches complexes si possible.",
+      critical: "Jour critique intellectuel. Risque d'erreurs de jugement.",
+      rising: "Acuité mentale croissante. Bon moment pour apprendre.",
+      falling: "Capacités analytiques en baisse. Misez sur la routine.",
+    },
+  };
+
+  return cycles.map((c) => {
+    let phase: BiorhythmCycle["phase"];
+    if (Math.abs(c.value) < 0.05) phase = "critical";
+    else if (c.value > 0.7) phase = "high";
+    else if (c.value < -0.7) phase = "low";
+    else phase = c.nextValue > c.value ? "rising" : "falling";
+
+    return {
+      name: c.name,
+      nameEn: c.nameEn,
+      period: c.period,
+      value: c.value,
+      percentage: Math.round(c.value * 100),
+      phase,
+      color: c.color,
+      description: descriptions[c.name]?.[phase] || "",
+    };
+  });
+}
+
 export default function BiorhythmPage() {
   const [data, setData] = useState<BiorhythmData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentDate, setCurrentDate] = useState(new Date());
+  // selectedIndex: index into chartData (0..60), center=30 is "today"
+  const [selectedIndex, setSelectedIndex] = useState(30);
 
-  const fetchData = async (date?: Date) => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const d = date || currentDate;
-      const dateStr = d.toISOString().split("T")[0];
+      const dateStr = new Date().toISOString().split("T")[0];
       const res = await fetch(`/api/biorhythm?date=${dateStr}`);
       const json = await res.json();
       setData(json);
@@ -336,21 +438,26 @@ export default function BiorhythmPage() {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const navigateDay = (offset: number) => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(newDate.getDate() + offset);
-    setCurrentDate(newDate);
-    fetchData(newDate);
-  };
+  // Compute current cycles from chart data based on slider
+  const currentCycles = useMemo(() => {
+    if (!data?.chartData) return data?.cycles || [];
+    return computeCyclesFromChart(data.chartData, selectedIndex);
+  }, [data, selectedIndex]);
 
-  const goToToday = () => {
-    const today = new Date();
-    setCurrentDate(today);
-    fetchData(today);
-  };
+  // Current selected date
+  const selectedDate = useMemo(() => {
+    if (!data?.chartData?.[selectedIndex]) return new Date();
+    return new Date(data.chartData[selectedIndex].date);
+  }, [data, selectedIndex]);
+
+  // Days offset from today
+  const daysOffset = selectedIndex - 30;
+
+  const isToday = daysOffset === 0;
+
+  const goToToday = () => setSelectedIndex(30);
 
   if (loading && !data) {
     return (
@@ -364,16 +471,13 @@ export default function BiorhythmPage() {
     return <BirthDateForm onSaved={() => fetchData()} />;
   }
 
-  if (!data?.cycles) {
+  if (!data?.chartData) {
     return (
       <div className="max-w-4xl mx-auto flex items-center justify-center min-h-[60vh]">
         <p className="text-mystic-400">Erreur de chargement</p>
       </div>
     );
   }
-
-  const isToday =
-    currentDate.toDateString() === new Date().toDateString();
 
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-0 space-y-4 sm:space-y-6">
@@ -386,7 +490,12 @@ export default function BiorhythmPage() {
           <div>
             <h1 className="font-display text-xl sm:text-2xl text-lunar">Biorythme</h1>
             <p className="text-xs sm:text-sm text-mystic-400 capitalize">
-              {formatDate(currentDate)}
+              {formatDate(selectedDate)}
+              {!isToday && (
+                <span className="ml-1.5 text-gold/70">
+                  ({daysOffset > 0 ? "+" : ""}{daysOffset}j)
+                </span>
+              )}
             </p>
           </div>
         </div>
@@ -396,7 +505,8 @@ export default function BiorhythmPage() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigateDay(-1)}
+            onClick={() => setSelectedIndex(Math.max(0, selectedIndex - 1))}
+            disabled={selectedIndex <= 0}
             className="text-mystic-400 hover:text-lunar w-8 h-8"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -416,7 +526,8 @@ export default function BiorhythmPage() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigateDay(1)}
+            onClick={() => setSelectedIndex(Math.min(data.chartData.length - 1, selectedIndex + 1))}
+            disabled={selectedIndex >= data.chartData.length - 1}
             className="text-mystic-400 hover:text-lunar w-8 h-8"
           >
             <ChevronRight className="w-4 h-4" />
@@ -426,7 +537,7 @@ export default function BiorhythmPage() {
 
       {/* Cycle cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        {data.cycles.map((cycle) => (
+        {currentCycles.map((cycle) => (
           <Card
             key={cycle.nameEn}
             className="glass-card border-mystic-700/30 overflow-hidden"
@@ -470,7 +581,7 @@ export default function BiorhythmPage() {
                 </div>
                 <div className="h-2 rounded-full bg-mystic-800/50 overflow-hidden">
                   <div
-                    className="h-full rounded-full transition-all duration-500"
+                    className="h-full rounded-full transition-all duration-300"
                     style={{
                       width: `${Math.abs(cycle.percentage)}%`,
                       backgroundColor: cycle.color,
@@ -498,7 +609,7 @@ export default function BiorhythmPage() {
         <CardHeader className="pb-2 px-4 pt-4">
           <CardTitle className="font-display text-base sm:text-lg text-lunar flex items-center gap-2">
             <Minus className="w-4 h-4 text-mystic-400" />
-            Courbes sur 30 jours
+            Courbes sur 60 jours
           </CardTitle>
           {/* Legend */}
           <div className="flex gap-4 mt-2">
@@ -517,7 +628,7 @@ export default function BiorhythmPage() {
             ))}
           </div>
         </CardHeader>
-        <CardContent className="px-2 sm:px-4 pb-4">
+        <CardContent className="px-2 sm:px-4 pb-4 space-y-3">
           {loading ? (
             <div className="h-[200px] flex items-center justify-center">
               <Loader2 className="w-6 h-6 animate-spin text-mystic-400" />
@@ -525,9 +636,36 @@ export default function BiorhythmPage() {
           ) : (
             <BiorhythmChart
               chartData={data.chartData}
-              targetDate={data.targetDate}
+              selectedIndex={selectedIndex}
+              onIndexChange={setSelectedIndex}
             />
           )}
+
+          {/* Date slider */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-xs text-mystic-500">
+              <span>{data.chartData[0] ? formatShortDate(data.chartData[0].date) : ""}</span>
+              <div className="flex items-center gap-1 text-mystic-400">
+                <GripHorizontal className="w-3 h-3" />
+                <span className="text-[10px]">Glissez pour naviguer</span>
+              </div>
+              <span>{data.chartData[data.chartData.length - 1] ? formatShortDate(data.chartData[data.chartData.length - 1].date) : ""}</span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={data.chartData.length - 1}
+              value={selectedIndex}
+              onChange={(e) => setSelectedIndex(Number(e.target.value))}
+              className="w-full h-2 rounded-full appearance-none cursor-pointer bg-mystic-800/50
+                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5
+                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gold [&::-webkit-slider-thumb]:shadow-lg
+                [&::-webkit-slider-thumb]:shadow-gold/30 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white/20
+                [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full
+                [&::-moz-range-thumb]:bg-gold [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white/20
+                [&::-moz-range-thumb]:shadow-lg"
+            />
+          </div>
         </CardContent>
       </Card>
 
@@ -546,7 +684,7 @@ export default function BiorhythmPage() {
           </CardHeader>
           <CardContent className="px-4 pb-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {data.criticalDays.slice(0, 8).map((cd, i) => (
+              {data.criticalDays.slice(0, 10).map((cd, i) => (
                 <div
                   key={i}
                   className="flex items-center gap-3 px-3 py-2 rounded-lg bg-mystic-800/30"
