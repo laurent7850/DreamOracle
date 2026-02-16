@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
-import { stripe, priceIdToTier, mapStripeStatus } from '@/lib/stripe';
+import { stripe, getStripe, priceIdToTier, mapStripeStatus } from '@/lib/stripe';
 import { prisma } from '@/lib/db';
-import { createAndSendInvoice, getInvoiceDescription } from '@/lib/invoice';
+import { sendEmail } from '@/lib/email';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -193,8 +193,6 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   });
 
   console.log(`Payment failed for user ${user.id}`);
-
-  // TODO: Send email notification about failed payment
 }
 
 async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
@@ -220,39 +218,92 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
     console.log(`Payment succeeded, restored active status for user ${user.id}`);
   }
 
-  // Generate and send invoice PDF
+  // Forward Stripe invoice PDF to factures@distr-action.com
   // Skip $0 invoices (free tier) and draft/void invoices
   const amountPaid = invoice.amount_paid ?? 0;
   if (amountPaid > 0 && invoice.status === 'paid') {
     try {
-      // Determine subscription tier and interval from line items
-      const lineItem = invoice.lines?.data?.[0];
-      const pricing = lineItem?.pricing;
-      // Extract price ID from pricing.price_details.price (string or Price object)
-      const priceRef = pricing?.price_details?.price;
-      const priceId = typeof priceRef === 'string' ? priceRef : priceRef?.id || '';
-      const priceObj = typeof priceRef === 'object' ? priceRef : null;
-      const interval = priceObj?.recurring?.interval || 'month';
-      const tier = priceIdToTier(priceId) || user.subscriptionTier || 'ESSENTIAL';
-      const description = getInvoiceDescription(tier, interval);
-
-      const result = await createAndSendInvoice({
-        userId: user.id,
-        stripeInvoiceId: invoice.id,
-        amountTTC: amountPaid,
-        description,
-        customerName: user.name,
-        customerEmail: user.email,
-      });
-
-      if (result.success) {
-        console.log(`Invoice ${result.invoiceNumber} sent to ${user.email}`);
-      } else {
-        console.error(`Failed to create/send invoice for user ${user.id}`);
-      }
+      await forwardStripeInvoice(invoice, user.name, user.email);
     } catch (error) {
-      console.error('Invoice generation error:', error);
-      // Don't fail the webhook - invoice generation is non-critical
+      console.error('Invoice forwarding error:', error);
+      // Don't fail the webhook - invoice forwarding is non-critical
     }
+  }
+}
+
+/**
+ * Download the Stripe-generated invoice PDF and forward it to factures@distr-action.com.
+ * Stripe handles the customer-facing invoice email automatically.
+ * This function only sends the internal copy for accounting.
+ */
+async function forwardStripeInvoice(
+  invoice: Stripe.Invoice,
+  customerName: string | null,
+  customerEmail: string
+) {
+  const stripeInvoiceNumber = invoice.number || invoice.id;
+
+  // Get the invoice PDF URL from Stripe
+  // The invoice_pdf field contains a direct download URL
+  let pdfUrl = invoice.invoice_pdf;
+
+  if (!pdfUrl) {
+    // If not on the webhook event, fetch the full invoice object
+    const fullInvoice = await getStripe().invoices.retrieve(invoice.id);
+    pdfUrl = fullInvoice.invoice_pdf;
+  }
+
+  if (!pdfUrl) {
+    console.error(`No PDF URL for Stripe invoice ${invoice.id}`);
+    return;
+  }
+
+  // Download the PDF
+  const pdfResponse = await fetch(pdfUrl);
+  if (!pdfResponse.ok) {
+    console.error(`Failed to download invoice PDF: ${pdfResponse.status}`);
+    return;
+  }
+
+  const pdfBuffer = Buffer.from(await pdfResponse.arrayBuffer());
+  console.log(`Downloaded Stripe invoice PDF (${pdfBuffer.length} bytes) for ${stripeInvoiceNumber}`);
+
+  // Format the amount
+  const amountFormatted = new Intl.NumberFormat('fr-BE', {
+    style: 'currency',
+    currency: invoice.currency?.toUpperCase() || 'EUR',
+  }).format((invoice.amount_paid ?? 0) / 100);
+
+  // Send the copy to factures@distr-action.com
+  const sent = await sendEmail({
+    to: 'factures@distr-action.com',
+    subject: `[Copie] Facture ${stripeInvoiceNumber} - ${customerName || customerEmail} - ${amountFormatted}`,
+    html: `
+      <div style="font-family: sans-serif; color: #333; max-width: 600px;">
+        <h2 style="color: #6366f1;">📋 Copie de facture - DreamOracle</h2>
+        <p>Une facture Stripe a été générée et envoyée au client.</p>
+        <table style="border-collapse: collapse; width: 100%; margin: 16px 0;">
+          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Facture N°</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600;">${stripeInvoiceNumber}</td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Client</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${customerName || '-'} (${customerEmail})</td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Montant TTC</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600; color: #6366f1;">${amountFormatted}</td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Stripe Invoice ID</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-family: monospace; font-size: 12px;">${invoice.id}</td></tr>
+        </table>
+        <p style="color: #666; font-size: 13px;">La facture PDF est jointe à cet email. Le client a reçu sa copie directement via Stripe.</p>
+      </div>
+    `,
+    text: `Copie de facture DreamOracle\n\nFacture N°: ${stripeInvoiceNumber}\nClient: ${customerName || '-'} (${customerEmail})\nMontant TTC: ${amountFormatted}\nStripe ID: ${invoice.id}`,
+    attachments: [
+      {
+        filename: `${stripeInvoiceNumber}.pdf`,
+        content: pdfBuffer,
+        contentType: 'application/pdf',
+      },
+    ],
+  });
+
+  if (sent) {
+    console.log(`Invoice copy sent to factures@distr-action.com for ${stripeInvoiceNumber}`);
+  } else {
+    console.error(`Failed to send invoice copy for ${stripeInvoiceNumber}`);
   }
 }

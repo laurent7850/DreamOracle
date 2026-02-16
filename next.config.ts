@@ -3,8 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Empty turbopack config to satisfy Next.js 16
   turbopack: {},
-  // Exclude pdfkit from bundling so it can find its font files (.afm)
-  serverExternalPackages: ["pdfkit"],
 };
 
 // PWA configuration - conditionally applied

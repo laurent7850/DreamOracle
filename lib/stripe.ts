@@ -72,6 +72,9 @@ export async function getOrCreateStripeCustomer(
   return customer.id;
 }
 
+// Belgian VAT tax rate (21% inclusive) - created via scripts/create-stripe-tax-rate.ts
+const STRIPE_TAX_RATE_ID = process.env.STRIPE_TAX_RATE_BELGIUM_21;
+
 // Create checkout session
 export async function createCheckoutSession(
   customerId: string,
@@ -80,6 +83,8 @@ export async function createCheckoutSession(
   successUrl: string,
   cancelUrl: string
 ): Promise<Stripe.Checkout.Session> {
+  const taxRates = STRIPE_TAX_RATE_ID ? [STRIPE_TAX_RATE_ID] : [];
+
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
     mode: 'subscription',
@@ -88,6 +93,7 @@ export async function createCheckoutSession(
       {
         price: priceId,
         quantity: 1,
+        tax_rates: taxRates,
       },
     ],
     success_url: successUrl,
@@ -99,6 +105,7 @@ export async function createCheckoutSession(
       metadata: {
         userId,
       },
+      default_tax_rates: taxRates,
     },
     allow_promotion_codes: true,
   });
