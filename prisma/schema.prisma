@@ -20,6 +20,7 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   lastLoginAt   DateTime?
+  birthDate     DateTime?
   role          String    @default("user") // user | admin
 
   // Subscription fields

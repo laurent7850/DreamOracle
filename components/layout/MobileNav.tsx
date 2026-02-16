@@ -19,6 +19,7 @@ import {
   Brain,
   Sparkles,
   Cloud,
+  Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -61,6 +62,11 @@ const moreNavItems = [
     href: "/backup",
     label: "Sauvegarde",
     icon: Cloud,
+  },
+  {
+    href: "/biorhythm",
+    label: "Biorythme",
+    icon: Activity,
   },
   {
     href: "/calendar",
