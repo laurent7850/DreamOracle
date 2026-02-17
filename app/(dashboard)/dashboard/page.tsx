@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -5,6 +6,7 @@ import { Moon, PlusCircle, BookOpen, Sparkles, Calendar, BarChart3, ArrowRight }
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardUsage } from "@/components/subscription";
+import TrackWelcome from "@/components/tracking/TrackWelcome";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -40,6 +42,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 px-1">
+      <Suspense fallback={null}>
+        <TrackWelcome />
+      </Suspense>
       {/* Welcome Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
         <div>

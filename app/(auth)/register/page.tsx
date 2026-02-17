@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Moon, Mail, Lock, Eye, EyeOff, User, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { trackRegistration } from "@/lib/meta-events";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,6 +56,7 @@ export default function RegisterPage() {
       }
 
       toast.success("Compte créé avec succès !");
+      trackRegistration('credentials');
 
       // Auto sign in after registration
       const result = await signIn("credentials", {
@@ -77,7 +79,7 @@ export default function RegisterPage() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      await signIn("google", { callbackUrl: "/dashboard" });
+      await signIn("google", { callbackUrl: "/dashboard?welcome=google" });
     } catch {
       toast.error("Erreur de connexion avec Google");
       setIsLoading(false);

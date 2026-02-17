@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Settings, User, Bell, Palette, Shield, Smartphone, CreditCard } from "lucide-react";
@@ -7,6 +8,7 @@ import { SubscriptionSection } from "./SubscriptionSection";
 import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 import { InstallSection } from "@/components/pwa/InstallSection";
 import { TIERS, type SubscriptionTier } from "@/lib/subscription";
+import TrackSubscription from "@/components/tracking/TrackSubscription";
 
 export const metadata = {
   title: "Paramètres",
@@ -44,6 +46,9 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-8 px-3 sm:px-4 md:px-0">
+      <Suspense fallback={null}>
+        <TrackSubscription tier={tier} />
+      </Suspense>
       <div>
         <h1 className="font-display text-3xl text-lunar mb-2 flex items-center gap-3">
           <Settings className="w-8 h-8 text-mystic-400" />

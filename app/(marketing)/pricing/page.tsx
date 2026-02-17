@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { trackViewPricing } from "@/lib/meta-events";
 import Link from "next/link";
 import {
   Moon,
@@ -28,6 +29,9 @@ function PricingContent() {
 
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("yearly");
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
+
+  // Meta Pixel: track pricing page view
+  useEffect(() => { trackViewPricing(); }, []);
 
   const handleSubscribe = async (tier: SubscriptionTier) => {
     if (tier === "FREE") {
