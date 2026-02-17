@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import {
   Moon,
   LayoutDashboard,
@@ -21,10 +21,13 @@ import {
   Sparkles,
   Cloud,
   Activity,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+
+const ADMIN_EMAILS = ["divers@distr-action.com"];
 
 const navItems = [
   {
@@ -90,6 +93,8 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.email && ADMIN_EMAILS.includes(session.user.email);
 
   return (
     <aside
@@ -143,6 +148,22 @@ export function Sidebar() {
               </Link>
             );
           })}
+
+          {/* Admin CRM - visible only for admins */}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
+                pathname.startsWith("/admin")
+                  ? "bg-mystic-700/40 text-gold border border-mystic-600/50"
+                  : "text-red-400/80 hover:bg-mystic-900/30 hover:text-red-300"
+              )}
+            >
+              <Shield className={cn("w-5 h-5 flex-shrink-0", pathname.startsWith("/admin") && "text-gold")} />
+              {!collapsed && <span>Admin CRM</span>}
+            </Link>
+          )}
         </nav>
 
         {/* Upgrade & Install App Links */}

@@ -20,9 +20,12 @@ import {
   Sparkles,
   Cloud,
   Activity,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+
+const ADMIN_EMAILS = ["divers@distr-action.com"];
 
 const mainNavItems = [
   {
@@ -98,13 +101,15 @@ const moreNavItems = [
 export function MobileNav() {
   const pathname = usePathname();
   const [showMore, setShowMore] = useState(false);
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.email && ADMIN_EMAILS.includes(session.user.email);
 
-  // Check if any "more" item is active
+  // Check if any "more" item is active (including admin)
   const isMoreActive = moreNavItems.some(
     (item) =>
       pathname === item.href ||
       (item.href !== "/dashboard" && pathname.startsWith(item.href.split("#")[0]))
-  );
+  ) || pathname.startsWith("/admin");
 
   return (
     <>
@@ -151,6 +156,22 @@ export function MobileNav() {
                 </Link>
               );
             })}
+            {/* Admin CRM - visible only for admins */}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                onClick={() => setShowMore(false)}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all",
+                  pathname.startsWith("/admin")
+                    ? "bg-mystic-700/40 text-gold"
+                    : "text-red-400/80 hover:bg-mystic-900/30 hover:text-red-300"
+                )}
+              >
+                <Shield className="w-5 h-5" />
+                <span className="text-sm">Admin CRM</span>
+              </Link>
+            )}
             <button
               onClick={() => {
                 setShowMore(false);
