@@ -582,6 +582,9 @@ function PricingContent() {
             <Link href="/cgv" className="hover:text-white transition-colors">
               CGV
             </Link>
+            <Link href="/mentions-legales" className="hover:text-white transition-colors">
+              Mentions légales
+            </Link>
             <Link href="/contact" className="hover:text-white transition-colors">
               Contact
             </Link>

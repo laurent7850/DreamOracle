@@ -342,6 +342,7 @@ export default function LandingPage() {
             <Link href="/privacy" className="hover:text-mystic-300">Confidentialité</Link>
             <Link href="/terms" className="hover:text-mystic-300">CGU</Link>
             <Link href="/cgv" className="hover:text-mystic-300">CGV</Link>
+            <Link href="/mentions-legales" className="hover:text-mystic-300">Mentions légales</Link>
             <Link href="/pricing" className="hover:text-mystic-300">Tarifs</Link>
             <Link href="/contact" className="hover:text-mystic-300">Contact</Link>
           </div>

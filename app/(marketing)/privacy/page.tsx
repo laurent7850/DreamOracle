@@ -380,6 +380,10 @@ export default function PrivacyPage() {
             Conditions de vente
           </Link>
           <span className="text-muted-foreground hidden sm:inline">•</span>
+          <Link href="/mentions-legales" className="text-primary hover:underline px-2 py-1">
+            Mentions légales
+          </Link>
+          <span className="text-muted-foreground hidden sm:inline">•</span>
           <Link href="/pricing" className="text-primary hover:underline px-2 py-1">
             Tarifs
           </Link>
