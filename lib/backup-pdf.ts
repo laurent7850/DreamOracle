@@ -1,17 +1,16 @@
 import jsPDF from "jspdf";
 
 // ─── Theme colors (RGB) ─────────────────────────────────────
-const NIGHT = [15, 14, 30] as const;        // dark background
-const DEEP_PURPLE = [25, 23, 55] as const;  // card background
-const GOLD = [212, 175, 55] as const;       // accent
-const INDIGO = [99, 102, 241] as const;     // links/highlights
-const LUNAR = [232, 228, 240] as const;     // main text
-const MYSTIC_300 = [180, 175, 200] as const; // secondary text
-const MYSTIC_500 = [120, 115, 140] as const; // dim text
-const MYSTIC_700 = [60, 56, 80] as const;   // borders
+const NIGHT = [15, 14, 30] as const;
+const DEEP_PURPLE = [25, 23, 55] as const;
+const GOLD = [212, 175, 55] as const;
+const INDIGO = [99, 102, 241] as const;
+const LUNAR = [232, 228, 240] as const;
+const MYSTIC_300 = [180, 175, 200] as const;
+const MYSTIC_500 = [120, 115, 140] as const;
+const MYSTIC_700 = [60, 56, 80] as const;
 const RED = [239, 68, 68] as const;
 const BLUE = [59, 130, 246] as const;
-const GREEN = [34, 197, 94] as const;
 const AMBER = [245, 158, 11] as const;
 
 type RGB = readonly [number, number, number];
@@ -55,22 +54,24 @@ function safeParseArray(str: string): string[] {
   }
 }
 
-// ─── Helper: format date ─────────────────────────────────────
+// ─── Helper: format date (ASCII-safe) ────────────────────────
 function formatDate(d: string | Date): string {
-  return new Intl.DateTimeFormat("fr-FR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(d));
+  const date = new Date(d);
+  const days = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+  const months = [
+    "janvier", "fevrier", "mars", "avril", "mai", "juin",
+    "juillet", "aout", "septembre", "octobre", "novembre", "decembre",
+  ];
+  return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 function formatShortDate(d: string | Date): string {
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(d));
+  const date = new Date(d);
+  const months = [
+    "jan.", "fev.", "mars", "avr.", "mai", "juin",
+    "juil.", "aout", "sept.", "oct.", "nov.", "dec.",
+  ];
+  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 // ─── PDF Generator ───────────────────────────────────────────
@@ -106,12 +107,16 @@ export function generateBackupPDF(data: BackupData): Buffer {
     doc.rect(0, 0, pageW, pageH, "F");
   }
 
+  function newPage() {
+    addFooter();
+    doc.addPage();
+    fillPage();
+    y = 18;
+  }
+
   function checkPageBreak(needed: number) {
     if (y + needed > pageH - 20) {
-      addFooter();
-      doc.addPage();
-      fillPage();
-      y = 15;
+      newPage();
     }
   }
 
@@ -119,7 +124,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
     setColor(MYSTIC_700);
     doc.setFontSize(7);
     doc.text(
-      `DreamOracle — Sauvegarde du ${formatShortDate(new Date())}`,
+      `DreamOracle - Sauvegarde du ${formatShortDate(new Date())}`,
       pageW / 2,
       pageH - 8,
       { align: "center" }
@@ -132,7 +137,8 @@ export function generateBackupPDF(data: BackupData): Buffer {
     );
   }
 
-  // Wrapped text that returns actual height used
+  // Write wrapped text line by line, handling page breaks correctly.
+  // Returns the final y position (not delta) so the caller can track it.
   function wrappedText(
     text: string,
     x: number,
@@ -144,17 +150,22 @@ export function generateBackupPDF(data: BackupData): Buffer {
   ): number {
     doc.setFontSize(fontSize);
     setColor(color);
-    const lines = doc.splitTextToSize(text, maxWidth);
-    const lineSpacing = fontSize * 0.353 * lineHeight; // pt to mm * lineHeight
+    const lines: string[] = doc.splitTextToSize(text, maxWidth);
+    const lineSpacing = fontSize * 0.353 * lineHeight;
     let curY = startY;
 
     for (const line of lines) {
-      checkPageBreak(lineSpacing + 2);
+      if (curY + lineSpacing > pageH - 20) {
+        newPage();
+        curY = y;
+        doc.setFontSize(fontSize);
+        setColor(color);
+      }
       doc.text(line, x, curY);
       curY += lineSpacing;
     }
 
-    return curY - startY;
+    return curY;
   }
 
   // Draw a rounded rect card
@@ -165,7 +176,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
     doc.roundedRect(x, cardY, w, h, 3, 3, "FD");
   }
 
-  // Draw a pill/badge
+  // Draw a pill/badge (ASCII-safe text only)
   function drawBadge(text: string, x: number, badgeY: number, color: RGB): number {
     doc.setFontSize(7);
     const textWidth = doc.getTextWidth(text);
@@ -176,10 +187,22 @@ export function generateBackupPDF(data: BackupData): Buffer {
 
     setFillColor([color[0], color[1], color[2]]);
     doc.roundedRect(x, badgeY - h + padY, w, h, 1.5, 1.5, "F");
-    doc.setTextColor(15, 14, 30); // dark text on badge
+    doc.setTextColor(15, 14, 30);
     doc.text(text, x + padX, badgeY);
 
-    return w + 2; // return width for next badge position
+    return w + 2;
+  }
+
+  // Draw a small decorative circle (replaces unicode symbols)
+  function drawCircle(cx: number, cy: number, r: number, color: RGB, filled = true) {
+    if (filled) {
+      setFillColor(color);
+      doc.circle(cx, cy, r, "F");
+    } else {
+      setDrawColor(color);
+      doc.setLineWidth(0.3);
+      doc.circle(cx, cy, r, "S");
+    }
   }
 
   // ─── Cover page ─────────────────────────────────────────────
@@ -196,11 +219,12 @@ export function generateBackupPDF(data: BackupData): Buffer {
     doc.rect(0, i * 1.5, pageW, 1.5, "F");
   }
 
-  // Moon symbol
-  y = 70;
-  setColor(GOLD);
-  doc.setFontSize(48);
-  doc.text("☽", pageW / 2, y, { align: "center" });
+  // Moon symbol — draw a crescent with circles instead of unicode
+  y = 65;
+  setFillColor(GOLD);
+  doc.circle(pageW / 2, y, 12, "F");
+  setFillColor(NIGHT);
+  doc.circle(pageW / 2 + 6, y - 2, 11, "F");
 
   // Title
   y += 25;
@@ -212,7 +236,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
   y += 12;
   doc.setFontSize(14);
   setColor(GOLD);
-  doc.text("Journal de Rêves", pageW / 2, y, { align: "center" });
+  doc.text("Journal de Reves", pageW / 2, y, { align: "center" });
 
   // Decorative line
   y += 10;
@@ -241,27 +265,24 @@ export function generateBackupPDF(data: BackupData): Buffer {
   setColor(MYSTIC_500);
   doc.text(
     `Sauvegarde du ${formatDate(new Date())}`,
-    pageW / 2,
-    y,
+    pageW / 2, y,
     { align: "center" }
   );
 
-  // Stats
+  // Stats boxes
   y += 20;
   const statBoxW = 50;
   const statBoxH = 22;
   const statsStartX = pageW / 2 - (statBoxW * 2 + 10) / 2;
 
-  // Dreams stat box
   drawCard(statsStartX, y, statBoxW, statBoxH);
   doc.setFontSize(18);
   setColor(GOLD);
   doc.text(String(data.stats.totalDreams), statsStartX + statBoxW / 2, y + 11, { align: "center" });
   doc.setFontSize(8);
   setColor(MYSTIC_300);
-  doc.text("Rêves", statsStartX + statBoxW / 2, y + 17, { align: "center" });
+  doc.text("Reves", statsStartX + statBoxW / 2, y + 17, { align: "center" });
 
-  // Symbols stat box
   const symBoxX = statsStartX + statBoxW + 10;
   drawCard(symBoxX, y, statBoxW, statBoxH);
   doc.setFontSize(18);
@@ -277,8 +298,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
   setColor(MYSTIC_500);
   doc.text(
     `Membre depuis le ${formatShortDate(data.user.createdAt)}`,
-    pageW / 2,
-    y,
+    pageW / 2, y,
     { align: "center" }
   );
 
@@ -290,14 +310,19 @@ export function generateBackupPDF(data: BackupData): Buffer {
     fillPage();
     y = 20;
 
-    // Section header
-    doc.setFontSize(20);
+    // Section header with drawn crescent
+    setFillColor(GOLD);
+    doc.circle(marginL + 5, y - 2.5, 3, "F");
+    setFillColor(NIGHT);
+    doc.circle(marginL + 6.5, y - 3.5, 2.8, "F");
+
+    doc.setFontSize(18);
     setColor(GOLD);
-    doc.text("☽  Journal de Rêves", marginL, y);
+    doc.text("Journal de Reves", marginL + 14, y);
     y += 3;
     setDrawColor(GOLD);
     doc.setLineWidth(0.4);
-    doc.line(marginL, y, marginL + 60, y);
+    doc.line(marginL, y, marginL + 65, y);
     y += 10;
 
     for (let i = 0; i < data.dreams.length; i++) {
@@ -306,79 +331,58 @@ export function generateBackupPDF(data: BackupData): Buffer {
       const symbols = safeParseArray(dream.symbols);
       const tags = safeParseArray(dream.tags);
 
-      // Estimate card height
-      doc.setFontSize(9);
-      const contentLines = doc.splitTextToSize(dream.content, contentW - 16);
-      let estimatedH = 28 + contentLines.length * 3.8;
-      if (dream.interpretation) {
-        const interpLines = doc.splitTextToSize(dream.interpretation, contentW - 20);
-        estimatedH += 12 + interpLines.length * 3.5;
-      }
-      if (emotions.length > 0) estimatedH += 8;
-      if (symbols.length > 0) estimatedH += 8;
-      if (tags.length > 0) estimatedH += 8;
-      estimatedH += 4; // bottom padding
+      // Estimate minimum height needed for dream header
+      checkPageBreak(30);
 
-      // Page break if needed
-      if (y + Math.min(estimatedH, 100) > pageH - 25) {
-        addFooter();
-        doc.addPage();
-        fillPage();
-        y = 15;
-      }
-
-      // Dream card background
-      const cardStartY = y;
-
-      // Dream number + date header
+      // Dream number + date
       y += 6;
       doc.setFontSize(7);
       setColor(MYSTIC_500);
-      doc.text(`Rêve ${i + 1}/${data.dreams.length}`, marginL + 8, y);
-
-      // Date on right
+      doc.text(`Reve ${i + 1}/${data.dreams.length}`, marginL + 8, y);
       doc.text(formatDate(dream.dreamDate), pageW - marginR - 8, y, { align: "right" });
 
       // Title
       y += 7;
       doc.setFontSize(13);
       setColor(LUNAR);
-      const titleLines = doc.splitTextToSize(dream.title, contentW - 16);
+      const titleLines: string[] = doc.splitTextToSize(dream.title, contentW - 16);
       for (const line of titleLines) {
         checkPageBreak(8);
+        doc.setFontSize(13);
+        setColor(LUNAR);
         doc.text(line, marginL + 8, y);
         y += 5.5;
       }
 
-      // Lucidity + mood + sleep indicators
+      // Badges (lucidity, recurring, mood, sleep) — ASCII-safe
       y += 1;
       let badgeX = marginL + 8;
 
       if (dream.lucidity > 0) {
-        const stars = "★".repeat(dream.lucidity) + "☆".repeat(5 - dream.lucidity);
-        badgeX += drawBadge(`Lucidité ${stars}`, badgeX, y, INDIGO);
+        const lucText = `Lucidite ${dream.lucidity}/5`;
+        badgeX += drawBadge(lucText, badgeX, y, INDIGO);
       }
       if (dream.isRecurring) {
-        badgeX += drawBadge("↻ Récurrent", badgeX, y, AMBER);
+        badgeX += drawBadge("Recurrent", badgeX, y, AMBER);
       }
       if (dream.mood) {
         badgeX += drawBadge(dream.mood, badgeX, y, MYSTIC_300);
       }
       if (dream.sleepQuality) {
-        const sqText = `Sommeil: ${"●".repeat(dream.sleepQuality)}${"○".repeat(5 - dream.sleepQuality)}`;
+        const sqText = `Sommeil ${dream.sleepQuality}/5`;
         drawBadge(sqText, badgeX, y, BLUE);
       }
 
       y += 5;
 
-      // Separator
+      // Separator line
       setDrawColor(MYSTIC_700);
       doc.setLineWidth(0.15);
       doc.line(marginL + 8, y, pageW - marginR - 8, y);
       y += 4;
 
       // Dream content
-      const contentH = wrappedText(
+      y = wrappedText(
         dream.content,
         marginL + 8,
         y,
@@ -387,45 +391,46 @@ export function generateBackupPDF(data: BackupData): Buffer {
         MYSTIC_300,
         1.5
       );
-      y += contentH + 3;
+      y += 3;
 
       // Interpretation
       if (dream.interpretation) {
-        checkPageBreak(20);
+        checkPageBreak(15);
 
-        // Interpretation box
         const interpStartY = y;
         y += 5;
+
+        // Interpretation label with a small diamond instead of emoji
+        drawCircle(marginL + 11, y - 1.2, 1.2, INDIGO);
         doc.setFontSize(8);
         setColor(INDIGO);
-        doc.text("🔮  Interprétation Oracle", marginL + 12, y);
-        y += 4;
+        doc.text("Interpretation Oracle", marginL + 15, y);
+        y += 5;
 
-        const interpH = wrappedText(
+        const interpEndY = wrappedText(
           dream.interpretation,
-          marginL + 12,
+          marginL + 15,
           y,
-          contentW - 24,
+          contentW - 28,
           8.5,
           LUNAR,
           1.4
         );
-        y += interpH + 3;
+        y = interpEndY + 3;
 
-        // Left accent line
-        doc.setFillColor(INDIGO[0], INDIGO[1], INDIGO[2]);
+        // Left accent bar
+        setFillColor(INDIGO);
         doc.rect(marginL + 8, interpStartY, 1.5, y - interpStartY, "F");
       }
 
-      // Tags row
+      // Emotions / Symbols / Tags
       if (emotions.length > 0 || symbols.length > 0 || tags.length > 0) {
-        checkPageBreak(12);
+        checkPageBreak(10);
         y += 2;
 
         if (emotions.length > 0) {
           doc.setFontSize(7.5);
-          setColor(RED);
-          doc.text("♡", marginL + 8, y);
+          drawCircle(marginL + 9.5, y - 1, 1, RED);
           setColor(MYSTIC_300);
           doc.text(emotions.join("  "), marginL + 14, y);
           y += 5;
@@ -433,10 +438,9 @@ export function generateBackupPDF(data: BackupData): Buffer {
 
         if (symbols.length > 0) {
           doc.setFontSize(7.5);
-          setColor(AMBER);
-          doc.text("✦", marginL + 8, y);
+          drawCircle(marginL + 9.5, y - 1, 1, AMBER);
           setColor(MYSTIC_300);
-          const symbolText = doc.splitTextToSize(symbols.join("  ·  "), contentW - 20);
+          const symbolText: string[] = doc.splitTextToSize(symbols.join("  /  "), contentW - 20);
           for (const line of symbolText) {
             doc.text(line, marginL + 14, y);
             y += 4;
@@ -448,18 +452,17 @@ export function generateBackupPDF(data: BackupData): Buffer {
           doc.setFontSize(7.5);
           setColor(MYSTIC_500);
           const tagStr = tags.map((t: string) => `#${t}`).join("  ");
-          doc.text(tagStr, marginL + 8, y);
-          y += 4;
+          const tagLines: string[] = doc.splitTextToSize(tagStr, contentW - 16);
+          for (const line of tagLines) {
+            doc.text(line, marginL + 8, y);
+            y += 4;
+          }
         }
       }
 
       y += 3;
 
-      // Draw the card background behind everything we just drew
-      const cardH = y - cardStartY;
-      // We need to draw the card first — use a trick: draw on the page
-      // Since jsPDF draws in order, we add a semi-transparent overlay
-      // Actually, let's draw dividers between dreams instead
+      // Dashed divider between dreams
       if (i < data.dreams.length - 1) {
         setDrawColor(MYSTIC_700);
         doc.setLineWidth(0.15);
@@ -480,14 +483,15 @@ export function generateBackupPDF(data: BackupData): Buffer {
     fillPage();
     y = 20;
 
-    // Section header
-    doc.setFontSize(20);
+    // Section header with drawn diamond
+    drawCircle(marginL + 5, y - 2.5, 2.5, AMBER);
+    doc.setFontSize(18);
     setColor(GOLD);
-    doc.text("✦  Dictionnaire de Symboles", marginL, y);
+    doc.text("Dictionnaire de Symboles", marginL + 12, y);
     y += 3;
     setDrawColor(GOLD);
     doc.setLineWidth(0.4);
-    doc.line(marginL, y, marginL + 70, y);
+    doc.line(marginL, y, marginL + 75, y);
     y += 10;
 
     doc.setFontSize(9);
@@ -495,13 +499,12 @@ export function generateBackupPDF(data: BackupData): Buffer {
     doc.text(`${data.symbols.length} symbole${data.symbols.length > 1 ? "s" : ""} personnels`, marginL, y);
     y += 8;
 
-    // Sort symbols alphabetically
     const sortedSymbols = [...data.symbols].sort((a, b) =>
       a.name.localeCompare(b.name, "fr")
     );
 
     for (const symbol of sortedSymbols) {
-      checkPageBreak(20);
+      checkPageBreak(18);
 
       // Symbol name
       doc.setFontSize(11);
@@ -513,9 +516,8 @@ export function generateBackupPDF(data: BackupData): Buffer {
         doc.setFontSize(7);
         setColor(MYSTIC_500);
         doc.text(
-          `${symbol.occurrences}×`,
-          pageW - marginR - 4,
-          y,
+          `${symbol.occurrences}x`,
+          pageW - marginR - 4, y,
           { align: "right" }
         );
       }
@@ -523,7 +525,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
       y += 5;
 
       // Meaning
-      const meaningH = wrappedText(
+      y = wrappedText(
         symbol.meaning,
         marginL + 4,
         y,
@@ -532,7 +534,6 @@ export function generateBackupPDF(data: BackupData): Buffer {
         MYSTIC_300,
         1.3
       );
-      y += meaningH;
 
       // Personal note
       if (symbol.personalNote) {
@@ -541,7 +542,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
         setColor(MYSTIC_500);
         doc.text("Note :", marginL + 4, y);
         y += 3.5;
-        const noteH = wrappedText(
+        y = wrappedText(
           symbol.personalNote,
           marginL + 4,
           y,
@@ -550,7 +551,6 @@ export function generateBackupPDF(data: BackupData): Buffer {
           MYSTIC_500,
           1.3
         );
-        y += noteH;
       }
 
       y += 3;
@@ -565,17 +565,18 @@ export function generateBackupPDF(data: BackupData): Buffer {
     addFooter();
   }
 
-  // ─── Final page with summary ────────────────────────────────
+  // ─── Final page ─────────────────────────────────────────────
   doc.addPage();
   fillPage();
   y = pageH / 2 - 30;
 
-  // Decorative moon
-  setColor(GOLD);
-  doc.setFontSize(36);
-  doc.text("☽", pageW / 2, y, { align: "center" });
-  y += 20;
+  // Crescent moon
+  setFillColor(GOLD);
+  doc.circle(pageW / 2, y, 10, "F");
+  setFillColor(NIGHT);
+  doc.circle(pageW / 2 + 5, y - 2, 9.5, "F");
 
+  y += 22;
   doc.setFontSize(12);
   setColor(LUNAR);
   doc.text("Fin de la sauvegarde", pageW / 2, y, { align: "center" });
@@ -584,16 +585,14 @@ export function generateBackupPDF(data: BackupData): Buffer {
   doc.setFontSize(9);
   setColor(MYSTIC_500);
   doc.text(
-    `${data.stats.totalDreams} rêves · ${data.stats.totalSymbols} symboles`,
-    pageW / 2,
-    y,
+    `${data.stats.totalDreams} reves - ${data.stats.totalSymbols} symboles`,
+    pageW / 2, y,
     { align: "center" }
   );
   y += 6;
   doc.text(
-    `Généré le ${formatDate(new Date())}`,
-    pageW / 2,
-    y,
+    `Genere le ${formatDate(new Date())}`,
+    pageW / 2, y,
     { align: "center" }
   );
   y += 12;
@@ -604,6 +603,5 @@ export function generateBackupPDF(data: BackupData): Buffer {
 
   addFooter();
 
-  // Return as buffer
   return Buffer.from(doc.output("arraybuffer"));
 }
