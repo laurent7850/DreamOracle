@@ -6,14 +6,12 @@ import {
   Crown,
   CreditCard,
   ExternalLink,
-  FileText,
   Loader2,
   ArrowUpRight,
   CalendarDays,
   AlertCircle,
   CheckCircle2,
   Clock,
-  Receipt,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -25,15 +23,6 @@ interface SubscriptionSectionProps {
   subscriptionEnds: string | null;
   hasStripeCustomer: boolean;
   monthlyPrice: number;
-  invoices: {
-    id: string;
-    invoiceNumber: string;
-    amount: number;
-    currency: string;
-    description: string;
-    status: string;
-    paidAt: string;
-  }[];
 }
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
@@ -88,7 +77,6 @@ export function SubscriptionSection({
   subscriptionEnds,
   hasStripeCustomer,
   monthlyPrice,
-  invoices,
 }: SubscriptionSectionProps) {
   const [loadingPortal, setLoadingPortal] = useState(false);
   const statusInfo = STATUS_MAP[status] || STATUS_MAP.active;
@@ -223,41 +211,6 @@ export function SubscriptionSection({
         </p>
       )}
 
-      {/* Invoices */}
-      {invoices.length > 0 && (
-        <div className="pt-4 border-t border-mystic-700/30">
-          <h3 className="text-sm font-medium text-lunar mb-3 flex items-center gap-1.5">
-            <Receipt className="w-4 h-4 text-mystic-400" />
-            Historique de facturation
-          </h3>
-          <div className="space-y-2">
-            {invoices.map((inv) => (
-              <div
-                key={inv.id}
-                className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-mystic-900/20 border border-mystic-700/20 text-sm"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <FileText className="w-4 h-4 text-mystic-500 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-mystic-300 truncate">{inv.description}</p>
-                    <p className="text-xs text-mystic-500">
-                      {inv.invoiceNumber} • {formatDate(inv.paidAt)}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right flex-shrink-0 ml-3">
-                  <p className="text-mystic-300 font-medium">
-                    {formatPrice(inv.amount, inv.currency)}
-                  </p>
-                  <p className="text-xs text-emerald-500">
-                    {inv.status === "paid" ? "Payé" : inv.status === "refunded" ? "Remboursé" : inv.status}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

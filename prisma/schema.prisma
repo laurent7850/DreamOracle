@@ -38,7 +38,6 @@ model User {
   usageLogs     UsageLog[]
   pushSubscriptions PushSubscription[]
   symbols       UserSymbol[]
-  invoices      Invoice[]
 }
 
 model Dream {
@@ -150,25 +149,3 @@ model UserSymbol {
   @@index([userId])
 }
 
-model Invoice {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  invoiceNumber   String   @unique // DO-2026-0001
-  stripeInvoiceId String?  @unique
-  amount          Int      // Total TTC in cents
-  amountHT        Int      // Montant HT in cents
-  tva             Int      // TVA amount in cents
-  tvaRate         Float    @default(21.0) // TVA rate percentage
-  currency        String   @default("EUR")
-  description     String   // e.g. "Abonnement Explorateur - Mensuel"
-  customerName    String?
-  customerEmail   String
-  status          String   @default("paid") // paid | refunded
-  paidAt          DateTime @default(now())
-  createdAt       DateTime @default(now())
-
-  @@index([userId])
-  @@index([invoiceNumber])
-  @@index([createdAt])
-}

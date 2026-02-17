@@ -24,12 +24,8 @@ import {
   Mic,
   FileText,
   DollarSign,
-  Receipt,
-  ArrowUp,
-  ArrowDown,
   Percent,
   UserMinus,
-  CreditCard,
 } from "lucide-react";
 import { formatPrice, TIERS, type SubscriptionTier } from "@/lib/subscription";
 
@@ -89,26 +85,9 @@ interface Stats {
   }>;
   revenue: {
     mrr: number;
-    thisMonth: number;
-    lastMonth: number;
-    total: number;
-    invoicesThisMonth: number;
-    invoicesTotal: number;
     conversionRate: number;
     paidUsers: number;
     churnedThisMonth: number;
-    revenueByMonth: Record<string, number>;
-    recentInvoices: Array<{
-      id: string;
-      invoiceNumber: string;
-      amount: number;
-      currency: string;
-      description: string;
-      status: string;
-      paidAt: string;
-      customerName: string | null;
-      customerEmail: string;
-    }>;
   };
 }
 
@@ -726,7 +705,7 @@ export default function AdminPage() {
         {stats?.revenue && (
           <div className="space-y-6 mb-8">
             {/* Revenue KPI Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-gradient-to-br from-emerald-950/50 to-slate-900/50 border border-emerald-800/30 rounded-xl p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-emerald-500/20 rounded-lg">
@@ -741,33 +720,6 @@ export default function AdminPage() {
                 </div>
                 <div className="mt-3 text-xs text-slate-500">
                   {stats.revenue.paidUsers} abonné{stats.revenue.paidUsers > 1 ? "s" : ""} payant{stats.revenue.paidUsers > 1 ? "s" : ""}
-                </div>
-              </div>
-
-              <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-indigo-500/20 rounded-lg">
-                    <Receipt className="h-5 w-5 text-indigo-400" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-white">
-                      {(stats.revenue.thisMonth / 100).toFixed(2)}€
-                    </p>
-                    <p className="text-sm text-slate-400">Revenu ce mois</p>
-                  </div>
-                </div>
-                <div className="mt-3 text-xs flex items-center gap-1">
-                  {stats.revenue.thisMonth >= stats.revenue.lastMonth ? (
-                    <ArrowUp className="h-3 w-3 text-emerald-400" />
-                  ) : (
-                    <ArrowDown className="h-3 w-3 text-red-400" />
-                  )}
-                  <span className={stats.revenue.thisMonth >= stats.revenue.lastMonth ? "text-emerald-400" : "text-red-400"}>
-                    {stats.revenue.lastMonth > 0
-                      ? `${Math.round(((stats.revenue.thisMonth - stats.revenue.lastMonth) / stats.revenue.lastMonth) * 100)}%`
-                      : "N/A"}
-                  </span>
-                  <span className="text-slate-500 ml-1">vs mois dernier</span>
                 </div>
               </div>
 
@@ -806,95 +758,21 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Revenue Trend + Recent Invoices */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Revenue Trend Bar Chart */}
-              <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-indigo-400" />
-                  Tendance des revenus
-                </h3>
-                <div className="space-y-3">
-                  {Object.entries(stats.revenue.revenueByMonth).map(([month, amount]) => {
-                    const maxRevenue = Math.max(...Object.values(stats.revenue.revenueByMonth), 1);
-                    const percentage = (amount / maxRevenue) * 100;
-                    const monthLabel = new Date(month + "-15").toLocaleDateString("fr-FR", {
-                      month: "short",
-                      year: "2-digit",
-                    });
-                    return (
-                      <div key={month} className="flex items-center gap-3">
-                        <span className="text-xs text-slate-400 w-16 text-right shrink-0">
-                          {monthLabel}
-                        </span>
-                        <div className="flex-1 bg-slate-800 rounded-full h-6 overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-indigo-600 to-indigo-400 rounded-full flex items-center justify-end pr-2 transition-all duration-500"
-                            style={{ width: `${Math.max(percentage, 2)}%` }}
-                          >
-                            {amount > 0 && (
-                              <span className="text-xs text-white font-medium whitespace-nowrap">
-                                {(amount / 100).toFixed(0)}€
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="mt-4 pt-4 border-t border-slate-800 flex justify-between text-sm">
-                  <span className="text-slate-400">Total cumulé</span>
-                  <span className="text-white font-semibold">
-                    {(stats.revenue.total / 100).toFixed(2)}€
-                  </span>
-                </div>
-              </div>
-
-              {/* Recent Invoices */}
-              <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <Receipt className="h-5 w-5 text-emerald-400" />
-                  Dernières factures
-                </h3>
-                {stats.revenue.recentInvoices.length === 0 ? (
-                  <p className="text-slate-500 text-sm">Aucune facture enregistrée</p>
-                ) : (
-                  <div className="space-y-2">
-                    {stats.revenue.recentInvoices.map((inv) => (
-                      <div
-                        key={inv.id}
-                        className="flex items-center justify-between py-2 px-3 rounded-lg bg-slate-800/30 border border-slate-700/30 text-sm"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="text-white truncate">
-                            {inv.customerName || inv.customerEmail}
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            {inv.invoiceNumber} •{" "}
-                            {new Date(inv.paidAt).toLocaleDateString("fr-FR", {
-                              day: "numeric",
-                              month: "short",
-                            })}
-                          </p>
-                        </div>
-                        <div className="text-right shrink-0 ml-3">
-                          <p className="text-emerald-400 font-medium">
-                            {(inv.amount / 100).toFixed(2)}€
-                          </p>
-                          <p className="text-xs text-slate-500">{inv.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <div className="mt-4 pt-4 border-t border-slate-800 flex justify-between text-sm">
-                  <span className="text-slate-400">Factures ce mois</span>
-                  <span className="text-white font-medium">
-                    {stats.revenue.invoicesThisMonth} ({stats.revenue.invoicesTotal} total)
-                  </span>
-                </div>
-              </div>
+            {/* Stripe Info */}
+            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+              <p className="text-slate-400 text-sm">
+                Les factures et l&apos;historique des paiements sont gérés directement par Stripe.
+                Consultez le{" "}
+                <a
+                  href="https://dashboard.stripe.com/invoices"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-400 hover:text-indigo-300 underline"
+                >
+                  tableau de bord Stripe
+                </a>
+                {" "}pour les détails de facturation.
+              </p>
             </div>
           </div>
         )}

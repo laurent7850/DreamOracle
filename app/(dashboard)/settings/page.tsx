@@ -42,24 +42,6 @@ export default async function SettingsPage() {
   const tier = (user?.subscriptionTier || "FREE") as SubscriptionTier;
   const tierInfo = TIERS[tier];
 
-  // Fetch invoices
-  const invoices = session?.user?.id
-    ? await prisma.invoice.findMany({
-        where: { userId: session.user.id },
-        orderBy: { createdAt: "desc" },
-        take: 12,
-        select: {
-          id: true,
-          invoiceNumber: true,
-          amount: true,
-          currency: true,
-          description: true,
-          status: true,
-          paidAt: true,
-        },
-      })
-    : [];
-
   return (
     <div className="max-w-3xl mx-auto space-y-8 px-3 sm:px-4 md:px-0">
       <div>
@@ -88,10 +70,6 @@ export default async function SettingsPage() {
             subscriptionEnds={user?.subscriptionEnds?.toISOString() || null}
             hasStripeCustomer={!!user?.stripeCustomerId}
             monthlyPrice={tierInfo.monthlyPrice}
-            invoices={invoices.map((inv) => ({
-              ...inv,
-              paidAt: inv.paidAt.toISOString(),
-            }))}
           />
         </CardContent>
       </Card>
