@@ -54,6 +54,85 @@ function safeParseArray(str: string): string[] {
   }
 }
 
+// ─── Helper: sanitize text for jsPDF (Latin-1 only) ─────────
+// Strips emojis and characters outside Latin-1, replaces bullets
+function sanitizeForPDF(text: string): string {
+  return text
+    // Remove emoji and symbols outside Latin-1 (U+0100+)
+    // This regex matches surrogate pairs (4-byte emoji) and chars > U+00FF
+    .replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[\u{2B50}-\u{2BFF}]|[\u{FE00}-\u{FEFF}]|[\u{1F900}-\u{1F9FF}]|[\u{2702}-\u{27B0}]|[\u{200D}]|[\u{20E3}]|[\u{FE0F}]/gu, "")
+    // Replace bullet character with dash
+    .replace(/\u2022/g, "-")
+    // Replace en-dash, em-dash with simple dash
+    .replace(/[\u2013\u2014]/g, "-")
+    // Replace smart quotes with simple quotes
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, "\"")
+    // Replace ellipsis character
+    .replace(/\u2026/g, "...")
+    // Remove any remaining non-Latin-1 characters (keep U+0000-U+00FF)
+    .replace(/[^\u0000-\u00FF]/g, "")
+    // Clean up multiple spaces left by removed emojis
+    .replace(/  +/g, " ")
+    .trim();
+}
+
+// ─── Interpretation section types ───────────────────────────
+interface InterpSection {
+  icon: "sparkle" | "moon" | "star" | "crystal" | "shine";
+  title: string;
+  content: string;
+}
+
+// Parse stored interpretation text into structured sections
+function parseInterpretation(text: string): InterpSection[] {
+  const sections: InterpSection[] = [];
+  // Match sections: emoji + **Title**\n\ncontent
+  const sectionRegex = /(?:[\s\S]*?)(?:\u2728|\uD83C\uDF19|\uD83D\uDCAB|\uD83D\uDD2E|\uD83C\uDF1F)\s*\*\*([^*]+)\*\*\s*\n\n([\s\S]*?)(?=(?:[\u2728\uD83C\uD83D]|\n\n(?:[\u2728\uD83C\uD83D]))|$)/gu;
+
+  // Simpler approach: split by emoji markers
+  const rawSections = text.split(/(?:✨|🌙|💫|🔮|🌟)\s*/);
+
+  const iconMap: Array<InterpSection["icon"]> = ["sparkle", "moon", "star", "crystal", "shine"];
+
+  let iconIdx = 0;
+  for (const raw of rawSections) {
+    const trimmed = raw.trim();
+    if (!trimmed) continue;
+
+    // Extract **Title** from beginning
+    const titleMatch = trimmed.match(/^\*\*([^*]+)\*\*\s*\n?([\s\S]*)/);
+    if (titleMatch) {
+      const title = sanitizeForPDF(titleMatch[1]);
+      let content = titleMatch[2].trim();
+      // Remove ** from inline bold in content
+      content = content.replace(/\*\*([^*]+)\*\*/g, "$1");
+      content = sanitizeForPDF(content);
+
+      sections.push({
+        icon: iconMap[iconIdx % iconMap.length],
+        title,
+        content,
+      });
+      iconIdx++;
+    } else {
+      // No title found, just content
+      let content = trimmed.replace(/\*\*([^*]+)\*\*/g, "$1");
+      content = sanitizeForPDF(content);
+      if (content) {
+        sections.push({
+          icon: iconMap[iconIdx % iconMap.length],
+          title: "",
+          content,
+        });
+        iconIdx++;
+      }
+    }
+  }
+
+  return sections;
+}
+
 // ─── Helper: format date (ASCII-safe) ────────────────────────
 function formatDate(d: string | Date): string {
   const date = new Date(d);
@@ -249,7 +328,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
   doc.setFontSize(11);
   setColor(MYSTIC_300);
   if (data.user.name) {
-    doc.text(data.user.name, pageW / 2, y, { align: "center" });
+    doc.text(sanitizeForPDF(data.user.name), pageW / 2, y, { align: "center" });
     y += 6;
   }
   if (data.user.email) {
@@ -341,11 +420,11 @@ export function generateBackupPDF(data: BackupData): Buffer {
       doc.text(`R\u00eave ${i + 1}/${data.dreams.length}`, marginL + 8, y);
       doc.text(formatDate(dream.dreamDate), pageW - marginR - 8, y, { align: "right" });
 
-      // Title
+      // Title (sanitized)
       y += 7;
       doc.setFontSize(13);
       setColor(LUNAR);
-      const titleLines: string[] = doc.splitTextToSize(dream.title, contentW - 16);
+      const titleLines: string[] = doc.splitTextToSize(sanitizeForPDF(dream.title), contentW - 16);
       for (const line of titleLines) {
         checkPageBreak(8);
         doc.setFontSize(13);
@@ -366,7 +445,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
         badgeX += drawBadge("R\u00e9current", badgeX, y, AMBER);
       }
       if (dream.mood) {
-        badgeX += drawBadge(dream.mood, badgeX, y, MYSTIC_300);
+        badgeX += drawBadge(sanitizeForPDF(dream.mood), badgeX, y, MYSTIC_300);
       }
       if (dream.sleepQuality) {
         const sqText = `Sommeil ${dream.sleepQuality}/5`;
@@ -381,9 +460,9 @@ export function generateBackupPDF(data: BackupData): Buffer {
       doc.line(marginL + 8, y, pageW - marginR - 8, y);
       y += 4;
 
-      // Dream content
+      // Dream content (sanitized for Latin-1)
       y = wrappedText(
-        dream.content,
+        sanitizeForPDF(dream.content),
         marginL + 8,
         y,
         contentW - 16,
@@ -393,32 +472,102 @@ export function generateBackupPDF(data: BackupData): Buffer {
       );
       y += 3;
 
-      // Interpretation
+      // Interpretation — parsed into styled sections
       if (dream.interpretation) {
         checkPageBreak(15);
 
         const interpStartY = y;
         y += 5;
 
-        // Interpretation label with a small diamond instead of emoji
+        // Interpretation header
         drawCircle(marginL + 11, y - 1.2, 1.2, INDIGO);
         doc.setFontSize(8);
         setColor(INDIGO);
         doc.text("Interpr\u00e9tation Oracle", marginL + 15, y);
-        y += 5;
+        y += 6;
 
-        const interpEndY = wrappedText(
-          dream.interpretation,
-          marginL + 15,
-          y,
-          contentW - 28,
-          8.5,
-          LUNAR,
-          1.4
-        );
-        y = interpEndY + 3;
+        const sections = parseInterpretation(dream.interpretation);
+        const sectionColors: Record<InterpSection["icon"], RGB> = {
+          sparkle: GOLD,
+          moon: BLUE,
+          star: INDIGO,
+          crystal: AMBER,
+          shine: GOLD,
+        };
 
-        // Left accent bar
+        if (sections.length > 0) {
+          for (const section of sections) {
+            checkPageBreak(12);
+
+            // Section icon (small colored circle)
+            const sColor = sectionColors[section.icon];
+            drawCircle(marginL + 14, y - 1, 0.8, sColor);
+
+            // Section title (bold-like, larger)
+            if (section.title) {
+              doc.setFontSize(8);
+              setColor(sColor);
+              doc.text(section.title, marginL + 18, y);
+              y += 4;
+            }
+
+            // Section content
+            if (section.content) {
+              // Handle bullet lines
+              const lines = section.content.split("\n");
+              for (const line of lines) {
+                const trimLine = line.trim();
+                if (!trimLine) continue;
+
+                checkPageBreak(6);
+
+                if (trimLine.startsWith("- ")) {
+                  // Bullet item: draw small dot + text
+                  drawCircle(marginL + 16, y - 0.8, 0.5, MYSTIC_500);
+                  y = wrappedText(
+                    trimLine.substring(2),
+                    marginL + 19,
+                    y,
+                    contentW - 34,
+                    8,
+                    LUNAR,
+                    1.3
+                  );
+                  y += 1;
+                } else {
+                  y = wrappedText(
+                    trimLine,
+                    marginL + 15,
+                    y,
+                    contentW - 28,
+                    8,
+                    LUNAR,
+                    1.3
+                  );
+                  y += 1;
+                }
+              }
+              y += 2;
+            }
+          }
+        } else {
+          // Fallback: no sections parsed, render sanitized raw text
+          const cleanText = sanitizeForPDF(
+            dream.interpretation.replace(/\*\*([^*]+)\*\*/g, "$1")
+          );
+          y = wrappedText(
+            cleanText,
+            marginL + 15,
+            y,
+            contentW - 28,
+            8.5,
+            LUNAR,
+            1.4
+          );
+          y += 3;
+        }
+
+        // Left accent bar spanning the entire interpretation block
         setFillColor(INDIGO);
         doc.rect(marginL + 8, interpStartY, 1.5, y - interpStartY, "F");
       }
@@ -432,7 +581,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
           doc.setFontSize(7.5);
           drawCircle(marginL + 9.5, y - 1, 1, RED);
           setColor(MYSTIC_300);
-          doc.text(emotions.join("  "), marginL + 14, y);
+          doc.text(sanitizeForPDF(emotions.join("  ")), marginL + 14, y);
           y += 5;
         }
 
@@ -440,7 +589,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
           doc.setFontSize(7.5);
           drawCircle(marginL + 9.5, y - 1, 1, AMBER);
           setColor(MYSTIC_300);
-          const symbolText: string[] = doc.splitTextToSize(symbols.join("  /  "), contentW - 20);
+          const symbolText: string[] = doc.splitTextToSize(sanitizeForPDF(symbols.join("  /  ")), contentW - 20);
           for (const line of symbolText) {
             doc.text(line, marginL + 14, y);
             y += 4;
@@ -451,7 +600,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
         if (tags.length > 0) {
           doc.setFontSize(7.5);
           setColor(MYSTIC_500);
-          const tagStr = tags.map((t: string) => `#${t}`).join("  ");
+          const tagStr = tags.map((t: string) => `#${sanitizeForPDF(t)}`).join("  ");
           const tagLines: string[] = doc.splitTextToSize(tagStr, contentW - 16);
           for (const line of tagLines) {
             doc.text(line, marginL + 8, y);
@@ -506,10 +655,10 @@ export function generateBackupPDF(data: BackupData): Buffer {
     for (const symbol of sortedSymbols) {
       checkPageBreak(18);
 
-      // Symbol name
+      // Symbol name (sanitized)
       doc.setFontSize(11);
       setColor(AMBER);
-      doc.text(symbol.name, marginL + 4, y);
+      doc.text(sanitizeForPDF(symbol.name), marginL + 4, y);
 
       // Occurrences
       if (symbol.occurrences > 0) {
@@ -524,9 +673,9 @@ export function generateBackupPDF(data: BackupData): Buffer {
 
       y += 5;
 
-      // Meaning
+      // Meaning (sanitized)
       y = wrappedText(
-        symbol.meaning,
+        sanitizeForPDF(symbol.meaning),
         marginL + 4,
         y,
         contentW - 8,
@@ -535,7 +684,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
         1.3
       );
 
-      // Personal note
+      // Personal note (sanitized)
       if (symbol.personalNote) {
         y += 1;
         doc.setFontSize(7.5);
@@ -543,7 +692,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
         doc.text("Note :", marginL + 4, y);
         y += 3.5;
         y = wrappedText(
-          symbol.personalNote,
+          sanitizeForPDF(symbol.personalNote),
           marginL + 4,
           y,
           contentW - 8,
