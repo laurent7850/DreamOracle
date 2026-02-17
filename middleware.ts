@@ -43,10 +43,33 @@ const publicApiRoutes = [
   "/api/maintenance",
 ];
 
+/** Add security headers to every response */
+function addSecurityHeaders(response: NextResponse) {
+  // Prevent clickjacking
+  response.headers.set("X-Frame-Options", "DENY");
+  // Prevent MIME-type sniffing
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  // Control referrer information
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  // Restrict browser features
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(self), geolocation=(), payment=()"
+  );
+  // XSS protection (legacy browsers)
+  response.headers.set("X-XSS-Protection", "1; mode=block");
+  // Strict Transport Security (HTTPS only)
+  response.headers.set(
+    "Strict-Transport-Security",
+    "max-age=31536000; includeSubDomains"
+  );
+  return response;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip public static routes
+  // Skip public static routes — still add security headers
   if (
     pathname === "/" ||
     pathname === "/login" ||
@@ -64,13 +87,13 @@ export async function middleware(request: NextRequest) {
     pathname === "/sitemap.xml" ||
     pathname === "/robots.txt"
   ) {
-    return NextResponse.next();
+    return addSecurityHeaders(NextResponse.next());
   }
 
   // Skip public API routes
   for (const route of publicApiRoutes) {
     if (pathname.startsWith(route)) {
-      return NextResponse.next();
+      return addSecurityHeaders(NextResponse.next());
     }
   }
 
@@ -93,20 +116,19 @@ export async function middleware(request: NextRequest) {
 
     if (!token) {
       if (isProtectedApi) {
-        return NextResponse.json(
-          { error: "Non autorisé" },
-          { status: 401 }
+        return addSecurityHeaders(
+          NextResponse.json({ error: "Non autorisé" }, { status: 401 })
         );
       }
 
       // Redirect to login for pages
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
+      return addSecurityHeaders(NextResponse.redirect(loginUrl));
     }
   }
 
-  return NextResponse.next();
+  return addSecurityHeaders(NextResponse.next());
 }
 
 export const config = {

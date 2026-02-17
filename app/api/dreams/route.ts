@@ -4,16 +4,21 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { checkCredits, logUsage } from "@/lib/credits";
 
+/** Strip HTML tags from a string to prevent XSS in contexts where content is rendered outside React */
+function stripHtml(str: string): string {
+  return str.replace(/<[^>]*>/g, "");
+}
+
 const dreamSchema = z.object({
-  title: z.string().min(1, "Le titre est requis"),
-  content: z.string().min(10, "Décrivez votre rêve en au moins 10 caractères"),
+  title: z.string().min(1, "Le titre est requis").max(200, "Le titre est trop long").transform(stripHtml),
+  content: z.string().min(10, "Décrivez votre rêve en au moins 10 caractères").max(10000, "Le contenu est trop long"),
   dreamDate: z.string().transform((str) => new Date(str)),
-  emotions: z.array(z.string()).default([]),
+  emotions: z.array(z.string().max(50)).max(20).default([]),
   lucidity: z.number().min(0).max(5).default(0),
-  mood: z.string().optional(),
+  mood: z.string().max(50).optional(),
   sleepQuality: z.number().min(1).max(5).optional(),
   isRecurring: z.boolean().default(false),
-  tags: z.array(z.string()).default([]),
+  tags: z.array(z.string().max(50)).max(30).default([]),
 });
 
 // GET - List user's dreams
