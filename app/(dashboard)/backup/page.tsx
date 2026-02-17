@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   AlertCircle,
   FileJson,
+  FileText,
   Calendar,
   BookOpen,
   Hash,
@@ -33,6 +34,7 @@ export default function BackupPage() {
   const [loading, setLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [isExportingJson, setIsExportingJson] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [lastBackup, setLastBackup] = useState<string | null>(null);
@@ -60,10 +62,49 @@ export default function BackupPage() {
     checkAccess();
   }, []);
 
-  const handleExport = async () => {
+  const handleExportPDF = async () => {
     setIsExporting(true);
     try {
-      const res = await fetch("/api/backup");
+      const res = await fetch("/api/backup?format=pdf");
+      if (!res.ok) {
+        throw new Error("Export failed");
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `dreamoracle-sauvegarde-${new Date().toISOString().split("T")[0]}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      // Save last backup date
+      const now = new Date().toISOString();
+      localStorage.setItem("dreamoracle-last-backup", now);
+      setLastBackup(now);
+
+      toast({
+        title: "Export PDF réussi",
+        description: "Ta sauvegarde PDF a été téléchargée.",
+      });
+    } catch (error) {
+      console.error("Export error:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'exporter les données.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportJSON = async () => {
+    setIsExportingJson(true);
+    try {
+      const res = await fetch("/api/backup?format=json");
       if (!res.ok) {
         throw new Error("Export failed");
       }
@@ -81,13 +122,8 @@ export default function BackupPage() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      // Save last backup date
-      const now = new Date().toISOString();
-      localStorage.setItem("dreamoracle-last-backup", now);
-      setLastBackup(now);
-
       toast({
-        title: "Export réussi",
+        title: "Export JSON réussi",
         description: `${data.stats.totalDreams} rêves et ${data.stats.totalSymbols} symboles exportés.`,
       });
     } catch (error) {
@@ -98,7 +134,7 @@ export default function BackupPage() {
         variant: "destructive",
       });
     } finally {
-      setIsExporting(false);
+      setIsExportingJson(false);
     }
   };
 
@@ -171,7 +207,7 @@ export default function BackupPage() {
             </h1>
             <p className="text-mystic-300 mb-6 max-w-md mx-auto">
               Exporte et importe tes données pour les sauvegarder ou les
-              transférer. Disponible avec l'abonnement Oracle+.
+              transférer. Disponible avec l&apos;abonnement Oracle+.
             </p>
 
             <div className="bg-mystic-900/50 rounded-lg p-6 mb-6 text-left">
@@ -181,16 +217,16 @@ export default function BackupPage() {
               </h3>
               <ul className="space-y-2 text-mystic-300">
                 <li className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-mystic-400" />
+                  Sauvegarde complète en PDF
+                </li>
+                <li className="flex items-center gap-2">
                   <Download className="w-4 h-4 text-mystic-400" />
                   Exporte tous tes rêves et symboles
                 </li>
                 <li className="flex items-center gap-2">
                   <Upload className="w-4 h-4 text-mystic-400" />
                   Importe tes données sur un autre compte
-                </li>
-                <li className="flex items-center gap-2">
-                  <Cloud className="w-4 h-4 text-mystic-400" />
-                  Sauvegarde complète en JSON
                 </li>
               </ul>
             </div>
@@ -220,23 +256,23 @@ export default function BackupPage() {
         </p>
       </div>
 
-      {/* Export Card */}
+      {/* Export PDF Card */}
       <Card className="glass-card border-mystic-700/30">
         <CardHeader>
           <CardTitle className="text-lg text-lunar flex items-center gap-2">
-            <Download className="w-5 h-5 text-gold" />
-            Exporter tes données
+            <FileText className="w-5 h-5 text-gold" />
+            Exporter en PDF
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-mystic-300 text-sm">
-            Télécharge une copie complète de tes données : rêves, symboles et
-            paramètres. Le fichier JSON peut être réimporté plus tard.
+            Télécharge un PDF complet et agréable à lire de ton journal de rêves :
+            couverture, rêves avec interprétations, symboles personnels.
           </p>
 
           <div className="flex flex-wrap items-center gap-4">
             <Button
-              onClick={handleExport}
+              onClick={handleExportPDF}
               disabled={isExporting}
               className="bg-gold hover:bg-gold/90 text-night"
             >
@@ -245,7 +281,7 @@ export default function BackupPage() {
               ) : (
                 <Download className="w-4 h-4 mr-2" />
               )}
-              Exporter maintenant
+              Télécharger le PDF
             </Button>
 
             {lastBackup && (
@@ -267,21 +303,35 @@ export default function BackupPage() {
         </CardContent>
       </Card>
 
-      {/* Import Card */}
+      {/* Import / Export JSON Card */}
       <Card className="glass-card border-mystic-700/30">
         <CardHeader>
           <CardTitle className="text-lg text-lunar flex items-center gap-2">
             <Upload className="w-5 h-5 text-gold" />
-            Importer des données
+            Import & Export JSON
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-mystic-300 text-sm">
-            Importe un fichier de sauvegarde DreamOracle. Les rêves en double
-            (même titre et date) seront ignorés.
+            Le format JSON permet de réimporter tes données sur un autre compte
+            ou après une réinitialisation. Les rêves en double (même titre et date) seront ignorés.
           </p>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              onClick={handleExportJSON}
+              disabled={isExportingJson}
+              variant="outline"
+              className="border-mystic-600 text-mystic-200 hover:bg-mystic-800/50"
+            >
+              {isExportingJson ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <FileJson className="w-4 h-4 mr-2" />
+              )}
+              Exporter JSON
+            </Button>
+
             <input
               type="file"
               ref={fileInputRef}
@@ -298,9 +348,9 @@ export default function BackupPage() {
               {isImporting ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
-                <FileJson className="w-4 h-4 mr-2" />
+                <Upload className="w-4 h-4 mr-2" />
               )}
-              Choisir un fichier
+              Importer JSON
             </Button>
           </div>
 
@@ -309,7 +359,7 @@ export default function BackupPage() {
             <div className="mt-4 p-4 bg-mystic-900/50 rounded-lg border border-mystic-700/30">
               <h4 className="font-medium text-lunar mb-3 flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-green-500" />
-                Résultat de l'import
+                Résultat de l&apos;import
               </h4>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="flex items-center gap-2">
@@ -355,8 +405,10 @@ export default function BackupPage() {
                 régulièrement tes données pour garder une copie de sauvegarde.
               </p>
               <p>
-                Le fichier de sauvegarde contient uniquement tes données et peut
-                être ouvert avec n'importe quel éditeur de texte.
+                Le <strong className="text-mystic-300">PDF</strong> offre une
+                mise en page agréable pour la lecture et l&apos;archivage. Le{" "}
+                <strong className="text-mystic-300">JSON</strong> permet de
+                réimporter tes données.
               </p>
             </div>
           </div>

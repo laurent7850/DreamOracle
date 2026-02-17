@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { hasFeatureAccess } from "@/lib/subscription";
+import { generateBackupPDF } from "@/lib/backup-pdf";
 import { z } from "zod";
 
-// GET - Export user data as JSON backup
+// GET - Export user data as PDF backup (or JSON with ?format=json)
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
@@ -20,6 +21,8 @@ export async function GET(request: NextRequest) {
         { status: 403 }
       );
     }
+
+    const format = request.nextUrl.searchParams.get("format") || "pdf";
 
     // Fetch all user data
     const [user, dreams, settings, symbols] = await Promise.all([
@@ -43,13 +46,13 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    const backup = {
+    const backupData = {
       version: "1.0",
       exportedAt: new Date().toISOString(),
       user: {
-        name: user?.name,
-        email: user?.email,
-        createdAt: user?.createdAt,
+        name: user?.name || null,
+        email: user?.email || null,
+        createdAt: user?.createdAt || new Date(),
       },
       settings: settings
         ? {
@@ -87,7 +90,22 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    return NextResponse.json(backup);
+    // PDF format (default)
+    if (format === "pdf") {
+      const pdfBuffer = generateBackupPDF(backupData);
+      const dateStr = new Date().toISOString().split("T")[0];
+
+      return new NextResponse(new Uint8Array(pdfBuffer), {
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="dreamoracle-sauvegarde-${dateStr}.pdf"`,
+          "Content-Length": String(pdfBuffer.length),
+        },
+      });
+    }
+
+    // JSON format (for re-import)
+    return NextResponse.json(backupData);
   } catch (error) {
     console.error("Backup export error:", error);
     return NextResponse.json(
