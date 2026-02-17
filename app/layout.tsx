@@ -23,6 +23,7 @@ const philosopher = Philosopher({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://dreamoracle.eu"),
   title: {
     default: "DreamOracle - Interprète de Rêves",
     template: "%s | DreamOracle",

@@ -3,9 +3,14 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
+/** Strip HTML tags from a string to prevent XSS */
+function stripHtml(str: string): string {
+  return str.replace(/<[^>]*>/g, "");
+}
+
 // Schema for PATCH updates
 const updateDreamSchema = z.object({
-  title: z.string().min(1).max(200).optional(),
+  title: z.string().min(1).max(200).transform(stripHtml).optional(),
   content: z.string().min(10).max(10000).optional(),
   dreamDate: z.string().datetime().optional(),
   emotions: z.array(z.string().max(50)).max(20).optional(),

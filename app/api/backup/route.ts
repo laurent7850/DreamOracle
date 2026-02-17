@@ -99,38 +99,38 @@ export async function GET(request: NextRequest) {
 
 // POST - Import user data from JSON backup
 const importSchema = z.object({
-  version: z.string(),
+  version: z.string().max(10),
   dreams: z.array(
     z.object({
-      title: z.string(),
-      content: z.string(),
+      title: z.string().max(200),
+      content: z.string().max(10000),
       dreamDate: z.string(),
-      emotions: z.string().optional().default("[]"),
-      symbols: z.string().optional().default("[]"),
-      lucidity: z.number().optional().default(0),
-      interpretation: z.string().nullable().optional(),
-      tags: z.string().optional().default("[]"),
+      emotions: z.string().max(2000).optional().default("[]"),
+      symbols: z.string().max(5000).optional().default("[]"),
+      lucidity: z.number().min(0).max(5).optional().default(0),
+      interpretation: z.string().max(20000).nullable().optional(),
+      tags: z.string().max(2000).optional().default("[]"),
       isRecurring: z.boolean().optional().default(false),
-      mood: z.string().nullable().optional(),
-      sleepQuality: z.number().nullable().optional(),
+      mood: z.string().max(50).nullable().optional(),
+      sleepQuality: z.number().min(1).max(5).nullable().optional(),
       createdAt: z.string().optional(),
     })
-  ).optional().default([]),
+  ).max(1000).optional().default([]),
   symbols: z.array(
     z.object({
-      name: z.string(),
-      meaning: z.string(),
-      personalNote: z.string().nullable().optional(),
-      occurrences: z.number().optional().default(1),
+      name: z.string().max(100),
+      meaning: z.string().max(2000),
+      personalNote: z.string().max(2000).nullable().optional(),
+      occurrences: z.number().min(0).max(10000).optional().default(1),
       createdAt: z.string().optional(),
     })
-  ).optional().default([]),
+  ).max(500).optional().default([]),
   settings: z.object({
-    interpretationStyle: z.string().optional(),
-    language: z.string().optional(),
+    interpretationStyle: z.string().max(50).optional(),
+    language: z.string().max(10).optional(),
     notificationsEnabled: z.boolean().optional(),
-    reminderTime: z.string().nullable().optional(),
-    theme: z.string().optional(),
+    reminderTime: z.string().max(10).nullable().optional(),
+    theme: z.string().max(50).optional(),
   }).nullable().optional(),
 });
 

@@ -2,12 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { checkUsageLimit, incrementUsage } from "@/lib/usage";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const exportSchema = z.object({
   dreamIds: z.array(z.string()).min(1).max(50),
   format: z.enum(["pdf", "json"]).default("pdf"),
 });
+
+/** Escape HTML special characters to prevent XSS in exported HTML */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 // Generate PDF content as HTML (will be converted client-side)
 function generateDreamHTML(dreams: Array<{
@@ -20,13 +31,13 @@ function generateDreamHTML(dreams: Array<{
   tags: string;
 }>) {
   const dreamsHTML = dreams.map((dream) => {
-    const emotions = JSON.parse(dream.emotions || "[]");
-    const symbols = JSON.parse(dream.symbols || "[]");
-    const tags = JSON.parse(dream.tags || "[]");
+    const emotions = JSON.parse(dream.emotions || "[]") as string[];
+    const symbols = JSON.parse(dream.symbols || "[]") as string[];
+    const tags = JSON.parse(dream.tags || "[]") as string[];
 
     return `
       <div class="dream" style="page-break-after: always; margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-        <h2 style="color: #4F46E5; margin-bottom: 10px;">${dream.title}</h2>
+        <h2 style="color: #4F46E5; margin-bottom: 10px;">${escapeHtml(dream.title)}</h2>
         <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
           ${new Date(dream.dreamDate).toLocaleDateString("fr-FR", {
             weekday: "long",
@@ -38,34 +49,34 @@ function generateDreamHTML(dreams: Array<{
 
         <div style="background: #f9fafb; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
           <h3 style="font-size: 14px; color: #374151; margin-bottom: 8px;">Récit du rêve</h3>
-          <p style="white-space: pre-wrap; line-height: 1.6;">${dream.content}</p>
+          <p style="white-space: pre-wrap; line-height: 1.6;">${escapeHtml(dream.content)}</p>
         </div>
 
         ${dream.interpretation ? `
           <div style="background: #EEF2FF; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #4F46E5;">
             <h3 style="font-size: 14px; color: #4F46E5; margin-bottom: 8px;">🔮 Interprétation Oracle</h3>
-            <p style="white-space: pre-wrap; line-height: 1.6;">${dream.interpretation}</p>
+            <p style="white-space: pre-wrap; line-height: 1.6;">${escapeHtml(dream.interpretation)}</p>
           </div>
         ` : ""}
 
         ${emotions.length > 0 ? `
           <div style="margin-bottom: 10px;">
             <strong style="font-size: 13px; color: #374151;">Émotions:</strong>
-            <span style="color: #6B7280;"> ${emotions.join(", ")}</span>
+            <span style="color: #6B7280;"> ${emotions.map(escapeHtml).join(", ")}</span>
           </div>
         ` : ""}
 
         ${symbols.length > 0 ? `
           <div style="margin-bottom: 10px;">
             <strong style="font-size: 13px; color: #374151;">Symboles:</strong>
-            <span style="color: #D97706;"> ${symbols.join(", ")}</span>
+            <span style="color: #D97706;"> ${symbols.map(escapeHtml).join(", ")}</span>
           </div>
         ` : ""}
 
         ${tags.length > 0 ? `
           <div style="margin-bottom: 10px;">
             <strong style="font-size: 13px; color: #374151;">Tags:</strong>
-            <span style="color: #6B7280;"> #${tags.join(" #")}</span>
+            <span style="color: #6B7280;"> #${tags.map(escapeHtml).join(" #")}</span>
           </div>
         ` : ""}
       </div>
@@ -124,6 +135,15 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
+    // Rate limiting
+    const rateLimit = checkRateLimit(`export:${session.user.id}`, RATE_LIMITS.export);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requêtes. Veuillez patienter." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) } }
+      );
     }
 
     // Check usage limit
