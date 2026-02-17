@@ -198,6 +198,7 @@ export function VoiceRecorder({ onTranscript, className, disabled }: VoiceRecord
             : "border-mystic-600/30 text-mystic-400 hover:border-mystic-500 hover:text-mystic-300",
           className
         )}
+        aria-label={isRecording ? "Arrêter l'enregistrement" : isTranscribing ? "Transcription en cours" : "Dicter votre rêve"}
         title={isRecording ? "Arrêter l'enregistrement" : "Dicter votre rêve"}
       >
         {isTranscribing ? (

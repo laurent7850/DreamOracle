@@ -140,6 +140,7 @@ export function DreamCalendar({ dreams }: DreamCalendarProps) {
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Mois précédent"
             onClick={goToPreviousMonth}
             className="text-mystic-400 hover:text-lunar h-8 w-8 sm:h-10 sm:w-10"
           >
@@ -148,6 +149,7 @@ export function DreamCalendar({ dreams }: DreamCalendarProps) {
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Mois suivant"
             onClick={goToNextMonth}
             className="text-mystic-400 hover:text-lunar h-8 w-8 sm:h-10 sm:w-10"
           >

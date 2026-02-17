@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { stripe, getOrCreateStripeCustomer, createCheckoutSession, STRIPE_PRODUCTS } from '@/lib/stripe';
+import { z } from 'zod';
+
+const checkoutSchema = z.object({
+  tier: z.enum(['ESSENTIAL', 'PREMIUM']),
+  billingPeriod: z.enum(['monthly', 'yearly']),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,17 +18,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { tier, billingPeriod } = body;
+    const parsed = checkoutSchema.safeParse(body);
 
-    // Validate tier
-    if (!['ESSENTIAL', 'PREMIUM'].includes(tier)) {
-      return NextResponse.json({ error: 'Tier invalide' }, { status: 400 });
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Paramètres invalides' }, { status: 400 });
     }
 
-    // Validate billing period
-    if (!['monthly', 'yearly'].includes(billingPeriod)) {
-      return NextResponse.json({ error: 'Période de facturation invalide' }, { status: 400 });
-    }
+    const { tier, billingPeriod } = parsed.data;
 
     // Get or create Stripe customer
     let customerId = await prisma.user.findUnique({
