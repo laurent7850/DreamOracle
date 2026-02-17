@@ -344,7 +344,7 @@ export default function LandingPage() {
             <Link href="/cgv" className="hover:text-mystic-300">CGV</Link>
             <Link href="/mentions-legales" className="hover:text-mystic-300">Mentions légales</Link>
             <Link href="/pricing" className="hover:text-mystic-300">Tarifs</Link>
-            <Link href="/contact" className="hover:text-mystic-300">Contact</Link>
+            <a href="mailto:support@dreamoracle.eu" className="hover:text-mystic-300">Contact</a>
           </div>
           <p className="text-mystic-500 text-xs sm:text-sm text-center">
             © {new Date().getFullYear()} DreamOracle. Tous droits réservés.

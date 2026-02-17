@@ -107,19 +107,20 @@ export function UsageDisplay({
     (resetDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   );
 
-  const tierColors = {
-    FREE: "slate",
-    ESSENTIAL: "indigo",
-    PREMIUM: "amber",
+  // Static class maps for Tailwind CSS purge compatibility
+  const tierBadgeClasses = {
+    FREE: "bg-slate-500/20 text-slate-400",
+    ESSENTIAL: "bg-indigo-500/20 text-indigo-400",
+    PREMIUM: "bg-amber-500/20 text-amber-400",
   };
 
-  const tierColor = tierColors[data.tier];
+  const tierBadge = tierBadgeClasses[data.tier];
 
   if (variant === "minimal") {
     return (
       <div className="flex items-center gap-4 text-sm">
         <span
-          className={`px-2 py-1 bg-${tierColor}-500/20 text-${tierColor}-400 rounded-full text-xs font-medium`}
+          className={`px-2 py-1 ${tierBadge} rounded-full text-xs font-medium`}
         >
           {data.tierInfo.displayName}
         </span>
@@ -138,7 +139,7 @@ export function UsageDisplay({
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span
-              className={`px-2 py-1 bg-${tierColor}-500/20 text-${tierColor}-400 rounded-full text-xs font-medium`}
+              className={`px-2 py-1 ${tierBadge} rounded-full text-xs font-medium`}
             >
               {data.tierInfo.displayName}
             </span>
@@ -168,7 +169,7 @@ export function UsageDisplay({
               Votre utilisation
             </h3>
             <span
-              className={`px-2 py-1 bg-${tierColor}-500/20 text-${tierColor}-400 rounded-full text-xs font-medium`}
+              className={`px-2 py-1 ${tierBadge} rounded-full text-xs font-medium`}
             >
               {data.tierInfo.displayName}
             </span>
@@ -218,6 +219,19 @@ interface UsageBarProps {
   compact?: boolean;
 }
 
+// Static class maps for Tailwind CSS purge compatibility
+const barColorMap: Record<string, string> = {
+  indigo: "bg-indigo-500",
+  purple: "bg-purple-500",
+  green: "bg-green-500",
+};
+
+const iconColorMap: Record<string, string> = {
+  indigo: "text-indigo-400",
+  purple: "text-purple-400",
+  green: "text-green-400",
+};
+
 function UsageBar({ icon: Icon, label, stat, color, compact }: UsageBarProps) {
   const percentage = stat.isUnlimited
     ? 100
@@ -232,7 +246,7 @@ function UsageBar({ icon: Icon, label, stat, color, compact }: UsageBarProps) {
     ? "bg-red-500"
     : isNearLimit
     ? "bg-amber-500"
-    : `bg-${color}-500`;
+    : barColorMap[color] || "bg-indigo-500";
 
   if (compact) {
     return (
@@ -257,7 +271,7 @@ function UsageBar({ icon: Icon, label, stat, color, compact }: UsageBarProps) {
     <div>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <Icon className={`h-4 w-4 text-${color}-400`} />
+          <Icon className={`h-4 w-4 ${iconColorMap[color] || "text-indigo-400"}`} />
           <span className="text-sm text-slate-300">{label}</span>
         </div>
         <span className="text-sm text-slate-400">

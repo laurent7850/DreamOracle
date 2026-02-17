@@ -5,13 +5,22 @@ import { stripe, getStripe, priceIdToTier, mapStripeStatus } from '@/lib/stripe'
 import { prisma } from '@/lib/db';
 import { sendEmail } from '@/lib/email';
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(request: NextRequest) {
   try {
+    if (!webhookSecret) {
+      console.error('STRIPE_WEBHOOK_SECRET is not configured');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+    }
+
     const body = await request.text();
     const headersList = await headers();
-    const signature = headersList.get('stripe-signature')!;
+    const signature = headersList.get('stripe-signature');
+
+    if (!signature) {
+      return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 400 });
+    }
 
     let event: Stripe.Event;
 

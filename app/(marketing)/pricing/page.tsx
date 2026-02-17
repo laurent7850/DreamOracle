@@ -585,9 +585,9 @@ function PricingContent() {
             <Link href="/mentions-legales" className="hover:text-white transition-colors">
               Mentions légales
             </Link>
-            <Link href="/contact" className="hover:text-white transition-colors">
+            <a href="mailto:support@dreamoracle.eu" className="hover:text-white transition-colors">
               Contact
-            </Link>
+            </a>
           </div>
         </div>
       </footer>
