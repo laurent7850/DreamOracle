@@ -3,6 +3,17 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { calculateBiorhythm, calculateBiorhythmRange, findCriticalDays } from "@/lib/biorhythm";
 import { hasFeature, type SubscriptionTier } from "@/lib/subscription";
+import { z } from "zod";
+
+const birthDateSchema = z.object({
+  birthDate: z.string().refine((val) => {
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return false;
+    // Must be in the past and after 1900
+    const now = new Date();
+    return d < now && d.getFullYear() >= 1900;
+  }, { message: "Date de naissance invalide" }),
+});
 
 export async function GET(request: NextRequest) {
   try {
@@ -63,19 +74,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const { birthDate } = await request.json();
-    if (!birthDate) {
-      return NextResponse.json({ error: "Date de naissance requise" }, { status: 400 });
+    const body = await request.json();
+    const parsed = birthDateSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message || "Date de naissance invalide" },
+        { status: 400 }
+      );
     }
 
-    const parsed = new Date(birthDate);
-    if (isNaN(parsed.getTime())) {
-      return NextResponse.json({ error: "Date invalide" }, { status: 400 });
-    }
+    const birthDate = new Date(parsed.data.birthDate);
 
     await prisma.user.update({
       where: { id: session.user.id },
-      data: { birthDate: parsed },
+      data: { birthDate },
     });
 
     return NextResponse.json({ success: true });

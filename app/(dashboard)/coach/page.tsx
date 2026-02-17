@@ -336,6 +336,7 @@ Pose-moi une question sur tes rêves, ou choisis une suggestion ci-dessous !`,
               type="submit"
               disabled={!input.trim() || isLoading}
               size="icon"
+              aria-label="Envoyer le message"
               className="rounded-full bg-gold hover:bg-gold/90 text-night shrink-0 w-9 h-9 sm:w-10 sm:h-10"
             >
               {isLoading ? (

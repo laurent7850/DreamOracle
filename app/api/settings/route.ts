@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { z } from "zod";
+
+const updateSettingsSchema = z.object({
+  interpretationStyle: z.enum(["spiritual", "psychological", "balanced", "creative"]).optional(),
+  language: z.enum(["fr", "en"]).optional(),
+  notificationsEnabled: z.boolean().optional(),
+  theme: z.enum(["dark", "light", "cosmic", "ocean", "forest"]).optional(),
+  reminderTime: z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
+});
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -11,29 +20,39 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
+    const parsed = updateSettingsSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Données invalides", details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const data = parsed.data;
 
     const settings = await prisma.userSettings.upsert({
       where: { userId: session.user.id },
       update: {
-        ...(body.interpretationStyle && {
-          interpretationStyle: body.interpretationStyle,
+        ...(data.interpretationStyle && {
+          interpretationStyle: data.interpretationStyle,
         }),
-        ...(body.language && { language: body.language }),
-        ...(body.notificationsEnabled !== undefined && {
-          notificationsEnabled: body.notificationsEnabled,
+        ...(data.language && { language: data.language }),
+        ...(data.notificationsEnabled !== undefined && {
+          notificationsEnabled: data.notificationsEnabled,
         }),
-        ...(body.theme && { theme: body.theme }),
-        ...(body.reminderTime !== undefined && {
-          reminderTime: body.reminderTime,
+        ...(data.theme && { theme: data.theme }),
+        ...(data.reminderTime !== undefined && {
+          reminderTime: data.reminderTime,
         }),
       },
       create: {
         userId: session.user.id,
-        interpretationStyle: body.interpretationStyle || "balanced",
-        language: body.language || "fr",
-        notificationsEnabled: body.notificationsEnabled ?? true,
-        theme: body.theme || "dark",
-        reminderTime: body.reminderTime,
+        interpretationStyle: data.interpretationStyle || "balanced",
+        language: data.language || "fr",
+        notificationsEnabled: data.notificationsEnabled ?? true,
+        theme: data.theme || "dark",
+        reminderTime: data.reminderTime,
       },
     });
 

@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { z } from "zod";
+
+const subscribeSchema = z.object({
+  endpoint: z.string().url().max(2000),
+  keys: z.object({
+    p256dh: z.string().min(1).max(500),
+    auth: z.string().min(1).max(500),
+  }),
+});
+
+const unsubscribeSchema = z.object({
+  endpoint: z.string().url().max(2000),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,28 +22,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const subscription = await request.json();
+    const body = await request.json();
+    const parsed = subscribeSchema.safeParse(body);
 
-    if (!subscription.endpoint || !subscription.keys?.p256dh || !subscription.keys?.auth) {
+    if (!parsed.success) {
       return NextResponse.json(
         { error: "Données d'abonnement invalides" },
         { status: 400 }
       );
     }
 
+    const { endpoint, keys } = parsed.data;
+
     // Upsert the subscription (update if endpoint exists, create otherwise)
     await prisma.pushSubscription.upsert({
-      where: { endpoint: subscription.endpoint },
+      where: { endpoint },
       update: {
-        p256dh: subscription.keys.p256dh,
-        auth: subscription.keys.auth,
+        p256dh: keys.p256dh,
+        auth: keys.auth,
         userId: session.user.id,
       },
       create: {
         userId: session.user.id,
-        endpoint: subscription.endpoint,
-        p256dh: subscription.keys.p256dh,
-        auth: subscription.keys.auth,
+        endpoint,
+        p256dh: keys.p256dh,
+        auth: keys.auth,
       },
     });
 
@@ -51,11 +67,12 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const { endpoint } = await request.json();
+    const body = await request.json();
+    const parsed = unsubscribeSchema.safeParse(body);
 
-    if (!endpoint) {
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Endpoint manquant" },
+        { error: "Endpoint manquant ou invalide" },
         { status: 400 }
       );
     }
@@ -64,7 +81,7 @@ export async function DELETE(request: NextRequest) {
     await prisma.pushSubscription.deleteMany({
       where: {
         userId: session.user.id,
-        endpoint: endpoint,
+        endpoint: parsed.data.endpoint,
       },
     });
 

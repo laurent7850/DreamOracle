@@ -116,6 +116,7 @@ export function Sidebar() {
             variant="ghost"
             size="icon"
             onClick={() => setCollapsed(!collapsed)}
+            aria-label={collapsed ? "Développer le menu" : "Réduire le menu"}
             className="text-mystic-400 hover:text-mystic-300 hover:bg-mystic-900/30"
           >
             {collapsed ? (

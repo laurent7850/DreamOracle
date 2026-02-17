@@ -509,6 +509,7 @@ export default function BiorhythmPage() {
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Jour précédent"
             onClick={() => setSelectedIndex(Math.max(0, selectedIndex - 1))}
             disabled={selectedIndex <= 0}
             className="text-mystic-400 hover:text-lunar w-8 h-8"
@@ -530,6 +531,7 @@ export default function BiorhythmPage() {
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Jour suivant"
             onClick={() => setSelectedIndex(Math.min(data.chartData.length - 1, selectedIndex + 1))}
             disabled={selectedIndex >= data.chartData.length - 1}
             className="text-mystic-400 hover:text-lunar w-8 h-8"

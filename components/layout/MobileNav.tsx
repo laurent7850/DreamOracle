@@ -129,6 +129,7 @@ export function MobileNav() {
               <span className="text-sm font-medium text-lunar">Plus d&apos;options</span>
               <button
                 onClick={() => setShowMore(false)}
+                aria-label="Fermer le menu"
                 className="text-mystic-400 hover:text-lunar p-1"
               >
                 <X className="w-5 h-5" />
@@ -212,6 +213,8 @@ export function MobileNav() {
           {/* More Button */}
           <button
             onClick={() => setShowMore(!showMore)}
+            aria-label="Plus d'options"
+            aria-expanded={showMore}
             className={cn(
               "flex flex-col items-center gap-0.5 sm:gap-1 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all min-w-[52px]",
               showMore || isMoreActive ? "text-gold" : "text-mystic-400"

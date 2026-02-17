@@ -27,6 +27,7 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
+          aria-label="Notifications"
           className="text-mystic-400 hover:text-mystic-300 hover:bg-mystic-900/30 h-8 w-8 sm:h-10 sm:w-10"
         >
           <Bell className="w-4 h-4 sm:w-5 sm:h-5" />

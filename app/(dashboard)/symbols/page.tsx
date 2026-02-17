@@ -617,12 +617,14 @@ export default function SymbolsPage() {
                         <div className="flex gap-1">
                           <button
                             onClick={() => startEdit(symbol)}
+                            aria-label={`Modifier ${symbol.name}`}
                             className="p-2 text-mystic-400 hover:text-mystic-200 hover:bg-mystic-800/50 rounded-lg transition-colors"
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(symbol.id)}
+                            aria-label={`Supprimer ${symbol.name}`}
                             className="p-2 text-mystic-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
