@@ -711,15 +711,9 @@ export function generateBackupPDF(data: BackupData): Buffer {
 
       y += 3;
 
-      // Dashed divider between dreams
+      // One dream per page: start new page for next dream
       if (i < data.dreams.length - 1) {
-        setDrawColor(MYSTIC_700);
-        doc.setLineWidth(0.15);
-        const lineY = y + 2;
-        doc.setLineDashPattern([2, 2], 0);
-        doc.line(marginL + 20, lineY, pageW - marginR - 20, lineY);
-        doc.setLineDashPattern([], 0);
-        y += 8;
+        newPage();
       }
     }
 
