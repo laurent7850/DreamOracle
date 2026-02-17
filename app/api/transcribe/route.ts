@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { checkCredits, logUsage } from "@/lib/credits";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
@@ -17,6 +18,15 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
+    // Rate limiting
+    const rateLimit = checkRateLimit(`transcribe:${session.user.id}`, RATE_LIMITS.transcription);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requêtes. Veuillez patienter." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) } }
+      );
     }
 
     // Check credits before processing

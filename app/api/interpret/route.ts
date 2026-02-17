@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { interpretDream, formatInterpretationAsText } from "@/lib/claude";
 import { checkCredits, logUsage } from "@/lib/credits";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 const interpretSchema = z.object({
   dreamId: z.string(),
@@ -16,6 +17,15 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
+    // Rate limiting
+    const rateLimit = checkRateLimit(`interpret:${session.user.id}`, RATE_LIMITS.interpretation);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requêtes. Veuillez patienter." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) } }
+      );
     }
 
     // Check credits before processing

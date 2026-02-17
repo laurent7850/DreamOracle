@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -13,6 +14,16 @@ const registerSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting by IP
+    const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
+    const rateLimit = checkRateLimit(`register:${ip}`, RATE_LIMITS.register);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Trop de tentatives d'inscription. Veuillez réessayer plus tard." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
 
     const validation = registerSchema.safeParse(body);

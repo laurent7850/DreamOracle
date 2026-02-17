@@ -17,7 +17,23 @@ export async function GET(
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: {
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+        lastLoginAt: true,
+        role: true,
+        subscriptionTier: true,
+        subscriptionStatus: true,
+        subscriptionEnds: true,
+        stripeCustomerId: true,
+        stripeSubscriptionId: true,
+        creditsResetAt: true,
+        birthDate: true,
+        // Explicitly omit: password, emailVerified
         _count: {
           select: {
             dreams: true,
