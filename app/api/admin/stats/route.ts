@@ -97,6 +97,93 @@ export async function GET() {
       signupsByDay[date] = (signupsByDay[date] || 0) + entry._count;
     });
 
+    // === Revenue & Subscription Performance ===
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+
+    // MRR: count active paid subscribers and estimate revenue
+    const paidSubscribers = await prisma.user.findMany({
+      where: {
+        subscriptionTier: { in: ["ESSENTIAL", "PREMIUM"] },
+        subscriptionStatus: "active",
+      },
+      select: { subscriptionTier: true },
+    });
+
+    // MRR based on monthly prices (7.99€ ESSENTIAL, 13.99€ PREMIUM)
+    const mrr = paidSubscribers.reduce((sum, u) => {
+      return sum + (u.subscriptionTier === "ESSENTIAL" ? 799 : 1399);
+    }, 0);
+
+    // Invoice revenue stats
+    const [
+      revenueThisMonth,
+      revenueLastMonth,
+      revenueTotal,
+      invoicesThisMonth,
+      invoicesTotal,
+    ] = await Promise.all([
+      prisma.invoice.aggregate({
+        where: { status: "paid", paidAt: { gte: startOfMonth } },
+        _sum: { amount: true },
+        _count: true,
+      }),
+      prisma.invoice.aggregate({
+        where: { status: "paid", paidAt: { gte: startOfLastMonth, lte: endOfLastMonth } },
+        _sum: { amount: true },
+      }),
+      prisma.invoice.aggregate({
+        where: { status: "paid" },
+        _sum: { amount: true },
+      }),
+      prisma.invoice.count({ where: { paidAt: { gte: startOfMonth } } }),
+      prisma.invoice.count(),
+    ]);
+
+    // Conversion rate: paid users / total users
+    const paidUsersCount = paidSubscribers.length;
+    const conversionRate = totalUsers > 0 ? (paidUsersCount / totalUsers) * 100 : 0;
+
+    // Churn: canceled this month
+    const churnedThisMonth = await prisma.user.count({
+      where: {
+        subscriptionStatus: "canceled",
+        updatedAt: { gte: startOfMonth },
+        stripeCustomerId: { not: null },
+      },
+    });
+
+    // Recent invoices
+    const recentInvoices = await prisma.invoice.findMany({
+      take: 10,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        invoiceNumber: true,
+        amount: true,
+        currency: true,
+        description: true,
+        status: true,
+        paidAt: true,
+        customerName: true,
+        customerEmail: true,
+      },
+    });
+
+    // Monthly revenue trend (last 6 months)
+    const revenueByMonth: Record<string, number> = {};
+    for (let i = 5; i >= 0; i--) {
+      const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
+      const monthKey = monthStart.toISOString().slice(0, 7); // "2026-02"
+
+      const monthRevenue = await prisma.invoice.aggregate({
+        where: { status: "paid", paidAt: { gte: monthStart, lte: monthEnd } },
+        _sum: { amount: true },
+      });
+      revenueByMonth[monthKey] = monthRevenue._sum.amount || 0;
+    }
+
     return NextResponse.json({
       users: {
         total: totalUsers,
@@ -141,6 +228,19 @@ export async function GET() {
       ),
       recentUsers,
       signupsByDay,
+      revenue: {
+        mrr,
+        thisMonth: revenueThisMonth._sum.amount || 0,
+        lastMonth: revenueLastMonth._sum.amount || 0,
+        total: revenueTotal._sum.amount || 0,
+        invoicesThisMonth,
+        invoicesTotal,
+        conversionRate: Math.round(conversionRate * 10) / 10,
+        paidUsers: paidUsersCount,
+        churnedThisMonth,
+        revenueByMonth,
+        recentInvoices,
+      },
     });
   } catch (error) {
     console.error("Admin stats error:", error);
