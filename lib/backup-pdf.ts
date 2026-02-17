@@ -284,6 +284,106 @@ export function generateBackupPDF(data: BackupData): Buffer {
     }
   }
 
+  // ─── Vector emoji icons drawn with jsPDF primitives ───────
+  // Each draws a ~5x5mm icon centered at (cx, cy)
+
+  // ✨ Sparkle: 4-pointed star shape
+  function drawSparkle(cx: number, cy: number, size: number, color: RGB) {
+    setFillColor(color);
+    const s = size / 2;
+    // Draw a 4-pointed star using triangles
+    // Vertical points
+    doc.triangle(cx, cy - s, cx - s * 0.25, cy, cx + s * 0.25, cy, "F");
+    doc.triangle(cx, cy + s, cx - s * 0.25, cy, cx + s * 0.25, cy, "F");
+    // Horizontal points
+    doc.triangle(cx - s, cy, cx, cy - s * 0.25, cx, cy + s * 0.25, "F");
+    doc.triangle(cx + s, cy, cx, cy - s * 0.25, cx, cy + s * 0.25, "F");
+    // Small sparkle dots
+    const dotR = s * 0.12;
+    doc.circle(cx - s * 0.6, cy - s * 0.6, dotR, "F");
+    doc.circle(cx + s * 0.6, cy - s * 0.6, dotR, "F");
+    doc.circle(cx - s * 0.6, cy + s * 0.6, dotR, "F");
+    doc.circle(cx + s * 0.6, cy + s * 0.6, dotR, "F");
+  }
+
+  // 🌙 Crescent moon
+  function drawMoon(cx: number, cy: number, size: number, color: RGB) {
+    const r = size / 2;
+    setFillColor(color);
+    doc.circle(cx, cy, r, "F");
+    // Cut out to make crescent
+    setFillColor(NIGHT);
+    doc.circle(cx + r * 0.45, cy - r * 0.2, r * 0.8, "F");
+  }
+
+  // 💫 Shooting star / dizzy star
+  function drawShootingStar(cx: number, cy: number, size: number, color: RGB) {
+    const s = size / 2;
+    setFillColor(color);
+    // Star body (small 4-pointed star)
+    const ss = s * 0.5;
+    doc.triangle(cx, cy - ss, cx - ss * 0.25, cy, cx + ss * 0.25, cy, "F");
+    doc.triangle(cx, cy + ss, cx - ss * 0.25, cy, cx + ss * 0.25, cy, "F");
+    doc.triangle(cx - ss, cy, cx, cy - ss * 0.25, cx, cy + ss * 0.25, "F");
+    doc.triangle(cx + ss, cy, cx, cy - ss * 0.25, cx, cy + ss * 0.25, "F");
+    // Trail arc (dots getting smaller)
+    const dotSizes = [0.25, 0.2, 0.15, 0.1];
+    for (let i = 0; i < dotSizes.length; i++) {
+      doc.circle(cx - s * 0.4 - i * s * 0.28, cy + s * 0.15 + i * s * 0.12, s * dotSizes[i], "F");
+    }
+  }
+
+  // 🔮 Crystal ball
+  function drawCrystalBall(cx: number, cy: number, size: number, color: RGB) {
+    const r = size / 2;
+    // Ball
+    setFillColor(color);
+    doc.circle(cx, cy - r * 0.15, r * 0.75, "F");
+    // Shine highlight
+    setFillColor([
+      Math.min(255, color[0] + 80),
+      Math.min(255, color[1] + 80),
+      Math.min(255, color[2] + 80),
+    ]);
+    doc.circle(cx - r * 0.25, cy - r * 0.4, r * 0.18, "F");
+    // Base/stand
+    setFillColor(color);
+    doc.rect(cx - r * 0.5, cy + r * 0.5, r * 1.0, r * 0.25, "F");
+  }
+
+  // 🌟 Glowing star (5-pointed effect with glow)
+  function drawGlowStar(cx: number, cy: number, size: number, color: RGB) {
+    const s = size / 2;
+    // Glow circle (lighter)
+    setFillColor([
+      Math.min(255, color[0] + 40),
+      Math.min(255, color[1] + 40),
+      Math.min(255, color[2] + 40),
+    ]);
+    doc.circle(cx, cy, s * 0.7, "F");
+    // Inner 4-pointed star
+    setFillColor(color);
+    const ss = s * 0.8;
+    doc.triangle(cx, cy - ss, cx - ss * 0.22, cy, cx + ss * 0.22, cy, "F");
+    doc.triangle(cx, cy + ss, cx - ss * 0.22, cy, cx + ss * 0.22, cy, "F");
+    doc.triangle(cx - ss, cy, cx, cy - ss * 0.22, cx, cy + ss * 0.22, "F");
+    doc.triangle(cx + ss, cy, cx, cy - ss * 0.22, cx, cy + ss * 0.22, "F");
+    // Center bright dot
+    setFillColor([255, 255, 255]);
+    doc.circle(cx, cy, s * 0.12, "F");
+  }
+
+  // Draw section icon by type
+  function drawSectionIcon(icon: InterpSection["icon"], cx: number, cy: number, size: number, color: RGB) {
+    switch (icon) {
+      case "sparkle": drawSparkle(cx, cy, size, color); break;
+      case "moon": drawMoon(cx, cy, size, color); break;
+      case "star": drawShootingStar(cx, cy, size, color); break;
+      case "crystal": drawCrystalBall(cx, cy, size, color); break;
+      case "shine": drawGlowStar(cx, cy, size, color); break;
+    }
+  }
+
   // ─── Cover page ─────────────────────────────────────────────
   fillPage();
 
@@ -499,16 +599,16 @@ export function generateBackupPDF(data: BackupData): Buffer {
           for (const section of sections) {
             checkPageBreak(12);
 
-            // Section icon (small colored circle)
+            // Section icon (vector emoji)
             const sColor = sectionColors[section.icon];
-            drawCircle(marginL + 14, y - 1, 0.8, sColor);
+            drawSectionIcon(section.icon, marginL + 14, y - 1.2, 4, sColor);
 
             // Section title (bold-like, larger)
             if (section.title) {
               doc.setFontSize(8);
               setColor(sColor);
-              doc.text(section.title, marginL + 18, y);
-              y += 4;
+              doc.text(section.title, marginL + 19, y);
+              y += 5;
             }
 
             // Section content
