@@ -105,7 +105,7 @@ export function SubscriptionSection({
         throw new Error(data.error || "Erreur");
       }
 
-      window.location.href = data.url;
+      window.open(data.url, "_blank", "noopener,noreferrer");
     } catch {
       toast.error("Impossible d'ouvrir le portail de facturation");
     } finally {
