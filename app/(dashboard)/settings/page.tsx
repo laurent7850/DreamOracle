@@ -1,10 +1,12 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { Settings, User, Bell, Palette, Shield, Smartphone } from "lucide-react";
+import { Settings, User, Bell, Palette, Shield, Smartphone, CreditCard } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SettingsForm } from "./SettingsForm";
+import { SubscriptionSection } from "./SubscriptionSection";
 import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 import { InstallSection } from "@/components/pwa/InstallSection";
+import { TIERS, type SubscriptionTier } from "@/lib/subscription";
 
 export const metadata = {
   title: "Paramètres",
@@ -24,6 +26,40 @@ export default async function SettingsPage() {
     });
   }
 
+  // Fetch subscription info
+  const user = session?.user?.id
+    ? await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          subscriptionTier: true,
+          subscriptionStatus: true,
+          subscriptionEnds: true,
+          stripeCustomerId: true,
+        },
+      })
+    : null;
+
+  const tier = (user?.subscriptionTier || "FREE") as SubscriptionTier;
+  const tierInfo = TIERS[tier];
+
+  // Fetch invoices
+  const invoices = session?.user?.id
+    ? await prisma.invoice.findMany({
+        where: { userId: session.user.id },
+        orderBy: { createdAt: "desc" },
+        take: 12,
+        select: {
+          id: true,
+          invoiceNumber: true,
+          amount: true,
+          currency: true,
+          description: true,
+          status: true,
+          paidAt: true,
+        },
+      })
+    : [];
+
   return (
     <div className="max-w-3xl mx-auto space-y-8 px-3 sm:px-4 md:px-0">
       <div>
@@ -35,6 +71,30 @@ export default async function SettingsPage() {
           Personnalisez votre expérience DreamOracle
         </p>
       </div>
+
+      {/* Subscription Section */}
+      <Card className="glass-card border-mystic-700/30 border-indigo-500/20 bg-gradient-to-br from-mystic-900/80 to-indigo-950/10">
+        <CardHeader className="border-b border-mystic-700/30">
+          <CardTitle className="font-display text-lg text-lunar flex items-center gap-2">
+            <CreditCard className="w-5 h-5 text-indigo-400" />
+            Abonnement
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <SubscriptionSection
+            tier={tier}
+            tierDisplayName={tierInfo.displayName}
+            status={user?.subscriptionStatus || "active"}
+            subscriptionEnds={user?.subscriptionEnds?.toISOString() || null}
+            hasStripeCustomer={!!user?.stripeCustomerId}
+            monthlyPrice={tierInfo.monthlyPrice}
+            invoices={invoices.map((inv) => ({
+              ...inv,
+              paidAt: inv.paidAt.toISOString(),
+            }))}
+          />
+        </CardContent>
+      </Card>
 
       {/* Profile Section */}
       <Card className="glass-card border-mystic-700/30">
