@@ -52,6 +52,7 @@ interface BiorhythmData {
   targetDate: string;
   needsBirthDate?: boolean;
   hasAdvanced?: boolean;
+  daysSinceBirthAtStart?: number;
 }
 
 function formatDate(date: Date): string {
@@ -94,10 +95,12 @@ function BiorhythmChart({
   chartData,
   selectedIndex,
   onIndexChange,
+  daysSinceBirthAtStart,
 }: {
   chartData: ChartDay[];
   selectedIndex: number;
   onIndexChange: (index: number) => void;
+  daysSinceBirthAtStart?: number;
 }) {
   const width = 700;
   const height = 280;
@@ -109,41 +112,36 @@ function BiorhythmChart({
 
   const lines = useMemo(() => {
     const keys = ["physical", "emotional", "intellectual"] as const;
+    const periods = { physical: 23, emotional: 28, intellectual: 33 };
     const colors = ["#ef4444", "#3b82f6", "#22c55e"];
+    const n = chartData.length;
+    if (n < 2) return [];
 
-    // Catmull-Rom → cubic Bezier for smooth curves through data points
-    function smoothPath(pts: { x: number; y: number }[]): string {
-      if (pts.length < 2) return "";
-      if (pts.length === 2)
-        return `M${pts[0].x},${pts[0].y}L${pts[1].x},${pts[1].y}`;
-
-      const t = 0.35; // tension (0 = sharp, 0.5 = very smooth)
-      let d = `M${pts[0].x},${pts[0].y}`;
-
-      for (let i = 0; i < pts.length - 1; i++) {
-        const p0 = pts[Math.max(0, i - 1)];
-        const p1 = pts[i];
-        const p2 = pts[i + 1];
-        const p3 = pts[Math.min(pts.length - 1, i + 2)];
-
-        const cp1x = p1.x + (p2.x - p0.x) * t;
-        const cp1y = p1.y + (p2.y - p0.y) * t;
-        const cp2x = p2.x - (p3.x - p1.x) * t;
-        const cp2y = p2.y - (p3.y - p1.y) * t;
-
-        d += `C${cp1x},${cp1y},${cp2x},${cp2y},${p2.x},${p2.y}`;
-      }
-      return d;
-    }
+    // High-resolution: recalculate sin() at 8 sub-steps per day
+    // This produces ~480 points for perfectly smooth sine curves
+    const SUB = 8;
+    const totalDays = n - 1;
+    const totalSteps = totalDays * SUB;
+    const d0 = daysSinceBirthAtStart ?? 0;
 
     return keys.map((key, ki) => {
-      const pts = chartData.map((d, i) => ({
-        x: padding.left + (i / (chartData.length - 1)) * chartW,
-        y: padding.top + chartH / 2 - (d[key] * chartH) / 2,
-      }));
-      return { key, color: colors[ki], path: smoothPath(pts) };
+      const period = periods[key];
+      let path = "";
+
+      for (let s = 0; s <= totalSteps; s++) {
+        const dayFrac = s / SUB; // fractional day offset from chart start
+        const x = padding.left + (dayFrac / totalDays) * chartW;
+
+        // Recompute sin(2π × (daysSinceBirth + dayFrac) / period)
+        const value = Math.sin((2 * Math.PI * (d0 + dayFrac)) / period);
+
+        const y = padding.top + chartH / 2 - (value * chartH) / 2;
+        path += s === 0 ? `M${x},${y}` : `L${x},${y}`;
+      }
+
+      return { key, color: colors[ki], path };
     });
-  }, [chartData, chartW, chartH, padding.left, padding.top]);
+  }, [chartData, chartW, chartH, padding.left, padding.top, daysSinceBirthAtStart]);
 
   // Grid lines and labels
   const gridYPositions = [-1, -0.5, 0, 0.5, 1].map((v) => ({
@@ -675,6 +673,7 @@ export default function BiorhythmPage() {
               chartData={data.chartData}
               selectedIndex={selectedIndex}
               onIndexChange={setSelectedIndex}
+              daysSinceBirthAtStart={data.daysSinceBirthAtStart}
             />
           )}
 

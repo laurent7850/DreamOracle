@@ -53,12 +53,18 @@ export async function GET(request: NextRequest) {
       ? findCriticalDays(user.birthDate, targetDate, 30)
       : [];
 
+    // Compute daysSinceBirth for chart start so client can super-sample sine curves
+    const birthMs = new Date(user.birthDate.getFullYear(), user.birthDate.getMonth(), user.birthDate.getDate()).getTime();
+    const startMs = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
+    const daysSinceBirthAtStart = Math.floor((startMs - birthMs) / (1000 * 60 * 60 * 24));
+
     return NextResponse.json({
       cycles,
       chartData,
       criticalDays,
       targetDate: targetDate.toISOString(),
       hasAdvanced,
+      daysSinceBirthAtStart,
     });
   } catch (error) {
     console.error("Biorhythm error:", error);
