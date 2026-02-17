@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import {
   BookOpen,
   Sparkles,
-  Mic,
   FileText,
-  Calendar,
   TrendingUp,
 } from "lucide-react";
 import { SubscriptionTier, TIERS } from "@/lib/subscription";
@@ -95,12 +93,6 @@ export function UsageDisplay({
       label: "Interprétations",
       stat: data.usage.interpretations,
       color: "purple",
-    },
-    {
-      icon: Mic,
-      label: "Transcriptions",
-      stat: data.usage.transcriptions,
-      color: "blue",
     },
     {
       icon: FileText,

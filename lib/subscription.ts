@@ -64,7 +64,7 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
   ESSENTIAL: {
     dreams: -1, // unlimited
     interpretations: 10,
-    transcriptions: 20,
+    transcriptions: -1, // unlimited for paid tiers
     exports: 10,
     features: {
       calendar: true,
@@ -134,7 +134,7 @@ export const TIERS: Record<SubscriptionTier, TierInfo> = {
     features: [
       'Tout de Rêveur +',
       '10 interprétations Oracle par mois',
-      '🎙️ Transcription vocale (20/mois)',
+      '🎙️ Transcription vocale',
       'Détection des patterns récurrents',
       'Statistiques avancées',
       'Biorythme détaillé',

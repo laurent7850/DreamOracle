@@ -149,7 +149,7 @@ export default function CGVPage() {
                   🔭 Explorateur — 7,99 €/mois ou 59,88 €/an (4,99 €/mois)
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground">
-                  Tout de Rêveur + 10 interprétations Oracle par mois, transcription vocale (20/mois),
+                  Tout de Rêveur + 10 interprétations Oracle par mois, transcription vocale illimitée,
                   détection des patterns récurrents, statistiques avancées, biorythme détaillé,
                   notifications de rappel, export PDF (10/mois).
                 </p>
