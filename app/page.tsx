@@ -340,7 +340,8 @@ export default function LandingPage() {
           </div>
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-mystic-400">
             <Link href="/privacy" className="hover:text-mystic-300">Confidentialité</Link>
-            <Link href="/terms" className="hover:text-mystic-300">Conditions</Link>
+            <Link href="/terms" className="hover:text-mystic-300">CGU</Link>
+            <Link href="/cgv" className="hover:text-mystic-300">CGV</Link>
             <Link href="/pricing" className="hover:text-mystic-300">Tarifs</Link>
             <Link href="/contact" className="hover:text-mystic-300">Contact</Link>
           </div>

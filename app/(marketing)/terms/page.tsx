@@ -33,7 +33,7 @@ export default function TermsPage() {
             </h1>
           </div>
           <p className="text-sm sm:text-base text-muted-foreground">
-            Dernière mise à jour : 6 février 2026
+            Dernière mise à jour : 17 février 2026
           </p>
         </div>
 
@@ -92,8 +92,11 @@ export default function TermsPage() {
             </p>
             <ul className="list-disc pl-5 sm:pl-6 space-y-1.5 sm:space-y-2 text-sm sm:text-base">
               <li>Enregistrement et stockage sécurisé de vos rêves</li>
-              <li>Interprétation des rêves par l&apos;Oracle</li>
+              <li>Interprétation des rêves par intelligence artificielle</li>
               <li>Transcription vocale de vos récits de rêves</li>
+              <li>Calcul et analyse de biorythmes</li>
+              <li>Coaching onirique personnalisé (Dream Coach)</li>
+              <li>Dictionnaire des symboles et détection de patterns</li>
               <li>Suivi statistique et calendrier de vos rêves</li>
               <li>Export de vos données personnelles</li>
             </ul>
@@ -124,13 +127,15 @@ export default function TermsPage() {
             </p>
             <ul className="list-disc pl-5 sm:pl-6 space-y-1.5 sm:space-y-2 mb-3 sm:mb-4 text-sm sm:text-base">
               <li>
-                <strong>Rêveur (Gratuit) :</strong> 5 rêves/mois, 2 interprétations/mois
+                <strong>Rêveur (Gratuit) :</strong> Journal de rêves illimité, 3 interprétations/mois
               </li>
               <li>
-                <strong>Explorateur (4,99€/mois) :</strong> Rêves illimités, 15 interprétations/mois
+                <strong>Explorateur (7,99 €/mois ou 59,88 €/an) :</strong> 10 interprétations/mois,
+                transcription vocale, biorythme détaillé, statistiques avancées
               </li>
               <li>
-                <strong>Oracle (9,99€/mois) :</strong> Toutes fonctionnalités illimitées
+                <strong>Oracle+ (13,99 €/mois ou 109,88 €/an) :</strong> Toutes fonctionnalités
+                illimitées dont Dream Coach, dictionnaire des symboles, rapports mensuels
               </li>
             </ul>
             <p className="text-sm sm:text-base">
@@ -250,6 +255,10 @@ export default function TermsPage() {
 
         {/* Links */}
         <div className="mt-6 sm:mt-8 flex flex-wrap gap-2 sm:gap-4 justify-center text-xs sm:text-sm">
+          <Link href="/cgv" className="text-primary hover:underline px-2 py-1">
+            Conditions de vente
+          </Link>
+          <span className="text-muted-foreground hidden sm:inline">•</span>
           <Link href="/privacy" className="text-primary hover:underline px-2 py-1">
             Politique de confidentialité
           </Link>

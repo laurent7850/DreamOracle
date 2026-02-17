@@ -376,6 +376,10 @@ export default function PrivacyPage() {
             Conditions d&apos;utilisation
           </Link>
           <span className="text-muted-foreground hidden sm:inline">•</span>
+          <Link href="/cgv" className="text-primary hover:underline px-2 py-1">
+            Conditions de vente
+          </Link>
+          <span className="text-muted-foreground hidden sm:inline">•</span>
           <Link href="/pricing" className="text-primary hover:underline px-2 py-1">
             Tarifs
           </Link>

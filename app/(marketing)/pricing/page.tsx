@@ -572,12 +572,15 @@ function PricingContent() {
               © {new Date().getFullYear()} DreamOracle
             </span>
           </div>
-          <div className="flex gap-4 sm:gap-6 text-xs sm:text-sm text-slate-400">
+          <div className="flex flex-wrap gap-4 sm:gap-6 text-xs sm:text-sm text-slate-400">
             <Link href="/privacy" className="hover:text-white transition-colors">
               Confidentialité
             </Link>
             <Link href="/terms" className="hover:text-white transition-colors">
               CGU
+            </Link>
+            <Link href="/cgv" className="hover:text-white transition-colors">
+              CGV
             </Link>
             <Link href="/contact" className="hover:text-white transition-colors">
               Contact
