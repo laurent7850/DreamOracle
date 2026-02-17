@@ -87,11 +87,11 @@ interface InterpSection {
 // Parse stored interpretation text into structured sections
 function parseInterpretation(text: string): InterpSection[] {
   const sections: InterpSection[] = [];
-  // Match sections: emoji + **Title**\n\ncontent
-  const sectionRegex = /(?:[\s\S]*?)(?:\u2728|\uD83C\uDF19|\uD83D\uDCAB|\uD83D\uDD2E|\uD83C\uDF1F)\s*\*\*([^*]+)\*\*\s*\n\n([\s\S]*?)(?=(?:[\u2728\uD83C\uD83D]|\n\n(?:[\u2728\uD83C\uD83D]))|$)/gu;
 
-  // Simpler approach: split by emoji markers
-  const rawSections = text.split(/(?:✨|🌙|💫|🔮|🌟)\s*/);
+  // Split by emoji markers using Unicode code points (robust across encodings)
+  // ✨ = U+2728, 🌙 = U+1F319, 💫 = U+1F4AB, 🔮 = U+1F52E, 🌟 = U+1F31F
+  const emojiSplitRegex = /(?:\u2728|\u{1F319}|\u{1F4AB}|\u{1F52E}|\u{1F31F})\s*/gu;
+  const rawSections = text.split(emojiSplitRegex);
 
   const iconMap: Array<InterpSection["icon"]> = ["sparkle", "moon", "star", "crystal", "shine"];
 
