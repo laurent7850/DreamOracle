@@ -59,8 +59,8 @@ function formatDate(d: string | Date): string {
   const date = new Date(d);
   const days = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
   const months = [
-    "janvier", "fevrier", "mars", "avril", "mai", "juin",
-    "juillet", "aout", "septembre", "octobre", "novembre", "decembre",
+    "janvier", "f\u00e9vrier", "mars", "avril", "mai", "juin",
+    "juillet", "ao\u00fbt", "septembre", "octobre", "novembre", "d\u00e9cembre",
   ];
   return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
@@ -68,8 +68,8 @@ function formatDate(d: string | Date): string {
 function formatShortDate(d: string | Date): string {
   const date = new Date(d);
   const months = [
-    "jan.", "fev.", "mars", "avr.", "mai", "juin",
-    "juil.", "aout", "sept.", "oct.", "nov.", "dec.",
+    "jan.", "f\u00e9v.", "mars", "avr.", "mai", "juin",
+    "juil.", "ao\u00fbt", "sept.", "oct.", "nov.", "d\u00e9c.",
   ];
   return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
@@ -236,7 +236,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
   y += 12;
   doc.setFontSize(14);
   setColor(GOLD);
-  doc.text("Journal de Reves", pageW / 2, y, { align: "center" });
+  doc.text("Journal de R\u00eaves", pageW / 2, y, { align: "center" });
 
   // Decorative line
   y += 10;
@@ -281,7 +281,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
   doc.text(String(data.stats.totalDreams), statsStartX + statBoxW / 2, y + 11, { align: "center" });
   doc.setFontSize(8);
   setColor(MYSTIC_300);
-  doc.text("Reves", statsStartX + statBoxW / 2, y + 17, { align: "center" });
+  doc.text("R\u00eaves", statsStartX + statBoxW / 2, y + 17, { align: "center" });
 
   const symBoxX = statsStartX + statBoxW + 10;
   drawCard(symBoxX, y, statBoxW, statBoxH);
@@ -318,7 +318,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
 
     doc.setFontSize(18);
     setColor(GOLD);
-    doc.text("Journal de Reves", marginL + 14, y);
+    doc.text("Journal de R\u00eaves", marginL + 14, y);
     y += 3;
     setDrawColor(GOLD);
     doc.setLineWidth(0.4);
@@ -338,7 +338,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
       y += 6;
       doc.setFontSize(7);
       setColor(MYSTIC_500);
-      doc.text(`Reve ${i + 1}/${data.dreams.length}`, marginL + 8, y);
+      doc.text(`R\u00eave ${i + 1}/${data.dreams.length}`, marginL + 8, y);
       doc.text(formatDate(dream.dreamDate), pageW - marginR - 8, y, { align: "right" });
 
       // Title
@@ -359,11 +359,11 @@ export function generateBackupPDF(data: BackupData): Buffer {
       let badgeX = marginL + 8;
 
       if (dream.lucidity > 0) {
-        const lucText = `Lucidite ${dream.lucidity}/5`;
+        const lucText = `Lucidit\u00e9 ${dream.lucidity}/5`;
         badgeX += drawBadge(lucText, badgeX, y, INDIGO);
       }
       if (dream.isRecurring) {
-        badgeX += drawBadge("Recurrent", badgeX, y, AMBER);
+        badgeX += drawBadge("R\u00e9current", badgeX, y, AMBER);
       }
       if (dream.mood) {
         badgeX += drawBadge(dream.mood, badgeX, y, MYSTIC_300);
@@ -404,7 +404,7 @@ export function generateBackupPDF(data: BackupData): Buffer {
         drawCircle(marginL + 11, y - 1.2, 1.2, INDIGO);
         doc.setFontSize(8);
         setColor(INDIGO);
-        doc.text("Interpretation Oracle", marginL + 15, y);
+        doc.text("Interpr\u00e9tation Oracle", marginL + 15, y);
         y += 5;
 
         const interpEndY = wrappedText(
@@ -585,13 +585,13 @@ export function generateBackupPDF(data: BackupData): Buffer {
   doc.setFontSize(9);
   setColor(MYSTIC_500);
   doc.text(
-    `${data.stats.totalDreams} reves - ${data.stats.totalSymbols} symboles`,
+    `${data.stats.totalDreams} r\u00eaves - ${data.stats.totalSymbols} symboles`,
     pageW / 2, y,
     { align: "center" }
   );
   y += 6;
   doc.text(
-    `Genere le ${formatDate(new Date())}`,
+    `G\u00e9n\u00e9r\u00e9 le ${formatDate(new Date())}`,
     pageW / 2, y,
     { align: "center" }
   );
