@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+// NextAuth v5 uses AUTH_SECRET env var by default, but we may have NEXTAUTH_SECRET
+const authSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+
 // Routes that require authentication
 const protectedRoutes = [
   "/dashboard",
@@ -109,9 +112,17 @@ export async function middleware(request: NextRequest) {
 
   if (isProtectedPage || isProtectedApi) {
     // Use JWT token check (Edge-compatible, no Prisma needed)
+    // NextAuth v5 uses "authjs.session-token" cookie name (or __Secure- prefix in HTTPS)
+    const isSecure = request.nextUrl.protocol === "https:";
+    const cookieName = isSecure
+      ? "__Secure-authjs.session-token"
+      : "authjs.session-token";
+
     const token = await getToken({
       req: request,
-      secret: process.env.NEXTAUTH_SECRET,
+      secret: authSecret,
+      salt: cookieName,
+      cookieName,
     });
 
     if (!token) {
