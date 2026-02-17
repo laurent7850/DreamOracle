@@ -34,9 +34,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Utilisateur non trouvé" }, { status: 404 });
     }
 
-    // Check if user has access to Dream Coach (PREMIUM only)
+    // Check if user has access to Dream Coach
     const tier = user.subscriptionTier as "FREE" | "ESSENTIAL" | "PREMIUM";
-    if (tier !== "PREMIUM") {
+    if (!hasFeature(tier, 'dreamCoach')) {
       return NextResponse.json(
         {
           error: "Dream Coach est une fonctionnalité Oracle+",

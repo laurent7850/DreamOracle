@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { calculateBiorhythm, calculateBiorhythmRange, findCriticalDays } from "@/lib/biorhythm";
+import { hasFeature, type SubscriptionTier } from "@/lib/subscription";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,12 +13,15 @@ export async function GET(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { birthDate: true },
+      select: { birthDate: true, subscriptionTier: true },
     });
 
     if (!user?.birthDate) {
       return NextResponse.json({ needsBirthDate: true }, { status: 200 });
     }
+
+    const tier = (user.subscriptionTier || 'FREE') as SubscriptionTier;
+    const hasAdvanced = hasFeature(tier, 'advancedBiorhythm');
 
     const searchParams = request.nextUrl.searchParams;
     const dateStr = searchParams.get("date");
@@ -33,14 +37,17 @@ export async function GET(request: NextRequest) {
     endDate.setDate(endDate.getDate() + 30);
     const chartData = calculateBiorhythmRange(user.birthDate, startDate, endDate);
 
-    // Find upcoming critical days (within 30 days)
-    const criticalDays = findCriticalDays(user.birthDate, targetDate, 30);
+    // Find upcoming critical days (within 30 days) - only for advanced tier
+    const criticalDays = hasAdvanced
+      ? findCriticalDays(user.birthDate, targetDate, 30)
+      : [];
 
     return NextResponse.json({
       cycles,
       chartData,
       criticalDays,
       targetDate: targetDate.toISOString(),
+      hasAdvanced,
     });
   } catch (error) {
     console.error("Biorhythm error:", error);

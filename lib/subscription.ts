@@ -19,6 +19,9 @@ export interface TierLimits {
     patternAnalysis: boolean;
     prioritySupport: boolean;
     cloudBackup: boolean;
+    advancedBiorhythm: boolean;
+    monthlyReport: boolean;
+    dreamCoach: boolean;
   };
 }
 
@@ -39,7 +42,7 @@ export interface TierInfo {
 // Limits configuration by tier
 export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
   FREE: {
-    dreams: -1, // unlimited journal (recommandation audit)
+    dreams: -1, // unlimited journal
     interpretations: 3,
     transcriptions: 0, // transcription reserved for paid tiers
     exports: 0,
@@ -53,11 +56,14 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
       patternAnalysis: false,
       prioritySupport: false,
       cloudBackup: false,
+      advancedBiorhythm: false,
+      monthlyReport: false,
+      dreamCoach: false,
     },
   },
   ESSENTIAL: {
     dreams: -1, // unlimited
-    interpretations: 30,
+    interpretations: 10,
     transcriptions: 20,
     exports: 10,
     features: {
@@ -67,9 +73,12 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
       notifications: true,
       themes: false,
       symbolDictionary: false,
-      patternAnalysis: true, // patterns moved to Essential (audit)
+      patternAnalysis: true,
       prioritySupport: false,
       cloudBackup: false,
+      advancedBiorhythm: true,
+      monthlyReport: false,
+      dreamCoach: false,
     },
   },
   PREMIUM: {
@@ -87,6 +96,9 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
       patternAnalysis: true,
       prioritySupport: true,
       cloudBackup: true,
+      advancedBiorhythm: true,
+      monthlyReport: true,
+      dreamCoach: true,
     },
   },
 };
@@ -106,6 +118,7 @@ export const TIERS: Record<SubscriptionTier, TierInfo> = {
       '3 interprétations Oracle par mois',
       'Calendrier des rêves',
       'Statistiques de base',
+      'Biorythme de base',
       'Tags et émotions',
     ],
   },
@@ -120,10 +133,11 @@ export const TIERS: Record<SubscriptionTier, TierInfo> = {
     highlighted: true,
     features: [
       'Tout de Rêveur +',
-      '30 interprétations Oracle par mois',
+      '10 interprétations Oracle par mois',
       '🎙️ Transcription vocale (20/mois)',
       'Détection des patterns récurrents',
       'Statistiques avancées',
+      'Biorythme détaillé',
       'Notifications de rappel',
       'Export PDF (10/mois)',
     ],
@@ -144,6 +158,7 @@ export const TIERS: Record<SubscriptionTier, TierInfo> = {
       '🎙️ Transcription vocale illimitée',
       '🧠 Dream Coach personnalisé',
       'Dictionnaire de symboles personnel',
+      'Rapport mensuel personnalisé',
       'Thèmes personnalisés',
       'Export PDF illimité',
       'Sauvegarde cloud',

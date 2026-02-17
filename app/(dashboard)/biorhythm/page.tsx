@@ -14,9 +14,12 @@ import {
   Minus,
   Calendar,
   GripHorizontal,
+  Lock,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 
 interface BiorhythmCycle {
   name: string;
@@ -48,6 +51,7 @@ interface BiorhythmData {
   criticalDays: CriticalDay[];
   targetDate: string;
   needsBirthDate?: boolean;
+  hasAdvanced?: boolean;
 }
 
 function formatDate(date: Date): string {
@@ -595,10 +599,17 @@ export default function BiorhythmPage() {
                 </div>
               </div>
 
-              {/* Description */}
-              <p className="text-xs text-mystic-400 leading-relaxed">
-                {cycle.description}
-              </p>
+              {/* Description - only for advanced tier */}
+              {data?.hasAdvanced ? (
+                <p className="text-xs text-mystic-400 leading-relaxed">
+                  {cycle.description}
+                </p>
+              ) : (
+                <p className="text-xs text-mystic-600 leading-relaxed italic">
+                  <Lock className="w-3 h-3 inline mr-1" />
+                  Conseil détaillé réservé aux abonnés
+                </p>
+              )}
             </CardContent>
           </Card>
         ))}
@@ -669,39 +680,69 @@ export default function BiorhythmPage() {
         </CardContent>
       </Card>
 
-      {/* Critical days */}
-      {data.criticalDays.length > 0 && (
-        <Card className="glass-card border-mystic-700/30">
-          <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="font-display text-base sm:text-lg text-lunar flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-400" />
-              Jours critiques à venir
-            </CardTitle>
-            <p className="text-xs text-mystic-500">
-              Les jours critiques sont des moments de transition où le cycle passe par zéro.
-              Soyez particulièrement vigilant.
-            </p>
-          </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {data.criticalDays.slice(0, 10).map((cd, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg bg-mystic-800/30"
-                >
+      {/* Critical days - advanced only */}
+      {data?.hasAdvanced ? (
+        data.criticalDays.length > 0 && (
+          <Card className="glass-card border-mystic-700/30">
+            <CardHeader className="px-4 pt-4 pb-2">
+              <CardTitle className="font-display text-base sm:text-lg text-lunar flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-400" />
+                Jours critiques à venir
+              </CardTitle>
+              <p className="text-xs text-mystic-500">
+                Les jours critiques sont des moments de transition où le cycle passe par zéro.
+                Soyez particulièrement vigilant.
+              </p>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {data.criticalDays.slice(0, 10).map((cd, i) => (
                   <div
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ backgroundColor: cd.color }}
-                  />
-                  <span className="text-xs text-mystic-300 capitalize">
-                    {formatShortDate(cd.date)}
-                  </span>
-                  <span className="text-xs text-mystic-500">-</span>
-                  <span className="text-xs" style={{ color: cd.color }}>
-                    {cd.cycle}
-                  </span>
-                </div>
-              ))}
+                    key={i}
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg bg-mystic-800/30"
+                  >
+                    <div
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{ backgroundColor: cd.color }}
+                    />
+                    <span className="text-xs text-mystic-300 capitalize">
+                      {formatShortDate(cd.date)}
+                    </span>
+                    <span className="text-xs text-mystic-500">-</span>
+                    <span className="text-xs" style={{ color: cd.color }}>
+                      {cd.cycle}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )
+      ) : (
+        <Card className="glass-card border-purple-500/20 overflow-hidden">
+          <CardContent className="p-5">
+            <div className="flex items-start gap-4">
+              <div className="p-2.5 rounded-full bg-purple-500/15 shrink-0">
+                <Sparkles className="w-5 h-5 text-purple-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-lunar mb-1">
+                  Biorythme détaillé
+                </h3>
+                <p className="text-xs text-mystic-400 mb-3">
+                  Débloquez les conseils personnalisés, les jours critiques et l&apos;analyse
+                  approfondie de vos cycles avec un abonnement Explorateur ou Oracle+.
+                </p>
+                <Link href="/pricing">
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-xs"
+                  >
+                    <Sparkles className="w-3 h-3 mr-1.5" />
+                    Voir les abonnements
+                  </Button>
+                </Link>
+              </div>
             </div>
           </CardContent>
         </Card>

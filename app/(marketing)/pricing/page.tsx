@@ -337,18 +337,27 @@ function PricingContent() {
                 </tr>
               </thead>
               <tbody className="text-xs sm:text-sm md:text-base">
+                {/* Journal illimité */}
                 <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Journal de rêves</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Journal illimité</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
                 </tr>
+                {/* Interprétations */}
                 <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Interprétations Oracle</td>
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Interprétations</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-slate-400">3/mois</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">30/mois</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">10/mois</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Sans limite</td>
                 </tr>
+                {/* Transcription vocale */}
                 <tr className="border-b border-slate-800 bg-indigo-500/5">
                   <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300 flex items-center gap-2">
                     <Mic className="h-4 w-4 text-indigo-400" />
@@ -357,11 +366,16 @@ function PricingContent() {
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
                     <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
                   </td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">20/mois</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
                 </tr>
+                {/* Stats avancées */}
                 <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Détection patterns</td>
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Stats avancées</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
                     <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
                   </td>
@@ -372,6 +386,46 @@ function PricingContent() {
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
                   </td>
                 </tr>
+                {/* Patterns récurrents */}
+                <tr className="border-b border-slate-800">
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Patterns récurrents</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
+                </tr>
+                {/* Biorythme de base */}
+                <tr className="border-b border-slate-800">
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Biorythme de base</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
+                </tr>
+                {/* Biorythme détaillé */}
+                <tr className="border-b border-slate-800">
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Biorythme détaillé</td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
+                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
+                  </td>
+                </tr>
+                {/* Dream Coach */}
                 <tr className="border-b border-slate-800 bg-amber-500/5">
                   <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300 flex items-center gap-2">
                     <Brain className="h-4 w-4 text-amber-400" />
@@ -387,52 +441,9 @@ function PricingContent() {
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
                   </td>
                 </tr>
+                {/* Dictionnaire perso */}
                 <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Export PDF</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
-                    <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">10/mois</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4 text-white">Illimité</td>
-                </tr>
-                <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Calendrier</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
-                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
-                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
-                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Stats avancées</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
-                    <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
-                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
-                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Notifications rappel</td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
-                    <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
-                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
-                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Dictionnaire symboles</td>
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Dictionnaire perso</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
                     <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
                   </td>
@@ -443,8 +454,9 @@ function PricingContent() {
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mx-auto" />
                   </td>
                 </tr>
+                {/* Rapport mensuel */}
                 <tr className="border-b border-slate-800">
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Support prioritaire</td>
+                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-slate-300">Rapport mensuel</td>
                   <td className="text-center py-3 sm:py-4 px-2 sm:px-4">
                     <X className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 mx-auto" />
                   </td>
