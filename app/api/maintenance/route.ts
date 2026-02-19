@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
       cleanedSessions: 0,
       cleanedTokens: 0,
       cleanedPushSubs: 0,
+      expiredTrials: 0,
       stats: {
         users: 0,
         dreams: 0,
@@ -59,7 +60,21 @@ export async function POST(request: NextRequest) {
     });
     results.cleanedPushSubs = stalePushSubs.count;
 
-    // 4. Get database stats
+    // 4. Expire finished Oracle+ trials
+    const expiredTrials = await prisma.user.updateMany({
+      where: {
+        trialEndsAt: { lt: new Date() },
+        subscriptionTier: "PREMIUM",
+        stripeSubscriptionId: null,
+      },
+      data: {
+        subscriptionTier: "FREE",
+        creditsResetAt: new Date(),
+      },
+    });
+    results.expiredTrials = expiredTrials.count;
+
+    // 5. Get database stats
     const [users, dreams, sessions, pushSubscriptions] = await Promise.all([
       prisma.user.count(),
       prisma.dream.count(),

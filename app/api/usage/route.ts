@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getUsageStats } from '@/lib/credits';
 import { prisma } from '@/lib/db';
-import { TIERS, SubscriptionTier } from '@/lib/subscription';
+import { TIERS, SubscriptionTier, getEffectiveTier } from '@/lib/subscription';
 
 export async function GET() {
   try {
@@ -18,6 +18,8 @@ export async function GET() {
         subscriptionTier: true,
         subscriptionStatus: true,
         subscriptionEnds: true,
+        trialEndsAt: true,
+        stripeSubscriptionId: true,
       },
     });
 
@@ -31,14 +33,17 @@ export async function GET() {
       return NextResponse.json({ error: 'Impossible de récupérer les statistiques' }, { status: 500 });
     }
 
-    // Get effective tier
-    let effectiveTier = user.subscriptionTier as SubscriptionTier;
-    if (user.subscriptionStatus !== 'active' ||
-        (user.subscriptionEnds && new Date() > user.subscriptionEnds)) {
-      effectiveTier = 'FREE';
-    }
+    // Get effective tier (handles trial expiration)
+    const effectiveTier = getEffectiveTier(user);
 
     const tierInfo = TIERS[effectiveTier];
+
+    // Trial info
+    const isTrialing = !!(
+      user.trialEndsAt &&
+      new Date(user.trialEndsAt) > new Date() &&
+      !user.stripeSubscriptionId
+    );
 
     return NextResponse.json({
       tier: effectiveTier,
@@ -49,6 +54,8 @@ export async function GET() {
       },
       subscriptionStatus: user.subscriptionStatus,
       subscriptionEnds: user.subscriptionEnds,
+      isTrialing,
+      trialEndsAt: isTrialing ? user.trialEndsAt : null,
       usage: stats,
       features: tierInfo.limits.features,
     });

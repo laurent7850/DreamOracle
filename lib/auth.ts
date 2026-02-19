@@ -72,14 +72,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token;
     },
     async signIn({ user }) {
-      // Update lastLoginAt on sign in
       if (user.id) {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { lastLoginAt: new Date() },
-        }).catch(() => {
+        try {
+          // Check if this is a new Google OAuth user → activate Oracle+ trial
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { createdAt: true, trialUsed: true },
+          });
+
+          if (dbUser) {
+            const isNewUser = (Date.now() - dbUser.createdAt.getTime()) < 60000 && !dbUser.trialUsed;
+
+            await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                lastLoginAt: new Date(),
+                // Essai Oracle+ 7 jours pour les nouveaux inscrits Google
+                ...(isNewUser ? {
+                  subscriptionTier: "PREMIUM",
+                  trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                  trialUsed: true,
+                } : {}),
+              },
+            });
+          }
+        } catch {
           // Ignore errors (e.g., field doesn't exist yet)
-        });
+        }
       }
       return true;
     },

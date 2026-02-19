@@ -75,15 +75,20 @@ export default function LandingPage() {
           <span className="text-gradient-gold">Rêves</span>
         </h1>
 
-        <p className="font-mystical text-sm sm:text-base md:text-lg lg:text-xl text-mystic-300 mb-6 sm:mb-8 md:mb-10 max-w-2xl px-2">
+        <p className="font-mystical text-sm sm:text-base md:text-lg lg:text-xl text-mystic-300 mb-4 sm:mb-6 md:mb-8 max-w-2xl px-2">
           Laissez l&apos;Oracle décoder les messages cachés de votre subconscient.
           Enregistrez, analysez et comprenez vos rêves comme jamais auparavant.
         </p>
 
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gold/10 rounded-full border border-gold/30 mb-6 sm:mb-8">
+          <Crown className="h-4 w-4 text-gold" />
+          <span className="text-gold text-xs sm:text-sm font-medium">7 jours d&apos;Oracle+ offerts — Accès complet, sans engagement</span>
+        </div>
+
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto px-4 sm:px-0">
           <Link href="/register" className="w-full sm:w-auto">
             <Button className="btn-mystic btn-gold text-sm sm:text-base md:text-lg px-6 sm:px-8 py-4 sm:py-5 md:py-6 w-full">
-              Commencer Gratuitement
+              Essayer Oracle+ gratuitement
             </Button>
           </Link>
           <Link href="#features" className="w-full sm:w-auto">
@@ -200,7 +205,7 @@ export default function LandingPage() {
             <Star className="w-4 h-4" />
           </div>
           <p className="text-mystic-300 font-mystical text-sm sm:text-base max-w-2xl mx-auto">
-            Commencez gratuitement et évoluez selon vos besoins
+            Testez Oracle+ gratuitement pendant 7 jours, puis choisissez le plan qui vous convient
           </p>
         </div>
 
@@ -227,18 +232,13 @@ export default function LandingPage() {
             </ul>
             <Link href="/register" className="w-full">
               <Button variant="outline" className="w-full border-mystic-600 text-mystic-300 hover:bg-mystic-800/50">
-                Commencer gratuitement
+                Plan après l&apos;essai
               </Button>
             </Link>
           </div>
 
-          {/* Essential Tier - Highlighted */}
+          {/* Essential Tier */}
           <div className="glass-card p-5 sm:p-6 flex flex-col border-mystic-500/50 relative">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-              <span className="bg-gradient-to-r from-mystic-500 to-purple-500 text-white text-xs font-medium px-3 py-1 rounded-full">
-                Populaire
-              </span>
-            </div>
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 rounded-lg bg-mystic-700/50">
                 <Star className="h-5 w-5 text-mystic-300" />
@@ -266,14 +266,20 @@ export default function LandingPage() {
             </div>
             <Link href="/pricing" className="w-full">
               <Button className="w-full btn-mystic">
-                Essai gratuit 7 jours
+                Voir les détails
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </Link>
           </div>
 
-          {/* Premium Tier */}
-          <div className="glass-card p-5 sm:p-6 flex flex-col sm:col-span-2 lg:col-span-1">
+          {/* Premium Tier - Highlighted */}
+          <div className="glass-card p-5 sm:p-6 flex flex-col sm:col-span-2 lg:col-span-1 border-gold/30 relative">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+              <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1">
+                <Crown className="h-3 w-3" />
+                7 jours gratuits
+              </span>
+            </div>
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 rounded-lg bg-gold/20">
                 <Crown className="h-5 w-5 text-gold" />
@@ -295,9 +301,9 @@ export default function LandingPage() {
                 </li>
               ))}
             </ul>
-            <Link href="/pricing" className="w-full">
+            <Link href="/register" className="w-full">
               <Button className="w-full btn-mystic btn-gold">
-                Débloquer l&apos;Oracle
+                Essayer Oracle+ 7 jours
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </Link>
@@ -325,9 +331,10 @@ export default function LandingPage() {
           </p>
           <Link href="/register">
             <Button className="btn-mystic btn-gold text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-4 sm:py-5 md:py-6">
-              Créer mon compte gratuit
+              Essayez Oracle+ pendant 7 jours
             </Button>
           </Link>
+          <p className="text-mystic-500 text-xs mt-3">Accès complet, sans engagement — Aucune carte requise</p>
         </div>
       </section>
 

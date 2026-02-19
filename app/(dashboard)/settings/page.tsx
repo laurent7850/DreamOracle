@@ -7,7 +7,7 @@ import { SettingsForm } from "./SettingsForm";
 import { SubscriptionSection } from "./SubscriptionSection";
 import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 import { InstallSection } from "@/components/pwa/InstallSection";
-import { TIERS, type SubscriptionTier } from "@/lib/subscription";
+import { TIERS, type SubscriptionTier, getEffectiveTier } from "@/lib/subscription";
 import TrackSubscription from "@/components/tracking/TrackSubscription";
 
 export const metadata = {
@@ -37,12 +37,22 @@ export default async function SettingsPage() {
           subscriptionStatus: true,
           subscriptionEnds: true,
           stripeCustomerId: true,
+          stripeSubscriptionId: true,
+          trialEndsAt: true,
         },
       })
     : null;
 
-  const tier = (user?.subscriptionTier || "FREE") as SubscriptionTier;
+  const tier = user ? getEffectiveTier(user as { subscriptionTier: string; trialEndsAt: Date | null; stripeSubscriptionId: string | null }) : "FREE" as SubscriptionTier;
   const tierInfo = TIERS[tier];
+
+  // Trial info
+  const isTrialing = !!(
+    user?.trialEndsAt &&
+    new Date(user.trialEndsAt) > new Date() &&
+    !user.stripeSubscriptionId
+  );
+  const trialEndsAt = isTrialing && user?.trialEndsAt ? user.trialEndsAt.toISOString() : null;
 
   return (
     <div className="max-w-3xl mx-auto space-y-8 px-3 sm:px-4 md:px-0">
@@ -75,6 +85,8 @@ export default async function SettingsPage() {
             subscriptionEnds={user?.subscriptionEnds?.toISOString() || null}
             hasStripeCustomer={!!user?.stripeCustomerId}
             monthlyPrice={tierInfo.monthlyPrice}
+            isTrialing={isTrialing}
+            trialEndsAt={trialEndsAt}
           />
         </CardContent>
       </Card>

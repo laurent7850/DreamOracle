@@ -236,6 +236,23 @@ export function getUpgradeRecommendation(
   return null;
 }
 
+// Get effective tier (checks trial expiration in real-time)
+export function getEffectiveTier(user: {
+  subscriptionTier: string;
+  trialEndsAt: Date | null;
+  stripeSubscriptionId: string | null;
+}): SubscriptionTier {
+  // If user has an active trial that expired and no paid subscription, revert to FREE
+  if (
+    user.trialEndsAt &&
+    new Date(user.trialEndsAt) < new Date() &&
+    !user.stripeSubscriptionId
+  ) {
+    return 'FREE';
+  }
+  return user.subscriptionTier as SubscriptionTier;
+}
+
 // Check if user has access to a feature (async - fetches user tier from DB)
 export async function hasFeatureAccess(
   userId: string,
@@ -246,11 +263,11 @@ export async function hasFeatureAccess(
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { subscriptionTier: true },
+    select: { subscriptionTier: true, trialEndsAt: true, stripeSubscriptionId: true },
   });
 
   if (!user) return false;
 
-  const tier = user.subscriptionTier as SubscriptionTier;
+  const tier = getEffectiveTier(user);
   return hasFeature(tier, feature);
 }

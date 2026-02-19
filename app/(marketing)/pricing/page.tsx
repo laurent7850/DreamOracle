@@ -131,9 +131,15 @@ function PricingContent() {
             </span>
           </h1>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto px-2">
-            Explorez vos rêves avec l&apos;Oracle.
-            Commencez gratuitement et évoluez selon vos besoins.
+            Testez Oracle+ pendant 7 jours — Toutes les fonctionnalités, sans engagement
           </p>
+
+          <div className="mt-4 sm:mt-6 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-full border border-amber-500/30">
+            <Crown className="h-4 w-4 text-amber-400" />
+            <span className="text-amber-300 text-xs sm:text-sm font-medium">
+              Chaque nouvel inscrit bénéficie de 7 jours d&apos;Oracle+ gratuit
+            </span>
+          </div>
         </div>
 
         {/* Billing toggle */}
@@ -201,7 +207,7 @@ function PricingContent() {
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                       <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium px-4 py-1 rounded-full flex items-center gap-1">
                         <Crown className="h-3 w-3" />
-                        Expérience complète
+                        7 jours gratuits
                       </div>
                     </div>
                   )}
@@ -252,16 +258,6 @@ function PricingContent() {
                     ))}
                   </ul>
 
-                  {/* Trial badge for Essential */}
-                  {tierKey === "ESSENTIAL" && (
-                    <div className="mb-4 text-center">
-                      <span className="inline-flex items-center gap-1.5 text-xs text-indigo-300 bg-indigo-500/10 px-3 py-1 rounded-full">
-                        <Shield className="h-3 w-3" />
-                        7 jours d&apos;essai gratuit
-                      </span>
-                    </div>
-                  )}
-
                   {/* CTA Button */}
                   <button
                     onClick={() => handleSubscribe(tierKey)}
@@ -278,9 +274,9 @@ function PricingContent() {
                       <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
                       <>
-                        {tierKey === "FREE" && "Commencer gratuitement"}
-                        {tierKey === "ESSENTIAL" && "Essayer 7 jours gratuit"}
-                        {tierKey === "PREMIUM" && "Débloquer l'Oracle"}
+                        {tierKey === "FREE" && "Plan après l'essai"}
+                        {tierKey === "ESSENTIAL" && "Choisir Explorateur"}
+                        {tierKey === "PREMIUM" && "Commencer mon essai gratuit"}
                         <ArrowRight className="h-4 w-4" />
                       </>
                     )}
@@ -488,10 +484,11 @@ function PricingContent() {
                 Comment fonctionne l&apos;essai gratuit de 7 jours ?
               </h3>
               <p className="text-slate-400 text-xs sm:text-base">
-                En choisissant le plan Explorateur, vous bénéficiez de 7 jours d&apos;essai
-                complet sans engagement. Vous ne serez facturé qu&apos;à la fin de la période
-                d&apos;essai si vous décidez de continuer. Annulez à tout moment avant la fin
-                des 7 jours et vous ne paierez rien.
+                Chaque nouvel inscrit bénéficie automatiquement de 7 jours d&apos;accès
+                complet à Oracle+ (notre plan le plus complet) sans engagement et
+                sans carte bancaire. À la fin des 7 jours, vous passez au plan
+                Rêveur (gratuit) ou vous choisissez un abonnement payant pour
+                garder toutes les fonctionnalités.
               </p>
             </div>
 

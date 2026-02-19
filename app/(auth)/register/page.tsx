@@ -4,9 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { Moon, Mail, Lock, Eye, EyeOff, User, Loader2 } from "lucide-react";
+import { Moon, Mail, Lock, Eye, EyeOff, User, Loader2, Crown, Sparkles, Brain, BookOpen } from "lucide-react";
 import { toast } from "sonner";
-import { trackRegistration } from "@/lib/meta-events";
+import { trackRegistration, trackStartTrial } from "@/lib/meta-events";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,6 +57,7 @@ export default function RegisterPage() {
 
       toast.success("Compte créé avec succès !");
       trackRegistration('credentials');
+      trackStartTrial('PREMIUM');
 
       // Auto sign in after registration
       const result = await signIn("credentials", {
@@ -93,8 +94,8 @@ export default function RegisterPage() {
           <Moon className="w-8 h-8 sm:w-10 sm:h-10 text-mystic-400" />
           <span className="font-display text-xl sm:text-2xl text-lunar">DreamOracle</span>
         </Link>
-        <h1 className="font-display text-xl sm:text-2xl text-lunar mb-2">Créer un compte</h1>
-        <p className="text-sm sm:text-base text-mystic-400">Commencez votre voyage onirique</p>
+        <h1 className="font-display text-xl sm:text-2xl text-lunar mb-2">Créez votre compte</h1>
+        <p className="text-sm sm:text-base text-mystic-400">7 jours d&apos;Oracle+ offerts — Accès complet, sans engagement</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 md:space-y-5">
@@ -217,6 +218,32 @@ export default function RegisterPage() {
         </svg>
         S&apos;inscrire avec Google
       </Button>
+
+      {/* Oracle+ trial features */}
+      <div className="mt-5 sm:mt-6 p-3 rounded-lg bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/20">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Crown className="w-3.5 h-3.5 text-amber-400" />
+          <span className="text-xs font-medium text-amber-300">Inclus dans votre essai Oracle+</span>
+        </div>
+        <ul className="grid grid-cols-2 gap-1.5 text-xs text-mystic-400">
+          <li className="flex items-center gap-1.5">
+            <Sparkles className="w-3 h-3 text-amber-400/70 flex-shrink-0" />
+            Interprétations illimitées
+          </li>
+          <li className="flex items-center gap-1.5">
+            <Brain className="w-3 h-3 text-amber-400/70 flex-shrink-0" />
+            Dream Coach personnel
+          </li>
+          <li className="flex items-center gap-1.5">
+            <BookOpen className="w-3 h-3 text-amber-400/70 flex-shrink-0" />
+            Dictionnaire de symboles
+          </li>
+          <li className="flex items-center gap-1.5">
+            <Moon className="w-3 h-3 text-amber-400/70 flex-shrink-0" />
+            Biorythme détaillé
+          </li>
+        </ul>
+      </div>
 
       <p className="text-center mt-4 sm:mt-6 text-sm sm:text-base text-mystic-400">
         Déjà un compte ?{" "}

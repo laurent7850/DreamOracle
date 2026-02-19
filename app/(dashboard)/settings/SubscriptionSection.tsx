@@ -23,6 +23,8 @@ interface SubscriptionSectionProps {
   subscriptionEnds: string | null;
   hasStripeCustomer: boolean;
   monthlyPrice: number;
+  isTrialing?: boolean;
+  trialEndsAt?: string | null;
 }
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
@@ -77,11 +79,17 @@ export function SubscriptionSection({
   subscriptionEnds,
   hasStripeCustomer,
   monthlyPrice,
+  isTrialing,
+  trialEndsAt,
 }: SubscriptionSectionProps) {
   const [loadingPortal, setLoadingPortal] = useState(false);
   const statusInfo = STATUS_MAP[status] || STATUS_MAP.active;
   const isFree = tier === "FREE";
   const isCanceled = status === "canceled" && subscriptionEnds;
+
+  const trialDaysLeft = isTrialing && trialEndsAt
+    ? Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
 
   const handleManageSubscription = async () => {
     setLoadingPortal(true);
@@ -103,6 +111,28 @@ export function SubscriptionSection({
 
   return (
     <div className="space-y-6">
+      {/* Trial banner */}
+      {isTrialing && (
+        <Link href="/pricing">
+          <div className="p-3 bg-gradient-to-r from-amber-600/20 to-orange-600/20 border border-amber-500/30 rounded-lg hover:border-amber-500/50 transition-all cursor-pointer group">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Crown className="w-4 h-4 text-amber-400" />
+                <div>
+                  <span className="text-sm text-white font-medium">
+                    Essai Oracle+ — {trialDaysLeft} jour{trialDaysLeft > 1 ? 's' : ''} restant{trialDaysLeft > 1 ? 's' : ''}
+                  </span>
+                  <p className="text-xs text-amber-300/70">
+                    Passez à un plan payant pour garder Oracle+
+                  </p>
+                </div>
+              </div>
+              <ArrowUpRight className="w-4 h-4 text-amber-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </div>
+          </div>
+        </Link>
+      )}
+
       {/* Current Plan */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">

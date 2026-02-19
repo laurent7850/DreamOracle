@@ -56,6 +56,10 @@ export async function POST(request: NextRequest) {
         name,
         email,
         password: hashedPassword,
+        // Essai Oracle+ 7 jours pour tout nouvel inscrit
+        subscriptionTier: "PREMIUM",
+        trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        trialUsed: true,
       },
     });
 

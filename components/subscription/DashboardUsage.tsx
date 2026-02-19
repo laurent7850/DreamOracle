@@ -7,6 +7,7 @@ import {
   ArrowRight,
   Crown,
   Zap,
+  Clock,
 } from "lucide-react";
 import { SubscriptionTier, TIERS } from "@/lib/subscription";
 
@@ -24,6 +25,8 @@ interface UsageData {
     displayName: string;
     description: string;
   };
+  isTrialing?: boolean;
+  trialEndsAt?: string | null;
   usage: {
     dreams: UsageStat;
     interpretations: UsageStat;
@@ -79,6 +82,11 @@ export function DashboardUsage() {
 
   const tierStyle = tierColors[data.tier];
 
+  // Trial countdown
+  const trialDaysLeft = data.isTrialing && data.trialEndsAt
+    ? Math.max(0, Math.ceil((new Date(data.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
+
   const resetDate = new Date(data.usage.resetDate);
   const daysUntilReset = Math.ceil(
     (resetDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
@@ -119,6 +127,31 @@ export function DashboardUsage() {
           </span>
         </div>
       </div>
+
+      {/* Trial banner */}
+      {data.isTrialing && (
+        <Link href="/pricing">
+          <div className="mb-4 p-3 bg-gradient-to-r from-amber-600/20 to-orange-600/20 border border-amber-500/30 rounded-lg hover:border-amber-500/50 transition-all cursor-pointer group">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Crown className="w-4 h-4 text-amber-400" />
+                <div>
+                  <span className="text-sm text-white font-medium">
+                    Essai Oracle+ — {trialDaysLeft} jour{trialDaysLeft > 1 ? 's' : ''} restant{trialDaysLeft > 1 ? 's' : ''}
+                  </span>
+                  <p className="text-xs text-amber-300/70">
+                    Gardez l&apos;accès complet en choisissant un plan
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 text-amber-400">
+                <Clock className="w-3.5 h-3.5" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+          </div>
+        </Link>
+      )}
 
       {/* Usage bars */}
       <div className="space-y-3 mb-4">
