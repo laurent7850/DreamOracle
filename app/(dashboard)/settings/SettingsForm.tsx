@@ -96,7 +96,7 @@ export function SettingsForm({ initialSettings, isPremium = false }: SettingsFor
             setSettings({ ...settings, interpretationStyle: value })
           }
         >
-          <SelectTrigger className="bg-mystic-900/30 border-mystic-600/30 text-lunar">
+          <SelectTrigger className="w-full bg-mystic-900/30 border-mystic-600/30 text-lunar">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-night-light border-mystic-700">
@@ -106,14 +106,15 @@ export function SettingsForm({ initialSettings, isPremium = false }: SettingsFor
                 value={style.value}
                 className="text-lunar hover:bg-mystic-800"
               >
-                <div>
-                  <span className="font-medium">{style.label}</span>
-                  <p className="text-xs text-mystic-400">{style.description}</p>
-                </div>
+                {style.label}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+        {/* Description du style sélectionné */}
+        <p className="text-xs text-mystic-400 pl-1">
+          {INTERPRETATION_STYLES.find(s => s.value === settings.interpretationStyle)?.description}
+        </p>
       </div>
 
       {/* Language */}
@@ -125,7 +126,7 @@ export function SettingsForm({ initialSettings, isPremium = false }: SettingsFor
             setSettings({ ...settings, language: value })
           }
         >
-          <SelectTrigger className="bg-mystic-900/30 border-mystic-600/30 text-lunar">
+          <SelectTrigger className="w-full bg-mystic-900/30 border-mystic-600/30 text-lunar">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-night-light border-mystic-700">
@@ -161,7 +162,7 @@ export function SettingsForm({ initialSettings, isPremium = false }: SettingsFor
             setSettings({ ...settings, theme: value });
           }}
         >
-          <SelectTrigger className="bg-mystic-900/30 border-mystic-600/30 text-lunar">
+          <SelectTrigger className="w-full bg-mystic-900/30 border-mystic-600/30 text-lunar">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-night-light border-mystic-700">
