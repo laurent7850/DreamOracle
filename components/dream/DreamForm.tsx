@@ -182,19 +182,20 @@ export function DreamForm() {
       {/* Emotions */}
       <div className="space-y-2 sm:space-y-3">
         <Label className="text-lunar text-sm sm:text-base">Émotions ressenties</Label>
-        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           {EMOTION_OPTIONS.map((emotion) => (
             <button
               key={emotion.value}
               type="button"
               onClick={() => toggleEmotion(emotion.value)}
-              className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm transition-all ${
+              className={`flex flex-col items-center gap-1 px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all min-w-[3.5rem] sm:min-w-[4.5rem] ${
                 selectedEmotions.includes(emotion.value)
                   ? "bg-mystic-600 text-white border border-mystic-500"
                   : "bg-mystic-900/30 text-mystic-300 border border-mystic-700/30 hover:border-mystic-600/50"
               }`}
             >
-              {emotion.emoji} <span className="hidden xs:inline">{emotion.label}</span>
+              <span className="text-lg sm:text-xl">{emotion.emoji}</span>
+              <span className="text-[10px] sm:text-xs leading-tight">{emotion.label}</span>
             </button>
           ))}
         </div>
