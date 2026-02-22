@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { INTERPRETATION_STYLES } from "@/types";
+import { useTheme } from "@/components/providers/ThemeProvider";
 import Link from "next/link";
 
 // Theme definitions
@@ -39,6 +40,7 @@ export function SettingsForm({ initialSettings, isPremium = false }: SettingsFor
   const [isLoading, setIsLoading] = useState(false);
   const [settings, setSettings] = useState(initialSettings);
   const [userTier, setUserTier] = useState<string>("FREE");
+  const { setTheme: applyTheme } = useTheme();
 
   // Check user tier on mount
   useEffect(() => {
@@ -66,6 +68,13 @@ export function SettingsForm({ initialSettings, isPremium = false }: SettingsFor
 
       if (!response.ok) {
         throw new Error("Failed to save settings");
+      }
+
+      // Apply theme immediately via ThemeProvider context
+      if (settings.theme) {
+        applyTheme(settings.theme as "dark" | "midnight" | "aurora" | "cosmic" | "ocean" | "sunset");
+        // Sync to localStorage for cross-tab updates
+        localStorage.setItem("dreamoracle-theme", settings.theme);
       }
 
       toast.success("Paramètres sauvegardés");

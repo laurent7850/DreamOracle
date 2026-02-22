@@ -7,7 +7,7 @@ const updateSettingsSchema = z.object({
   interpretationStyle: z.enum(["spiritual", "psychological", "balanced", "creative"]).optional(),
   language: z.enum(["fr", "en"]).optional(),
   notificationsEnabled: z.boolean().optional(),
-  theme: z.enum(["dark", "light", "cosmic", "ocean", "forest"]).optional(),
+  theme: z.enum(["dark", "midnight", "aurora", "cosmic", "ocean", "sunset"]).optional(),
   reminderTime: z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
 });
 
