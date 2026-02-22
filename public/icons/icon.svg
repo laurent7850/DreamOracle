@@ -1,44 +1,87 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="0%" style="stop-color:#1a1040"/>
+      <stop offset="50%" style="stop-color:#12122a"/>
       <stop offset="100%" style="stop-color:#0a0a1a"/>
     </linearGradient>
-    <linearGradient id="moon" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#f5e6a3"/>
+    <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd700"/>
       <stop offset="100%" style="stop-color:#d4af37"/>
     </linearGradient>
-    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#d4af37;stop-opacity:0.4"/>
-      <stop offset="100%" style="stop-color:#d4af37;stop-opacity:0"/>
+    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a78bfa"/>
+      <stop offset="50%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#7c3aed"/>
     </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="50%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="moonGlow" cx="42%" cy="38%" r="35%">
+      <stop offset="0%" style="stop-color:#ffd700;stop-opacity:0.3"/>
+      <stop offset="60%" style="stop-color:#d4af37;stop-opacity:0.1"/>
+      <stop offset="100%" style="stop-color:#d4af37;stop-opacity:0"/>
+    </radialGradient>
+    <!-- Clip path to create crescent moon -->
+    <clipPath id="crescentClip">
+      <rect width="512" height="512"/>
+      <circle cx="300" cy="185" r="95" style="clip-rule:evenodd"/>
+    </clipPath>
   </defs>
 
-  <!-- Background -->
-  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Background with subtle purple tint -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
 
-  <!-- Outer glow -->
-  <circle cx="256" cy="240" r="160" fill="url(#glow)"/>
+  <!-- Purple ambient glow -->
+  <circle cx="256" cy="230" r="220" fill="url(#glow)"/>
 
-  <!-- Moon crescent -->
-  <path d="M 256 100
-           A 140 140 0 1 1 256 380
-           A 100 100 0 1 0 256 100 Z"
-        fill="url(#moon)"/>
+  <!-- Gold ambient glow around moon -->
+  <circle cx="220" cy="195" r="150" fill="url(#moonGlow)"/>
 
-  <!-- Stars -->
-  <circle cx="120" cy="140" r="6" fill="#f5e6a3"/>
-  <circle cx="380" cy="120" r="8" fill="#f5e6a3"/>
-  <circle cx="400" cy="280" r="5" fill="#f5e6a3"/>
-  <circle cx="100" cy="320" r="7" fill="#f5e6a3"/>
-  <circle cx="340" cy="380" r="4" fill="#f5e6a3"/>
-  <circle cx="160" cy="400" r="5" fill="#f5e6a3"/>
+  <!-- Outer mystic ring (dashed) -->
+  <circle cx="256" cy="256" r="195" fill="none" stroke="#7c3aed" stroke-width="1" opacity="0.2" stroke-dasharray="6 10"/>
+
+  <!-- Inner mystic ring -->
+  <circle cx="256" cy="256" r="165" fill="none" stroke="url(#ring)" stroke-width="2" opacity="0.35"/>
+
+  <!-- Moon crescent using two overlapping circles -->
+  <circle cx="225" cy="195" r="100" fill="url(#moonGrad)"/>
+  <circle cx="275" cy="175" r="90" fill="url(#bg)"/>
+
+  <!-- Moon highlight edge -->
+  <circle cx="225" cy="195" r="100" fill="none" stroke="#ffd700" stroke-width="1" opacity="0.3"/>
+
+  <!-- Stars - bright gold and purple -->
+  <circle cx="370" cy="120" r="7" fill="#ffd700"/>
+  <circle cx="370" cy="120" r="14" fill="#ffd700" opacity="0.12"/>
+
+  <circle cx="400" cy="280" r="5" fill="#a78bfa"/>
+  <circle cx="400" cy="280" r="10" fill="#a78bfa" opacity="0.15"/>
+
+  <circle cx="100" cy="150" r="5.5" fill="#d4af37"/>
+  <circle cx="100" cy="150" r="11" fill="#d4af37" opacity="0.12"/>
+
+  <circle cx="90" cy="330" r="6" fill="#a78bfa"/>
+  <circle cx="90" cy="330" r="12" fill="#a78bfa" opacity="0.12"/>
+
+  <circle cx="380" cy="380" r="4" fill="#d4af37"/>
+  <circle cx="155" cy="400" r="4.5" fill="#c4b5fd" opacity="0.7"/>
 
   <!-- Small decorative stars -->
-  <circle cx="180" cy="180" r="3" fill="#f5e6a3" opacity="0.6"/>
-  <circle cx="350" cy="200" r="3" fill="#f5e6a3" opacity="0.6"/>
-  <circle cx="300" cy="340" r="2" fill="#f5e6a3" opacity="0.5"/>
+  <circle cx="340" cy="170" r="2.5" fill="#c4b5fd" opacity="0.5"/>
+  <circle cx="430" cy="190" r="2" fill="#ffd700" opacity="0.5"/>
+  <circle cx="320" cy="360" r="2" fill="#c4b5fd" opacity="0.4"/>
+  <circle cx="170" cy="320" r="2" fill="#ffd700" opacity="0.35"/>
+  <circle cx="130" cy="240" r="1.5" fill="#a78bfa" opacity="0.4"/>
+  <circle cx="420" cy="350" r="1.5" fill="#c4b5fd" opacity="0.3"/>
 
-  <!-- Text "DO" subtle -->
-  <text x="256" y="470" font-family="Georgia, serif" font-size="48" font-weight="bold" fill="#d4af37" text-anchor="middle" opacity="0.8">DreamOracle</text>
+  <!-- Sparkle accents (4-point stars) -->
+  <path d="M 390 150 L 390 140 M 390 150 L 390 160 M 390 150 L 380 150 M 390 150 L 400 150" stroke="#ffd700" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+  <path d="M 115 280 L 115 272 M 115 280 L 115 288 M 115 280 L 107 280 M 115 280 L 123 280" stroke="#a78bfa" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- Three small Z's for sleep/dreams - subtle -->
+  <text x="330" y="310" font-family="serif" font-size="28" font-weight="bold" fill="#a78bfa" opacity="0.25" transform="rotate(-15, 330, 310)">z</text>
+  <text x="355" y="285" font-family="serif" font-size="22" font-weight="bold" fill="#8b5cf6" opacity="0.2" transform="rotate(-15, 355, 285)">z</text>
+  <text x="373" y="265" font-family="serif" font-size="17" font-weight="bold" fill="#7c3aed" opacity="0.15" transform="rotate(-15, 373, 265)">z</text>
 </svg>
