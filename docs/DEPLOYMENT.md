@@ -9,6 +9,48 @@
 
 ---
 
+## Workflow Git (Dev / Prod)
+
+Le projet utilise deux branches principales :
+
+| Branche | Rôle | Déploiement |
+|---------|------|-------------|
+| `develop` | Développement quotidien | Local uniquement |
+| `master` | Production stable | Automatique via Hostinger |
+
+### Développer
+
+```bash
+# Travailler sur develop (branche par défaut)
+git checkout develop
+# ... coder, tester ...
+git add <fichiers>
+git commit -m "Description"
+git push origin develop
+```
+
+### Déployer en production
+
+```bash
+# Merger develop vers master
+git checkout master
+git merge develop
+git push origin master
+
+# Déclencher le redéploiement Hostinger
+# (via Claude Code ou manuellement)
+
+# Retourner sur develop
+git checkout develop
+```
+
+### Règles
+- **Ne jamais commit directement sur `master`** — toujours passer par `develop`
+- Tester localement avant de merger vers `master`
+- `master` = ce qui tourne en production sur dreamoracle.eu
+
+---
+
 ## Déploiement Hostinger (Production)
 
 ### Prérequis
@@ -38,11 +80,12 @@ mcp__hostinger-mcp__VPS_restartProjectV1(virtualMachineId: 767464, projectName: 
 
 ### Processus de déploiement
 
-1. **Push sur GitHub**
+1. **Merger develop → master et push**
    ```bash
-   git add .
-   git commit -m "Description des changements"
+   git checkout master
+   git merge develop
    git push origin master
+   git checkout develop
    ```
 
 2. **Déclencher le redéploiement**
