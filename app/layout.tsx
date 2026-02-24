@@ -69,6 +69,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
+    url: "https://dreamoracle.eu",
     siteName: "DreamOracle",
     title: "DreamOracle - Interprète de Rêves",
     description: "Explorez les mystères de vos rêves avec l'Oracle",
