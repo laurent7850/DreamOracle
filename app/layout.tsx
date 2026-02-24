@@ -61,6 +61,11 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
+  verification: {
+    other: {
+      'facebook-domain-verification': ['3528g14n4bhmp1rej8sxyqq322ydf9'],
+    },
+  },
   openGraph: {
     type: "website",
     locale: "fr_FR",
