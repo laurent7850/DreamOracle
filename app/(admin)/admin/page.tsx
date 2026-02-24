@@ -573,71 +573,55 @@ export default function AdminPage() {
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/20 rounded-lg">
-                  <Users className="h-5 w-5 text-blue-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-white">
-                    {stats.users.total}
-                  </p>
-                  <p className="text-sm text-slate-400">Utilisateurs</p>
-                </div>
+              <div className="p-2 bg-blue-500/20 rounded-lg w-fit mb-3">
+                <Users className="h-5 w-5 text-blue-400" />
               </div>
-              <div className="mt-3 text-xs text-slate-500">
+              <p className="text-2xl font-bold text-white">
+                {stats.users.total}
+              </p>
+              <p className="text-sm text-slate-400">Utilisateurs</p>
+              <p className="mt-2 text-xs text-slate-500">
                 +{stats.users.newWeek} cette semaine
-              </div>
+              </p>
             </div>
 
             <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-500/20 rounded-lg">
-                  <BookOpen className="h-5 w-5 text-purple-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-white">
-                    {stats.dreams.total}
-                  </p>
-                  <p className="text-sm text-slate-400">Rêves</p>
-                </div>
+              <div className="p-2 bg-purple-500/20 rounded-lg w-fit mb-3">
+                <BookOpen className="h-5 w-5 text-purple-400" />
               </div>
-              <div className="mt-3 text-xs text-slate-500">
+              <p className="text-2xl font-bold text-white">
+                {stats.dreams.total}
+              </p>
+              <p className="text-sm text-slate-400">Rêves</p>
+              <p className="mt-2 text-xs text-slate-500">
                 +{stats.dreams.week} cette semaine
-              </div>
+              </p>
             </div>
 
             <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-amber-500/20 rounded-lg">
-                  <Sparkles className="h-5 w-5 text-amber-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-white">
-                    {stats.interpretations.month}
-                  </p>
-                  <p className="text-sm text-slate-400">Interprétations/mois</p>
-                </div>
+              <div className="p-2 bg-amber-500/20 rounded-lg w-fit mb-3">
+                <Sparkles className="h-5 w-5 text-amber-400" />
               </div>
-              <div className="mt-3 text-xs text-slate-500">
+              <p className="text-2xl font-bold text-white">
+                {stats.interpretations.month}
+              </p>
+              <p className="text-sm text-slate-400">Interprétations/mois</p>
+              <p className="mt-2 text-xs text-slate-500">
                 {stats.interpretations.total} total
-              </div>
+              </p>
             </div>
 
             <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-500/20 rounded-lg">
-                  <TrendingUp className="h-5 w-5 text-green-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-white">
-                    {stats.users.activeWeek}
-                  </p>
-                  <p className="text-sm text-slate-400">Actifs cette semaine</p>
-                </div>
+              <div className="p-2 bg-green-500/20 rounded-lg w-fit mb-3">
+                <TrendingUp className="h-5 w-5 text-green-400" />
               </div>
-              <div className="mt-3 text-xs text-slate-500">
+              <p className="text-2xl font-bold text-white">
+                {stats.users.activeWeek}
+              </p>
+              <p className="text-sm text-slate-400">Actifs cette semaine</p>
+              <p className="mt-2 text-xs text-slate-500">
                 {stats.users.activeToday} aujourd&apos;hui
-              </div>
+              </p>
             </div>
           </div>
         )}
@@ -706,56 +690,44 @@ export default function AdminPage() {
         {stats?.revenue && (
           <div className="space-y-6 mb-8">
             {/* Revenue KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <div className="bg-gradient-to-br from-emerald-950/50 to-slate-900/50 border border-emerald-800/30 rounded-xl p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-emerald-500/20 rounded-lg">
-                    <DollarSign className="h-5 w-5 text-emerald-400" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-white">
-                      {(stats.revenue.mrr / 100).toFixed(2)}€
-                    </p>
-                    <p className="text-sm text-slate-400">MRR</p>
-                  </div>
+                <div className="p-2 bg-emerald-500/20 rounded-lg w-fit mb-3">
+                  <DollarSign className="h-5 w-5 text-emerald-400" />
                 </div>
-                <div className="mt-3 text-xs text-slate-500">
+                <p className="text-2xl font-bold text-white">
+                  {(stats.revenue.mrr / 100).toFixed(2)}€
+                </p>
+                <p className="text-sm text-slate-400">MRR</p>
+                <p className="mt-2 text-xs text-slate-500">
                   {stats.revenue.paidUsers} abonné{stats.revenue.paidUsers > 1 ? "s" : ""} payant{stats.revenue.paidUsers > 1 ? "s" : ""}
-                </div>
+                </p>
               </div>
 
               <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-amber-500/20 rounded-lg">
-                    <Percent className="h-5 w-5 text-amber-400" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-white">
-                      {stats.revenue.conversionRate}%
-                    </p>
-                    <p className="text-sm text-slate-400">Taux conversion</p>
-                  </div>
+                <div className="p-2 bg-amber-500/20 rounded-lg w-fit mb-3">
+                  <Percent className="h-5 w-5 text-amber-400" />
                 </div>
-                <div className="mt-3 text-xs text-slate-500">
+                <p className="text-2xl font-bold text-white">
+                  {stats.revenue.conversionRate}%
+                </p>
+                <p className="text-sm text-slate-400">Taux conversion</p>
+                <p className="mt-2 text-xs text-slate-500">
                   {stats.revenue.paidUsers} payants / {stats.users.total} total
-                </div>
+                </p>
               </div>
 
-              <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-red-500/20 rounded-lg">
-                    <UserMinus className="h-5 w-5 text-red-400" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-white">
-                      {stats.revenue.churnedThisMonth}
-                    </p>
-                    <p className="text-sm text-slate-400">Churn ce mois</p>
-                  </div>
+              <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 col-span-2 sm:col-span-1">
+                <div className="p-2 bg-red-500/20 rounded-lg w-fit mb-3">
+                  <UserMinus className="h-5 w-5 text-red-400" />
                 </div>
-                <div className="mt-3 text-xs text-slate-500">
+                <p className="text-2xl font-bold text-white">
+                  {stats.revenue.churnedThisMonth}
+                </p>
+                <p className="text-sm text-slate-400">Churn ce mois</p>
+                <p className="mt-2 text-xs text-slate-500">
                   Annulations ce mois
-                </div>
+                </p>
               </div>
             </div>
 
