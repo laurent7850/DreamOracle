@@ -99,11 +99,12 @@ export async function GET() {
 
     // === Revenue & Subscription Performance ===
 
-    // MRR: count active paid subscribers and estimate revenue
+    // MRR: count only users with actual Stripe subscriptions (excludes 7-day free trials)
     const paidSubscribers = await prisma.user.findMany({
       where: {
         subscriptionTier: { in: ["ESSENTIAL", "PREMIUM"] },
         subscriptionStatus: "active",
+        stripeSubscriptionId: { not: null },
       },
       select: { subscriptionTier: true },
     });

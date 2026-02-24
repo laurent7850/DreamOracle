@@ -99,9 +99,28 @@ export async function GET(request: NextRequest) {
       {} as Record<string, Record<string, number>>
     );
 
+    // Count interpreted dreams per user (dreams with interpretation != null)
+    const interpretedCounts = await prisma.dream.groupBy({
+      by: ["userId"],
+      where: {
+        userId: { in: users.map((u) => u.id) },
+        interpretation: { not: null },
+      },
+      _count: true,
+    });
+
+    const interpretedByUser = interpretedCounts.reduce(
+      (acc, stat) => {
+        acc[stat.userId] = stat._count;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
     const enrichedUsers = users.map((user) => ({
       ...user,
       monthlyUsage: usageByUser[user.id] || {},
+      interpretedDreams: interpretedByUser[user.id] || 0,
     }));
 
     return NextResponse.json({

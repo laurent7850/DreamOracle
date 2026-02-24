@@ -49,6 +49,7 @@ interface User {
     sessions: number;
   };
   monthlyUsage: Record<string, number>;
+  interpretedDreams: number;
 }
 
 interface Stats {
@@ -195,9 +196,9 @@ function UserModal({ user, onClose, onUpdate, onDelete }: UserModalProps) {
             </div>
             <div className="bg-slate-800/50 rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-white">
-                {user.monthlyUsage.interpretation || 0}
+                {user.interpretedDreams}
               </p>
-              <p className="text-sm text-slate-400">Interprétations/mois</p>
+              <p className="text-sm text-slate-400">Interprétés</p>
             </div>
             <div className="bg-slate-800/50 rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-white">
@@ -856,7 +857,7 @@ export default function AdminPage() {
                     Rêves
                   </th>
                   <th className="text-center py-3 px-4 text-slate-400 font-medium text-sm">
-                    Interp./mois
+                    Interprétés
                   </th>
                   <th className="text-right py-3 px-4 text-slate-400 font-medium text-sm">
                     Actions
@@ -946,7 +947,7 @@ export default function AdminPage() {
                         {user._count.dreams}
                       </td>
                       <td className="py-3 px-4 text-center text-white">
-                        {user.monthlyUsage.interpretation || 0}
+                        {user.interpretedDreams}
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-2">
