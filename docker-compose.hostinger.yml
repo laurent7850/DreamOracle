@@ -45,11 +45,20 @@ services:
       - traefik
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dreamoracle.rule=Host(`dreamoracle.eu`) || Host(`www.dreamoracle.eu`) || Host(`dreams.srv767464.hstgr.cloud`)"
+      # Main router (non-www)
+      - "traefik.http.routers.dreamoracle.rule=Host(`dreamoracle.eu`) || Host(`dreams.srv767464.hstgr.cloud`)"
       - "traefik.http.routers.dreamoracle.entrypoints=websecure"
       - "traefik.http.routers.dreamoracle.tls.certresolver=letsencrypt"
       - "traefik.http.services.dreamoracle.loadbalancer.server.port=3000"
       - "traefik.docker.network=root_default"
+      # WWW → non-www redirect router
+      - "traefik.http.routers.dreamoracle-www.rule=Host(`www.dreamoracle.eu`)"
+      - "traefik.http.routers.dreamoracle-www.entrypoints=websecure"
+      - "traefik.http.routers.dreamoracle-www.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dreamoracle-www.middlewares=dreamoracle-www-redirect"
+      - "traefik.http.middlewares.dreamoracle-www-redirect.redirectregex.regex=^https://www\\.dreamoracle\\.eu/(.*)"
+      - "traefik.http.middlewares.dreamoracle-www-redirect.redirectregex.replacement=https://dreamoracle.eu/$${1}"
+      - "traefik.http.middlewares.dreamoracle-www-redirect.redirectregex.permanent=true"
 
   postgres:
     image: postgres:16-alpine
