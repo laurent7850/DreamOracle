@@ -159,3 +159,84 @@ TVA : BE0462122648`;
     bcc: 'factures@distr-action.com',
   });
 }
+
+/**
+ * Notify admin of a new user registration
+ */
+export async function sendNewRegistrationEmail(
+  userName: string | null,
+  userEmail: string,
+  method: 'credentials' | 'Google OAuth'
+): Promise<boolean> {
+  const now = new Date().toLocaleString('fr-BE', { timeZone: 'Europe/Brussels' });
+
+  const html = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a2e; line-height: 1.6; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 30px; border-radius: 12px 12px 0 0; text-align: center; }
+    .header h1 { color: white; margin: 0; font-size: 24px; }
+    .header p { color: rgba(255,255,255,0.8); margin: 5px 0 0; }
+    .body { background: #f8fafc; padding: 30px; border: 1px solid #e2e8f0; }
+    .info-box { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; border: 1px solid #e2e8f0; }
+    .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+    .info-row:last-child { border-bottom: none; }
+    .label { color: #64748b; font-size: 13px; }
+    .value { font-weight: 600; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .badge-credentials { background: #dbeafe; color: #1d4ed8; }
+    .badge-google { background: #fef3c7; color: #b45309; }
+    .footer { background: #1a1a2e; padding: 20px 30px; border-radius: 0 0 12px 12px; color: #94a3b8; font-size: 12px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🌙 DreamOracle</h1>
+      <p>Nouvelle inscription</p>
+    </div>
+    <div class="body">
+      <p>Un nouvel utilisateur vient de s'inscrire sur DreamOracle !</p>
+      <div class="info-box">
+        <div class="info-row">
+          <span class="label">Nom</span>
+          <span class="value">${userName || 'Non renseigné'}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Email</span>
+          <span class="value">${userEmail}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Méthode</span>
+          <span class="value"><span class="badge ${method === 'Google OAuth' ? 'badge-google' : 'badge-credentials'}">${method}</span></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Date</span>
+          <span class="value">${now}</span>
+        </div>
+      </div>
+      <p style="color:#64748b;font-size:13px;">
+        Essai Oracle+ 7 jours activé automatiquement.
+        <a href="https://dreamoracle.eu/admin" style="color:#6366f1;">Voir le CRM</a>
+      </p>
+    </div>
+    <div class="footer">
+      <p>DreamOracle Admin Notification</p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  const text = `Nouvelle inscription DreamOracle\n\nNom: ${userName || 'Non renseigné'}\nEmail: ${userEmail}\nMéthode: ${method}\nDate: ${now}\n\nEssai Oracle+ 7 jours activé.`;
+
+  return sendEmail({
+    to: 'divers@distr-action.com',
+    subject: `🌙 Nouvel inscrit : ${userName || userEmail}`,
+    html,
+    text,
+  });
+}

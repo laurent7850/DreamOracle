@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { prisma } from "./db";
+import { sendNewRegistrationEmail } from "./email";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -95,6 +96,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 } : {}),
               },
             });
+
+            // Notify admin of new Google OAuth registration (fire-and-forget)
+            if (isNewUser) {
+              sendNewRegistrationEmail(user.name || null, user.email!, 'Google OAuth').catch(() => {});
+            }
           }
         } catch {
           // Ignore errors (e.g., field doesn't exist yet)

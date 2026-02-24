@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import { sendNewRegistrationEmail } from "@/lib/email";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -69,6 +70,9 @@ export async function POST(request: NextRequest) {
         userId: user.id,
       },
     });
+
+    // Notify admin (fire-and-forget)
+    sendNewRegistrationEmail(name, email, 'credentials').catch(() => {});
 
     return NextResponse.json(
       {

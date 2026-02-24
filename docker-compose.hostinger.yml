@@ -31,6 +31,10 @@ services:
       - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}
       - VAPID_SUBJECT=mailto:contact@dreamoracle.eu
       - CRON_SECRET=${CRON_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
     volumes:
       - dreamoracle_app:/app
     depends_on:
