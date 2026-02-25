@@ -89,14 +89,40 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return;
   }
 
-  // Update user with Stripe IDs
+  // Check if this is a trial-to-paid conversion
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { trialUsed: true, trialEndsAt: true, stripeSubscriptionId: true },
+  });
+
+  const isTrialConversion = user?.trialUsed && !user?.stripeSubscriptionId;
+
+  // Update user with Stripe IDs + conversion timestamp
   await prisma.user.update({
     where: { id: userId },
     data: {
       stripeCustomerId: customerId,
       stripeSubscriptionId: subscriptionId,
+      ...(isTrialConversion ? { trialConvertedAt: new Date() } : {}),
     },
   });
+
+  // Log trial conversion event
+  if (isTrialConversion) {
+    await prisma.trialEvent.create({
+      data: {
+        userId,
+        event: 'trial_converted',
+        metadata: JSON.stringify({
+          subscriptionId,
+          daysBeforeTrialEnd: user?.trialEndsAt
+            ? Math.ceil((user.trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+            : null,
+        }),
+      },
+    });
+    console.log(`🎉 Trial conversion for user ${userId}`);
+  }
 
   console.log(`Checkout completed for user ${userId}`);
 }

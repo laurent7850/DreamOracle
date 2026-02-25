@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Moon, Mail, Lock, Eye, EyeOff, User, Loader2, Crown, Sparkles, Brain, BookOpen } from "lucide-react";
 import { toast } from "sonner";
@@ -12,15 +12,47 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="glass-card p-4 sm:p-6 md:p-8 w-full max-w-md mx-auto flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-mystic-400" />
+      </div>
+    }>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [utmParams, setUtmParams] = useState<{
+    utm_source?: string;
+    utm_campaign?: string;
+    utm_medium?: string;
+  }>({});
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+
+  // Capture UTM params from URL on page load
+  useEffect(() => {
+    const source = searchParams.get("utm_source") || sessionStorage.getItem("utm_source") || undefined;
+    const campaign = searchParams.get("utm_campaign") || sessionStorage.getItem("utm_campaign") || undefined;
+    const medium = searchParams.get("utm_medium") || sessionStorage.getItem("utm_medium") || undefined;
+
+    // Store in sessionStorage so they survive navigation
+    if (searchParams.get("utm_source")) sessionStorage.setItem("utm_source", searchParams.get("utm_source")!);
+    if (searchParams.get("utm_campaign")) sessionStorage.setItem("utm_campaign", searchParams.get("utm_campaign")!);
+    if (searchParams.get("utm_medium")) sessionStorage.setItem("utm_medium", searchParams.get("utm_medium")!);
+
+    setUtmParams({ utm_source: source, utm_campaign: campaign, utm_medium: medium });
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +77,7 @@ export default function RegisterPage() {
           name: formData.name,
           email: formData.email,
           password: formData.password,
+          ...utmParams,
         }),
       });
 

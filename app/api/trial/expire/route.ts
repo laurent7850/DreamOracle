@@ -12,22 +12,52 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // Find all users with expired trials who are still PREMIUM without a Stripe subscription
-    const result = await prisma.user.updateMany({
+    // First, find users to expire (we need their IDs for event logging)
+    const usersToExpire = await prisma.user.findMany({
       where: {
         trialEndsAt: { lt: new Date() },
         subscriptionTier: "PREMIUM",
         stripeSubscriptionId: null,
       },
-      data: {
-        subscriptionTier: "FREE",
-        creditsResetAt: new Date(),
+      select: {
+        id: true,
+        acquisitionSource: true,
+        acquisitionCampaign: true,
+        _count: { select: { dreams: true, usageLogs: true } },
       },
     });
 
+    if (usersToExpire.length > 0) {
+      // Batch update: downgrade all expired trials
+      await prisma.user.updateMany({
+        where: {
+          id: { in: usersToExpire.map((u) => u.id) },
+        },
+        data: {
+          subscriptionTier: "FREE",
+          creditsResetAt: new Date(),
+          trialExpiredAt: new Date(),
+        },
+      });
+
+      // Log trial expiration events for each user
+      await prisma.trialEvent.createMany({
+        data: usersToExpire.map((user) => ({
+          userId: user.id,
+          event: "trial_expired",
+          metadata: JSON.stringify({
+            dreamsCreated: user._count.dreams,
+            totalActions: user._count.usageLogs,
+            source: user.acquisitionSource || "organic",
+            campaign: user.acquisitionCampaign || null,
+          }),
+        })),
+      });
+    }
+
     return NextResponse.json({
       success: true,
-      expired: result.count,
+      expired: usersToExpire.length,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

@@ -26,6 +26,10 @@ import {
   DollarSign,
   Percent,
   UserMinus,
+  FlaskConical,
+  ArrowRightLeft,
+  TimerOff,
+  Play,
 } from "lucide-react";
 import { formatPrice, TIERS, type SubscriptionTier } from "@/lib/subscription";
 
@@ -89,6 +93,13 @@ interface Stats {
     conversionRate: number;
     paidUsers: number;
     churnedThisMonth: number;
+  };
+  trial: {
+    totalTrialists: number;
+    activeTrials: number;
+    converted: number;
+    expired: number;
+    conversionRate: number;
   };
 }
 
@@ -746,6 +757,140 @@ export default function AdminPage() {
                 </a>
                 {" "}pour les détails de facturation.
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Trial Conversion Funnel */}
+        {stats?.trial && (
+          <div className="space-y-6 mb-8">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <FlaskConical className="h-5 w-5 text-violet-400" />
+              Conversion Essai Gratuit (7 jours Oracle+)
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
+                <div className="p-2 bg-violet-500/20 rounded-lg w-fit mb-3">
+                  <FlaskConical className="h-5 w-5 text-violet-400" />
+                </div>
+                <p className="text-2xl font-bold text-white">
+                  {stats.trial.totalTrialists}
+                </p>
+                <p className="text-sm text-slate-400">Total essais</p>
+                <p className="mt-2 text-xs text-slate-500">
+                  Utilisateurs ayant commencé un essai
+                </p>
+              </div>
+
+              <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
+                <div className="p-2 bg-blue-500/20 rounded-lg w-fit mb-3">
+                  <Play className="h-5 w-5 text-blue-400" />
+                </div>
+                <p className="text-2xl font-bold text-white">
+                  {stats.trial.activeTrials}
+                </p>
+                <p className="text-sm text-slate-400">Essais actifs</p>
+                <p className="mt-2 text-xs text-slate-500">
+                  En cours actuellement
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-br from-emerald-950/50 to-slate-900/50 border border-emerald-800/30 rounded-xl p-4">
+                <div className="p-2 bg-emerald-500/20 rounded-lg w-fit mb-3">
+                  <ArrowRightLeft className="h-5 w-5 text-emerald-400" />
+                </div>
+                <p className="text-2xl font-bold text-white">
+                  {stats.trial.converted}
+                </p>
+                <p className="text-sm text-slate-400">Convertis</p>
+                <p className="mt-2 text-xs text-emerald-400 font-medium">
+                  {stats.trial.conversionRate}% taux de conversion
+                </p>
+              </div>
+
+              <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
+                <div className="p-2 bg-orange-500/20 rounded-lg w-fit mb-3">
+                  <TimerOff className="h-5 w-5 text-orange-400" />
+                </div>
+                <p className="text-2xl font-bold text-white">
+                  {stats.trial.expired}
+                </p>
+                <p className="text-sm text-slate-400">Expirés</p>
+                <p className="mt-2 text-xs text-slate-500">
+                  Non convertis
+                </p>
+              </div>
+            </div>
+
+            {/* Trial Funnel Visual */}
+            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+              <h4 className="text-sm font-medium text-slate-400 mb-4">Funnel de conversion</h4>
+              <div className="space-y-3">
+                {/* Total trialists bar */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-slate-300">Essais démarrés</span>
+                    <span className="text-sm text-white font-medium">{stats.trial.totalTrialists}</span>
+                  </div>
+                  <div className="w-full bg-slate-800 rounded-full h-3">
+                    <div
+                      className="bg-violet-500 h-3 rounded-full transition-all"
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+                </div>
+                {/* Converted bar */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-slate-300">Convertis en payants</span>
+                    <span className="text-sm text-white font-medium">
+                      {stats.trial.converted} ({stats.trial.conversionRate}%)
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-800 rounded-full h-3">
+                    <div
+                      className="bg-emerald-500 h-3 rounded-full transition-all"
+                      style={{
+                        width: `${stats.trial.totalTrialists > 0 ? (stats.trial.converted / stats.trial.totalTrialists) * 100 : 0}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+                {/* Expired bar */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-slate-300">Expirés sans conversion</span>
+                    <span className="text-sm text-white font-medium">
+                      {stats.trial.expired} ({stats.trial.totalTrialists > 0 ? Math.round((stats.trial.expired / stats.trial.totalTrialists) * 1000) / 10 : 0}%)
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-800 rounded-full h-3">
+                    <div
+                      className="bg-orange-500 h-3 rounded-full transition-all"
+                      style={{
+                        width: `${stats.trial.totalTrialists > 0 ? (stats.trial.expired / stats.trial.totalTrialists) * 100 : 0}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+                {/* Active bar */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-slate-300">Essais en cours</span>
+                    <span className="text-sm text-white font-medium">
+                      {stats.trial.activeTrials} ({stats.trial.totalTrialists > 0 ? Math.round((stats.trial.activeTrials / stats.trial.totalTrialists) * 1000) / 10 : 0}%)
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-800 rounded-full h-3">
+                    <div
+                      className="bg-blue-500 h-3 rounded-full transition-all"
+                      style={{
+                        width: `${stats.trial.totalTrialists > 0 ? (stats.trial.activeTrials / stats.trial.totalTrialists) * 100 : 0}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Cinzel, Raleway, Philosopher } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import MetaPixel from "@/components/tracking/MetaPixel";
+import { UTMCapture } from "@/components/shared/UTMCapture";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -95,6 +97,9 @@ export default function RootLayout({
         className={`${cinzel.variable} ${raleway.variable} ${philosopher.variable} antialiased min-h-screen`}
       >
         <MetaPixel />
+        <Suspense fallback={null}>
+          <UTMCapture />
+        </Suspense>
         {children}
         <Toaster
           position="top-right"

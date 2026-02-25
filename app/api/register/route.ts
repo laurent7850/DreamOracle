@@ -11,6 +11,10 @@ const registerSchema = z.object({
   password: z
     .string()
     .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+  // UTM tracking (optional)
+  utm_source: z.string().optional(),
+  utm_campaign: z.string().optional(),
+  utm_medium: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -35,7 +39,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, email, password } = validation.data;
+    const { name, email, password, utm_source, utm_campaign, utm_medium } = validation.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -61,6 +65,10 @@ export async function POST(request: NextRequest) {
         subscriptionTier: "PREMIUM",
         trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         trialUsed: true,
+        // Acquisition tracking
+        acquisitionSource: utm_source || null,
+        acquisitionCampaign: utm_campaign || null,
+        acquisitionMedium: utm_medium || null,
       },
     });
 
@@ -68,6 +76,20 @@ export async function POST(request: NextRequest) {
     await prisma.userSettings.create({
       data: {
         userId: user.id,
+      },
+    });
+
+    // Log trial started event
+    await prisma.trialEvent.create({
+      data: {
+        userId: user.id,
+        event: "trial_started",
+        metadata: JSON.stringify({
+          tier: "PREMIUM",
+          source: utm_source || "organic",
+          campaign: utm_campaign || null,
+          medium: utm_medium || null,
+        }),
       },
     });
 

@@ -21,6 +21,26 @@
 - Stripe pour les paiements
 - PWA avec service worker
 
+## Architecture Auth & Trial
+
+- Deux chemins d'inscription : credentials (`/api/register`) et Google OAuth (`lib/auth.ts` signIn callback)
+- Les deux activent l'essai Oracle+ 7j — toute modification trial doit couvrir les deux
+- UTM tracking : `UTMCapture` component (layout racine) → sessionStorage + cookies → lu par les deux flux
+- Trial lifecycle events dans table `TrialEvent` : trial_started → trial_converted | trial_expired
+- CRON expiration trial : POST `/api/trial/expire` (protégé par CRON_SECRET)
+
+## Admin CRM
+
+- Page admin : `app/(admin)/admin/page.tsx` — stats cards, revenue, trial funnel, users table
+- APIs admin : `/api/admin/stats`, `/api/admin/trial-analytics`, `/api/admin/users`
+- Interface `Stats` dans la page admin doit matcher la réponse de `/api/admin/stats`
+
+## Gotchas Next.js 16
+
+- `useSearchParams()` requiert `<Suspense>` boundary sinon build fail (prerender error)
+- `cookies()` de `next/headers` est async (requiert `await`)
+- Prisma dev : `npx prisma db push` (pas migrate dev — SQLite)
+
 ## Conventions
 
 - UI en français

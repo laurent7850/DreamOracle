@@ -127,6 +127,27 @@ export async function GET() {
       },
     });
 
+    // === Trial Conversion Summary ===
+    const [totalTrialists, trialConverted, activeTrials] = await Promise.all([
+      prisma.user.count({ where: { trialUsed: true } }),
+      prisma.user.count({ where: { trialUsed: true, trialConvertedAt: { not: null } } }),
+      prisma.user.count({
+        where: {
+          trialUsed: true,
+          subscriptionTier: "PREMIUM",
+          stripeSubscriptionId: null,
+          trialEndsAt: { gt: now },
+        },
+      }),
+    ]);
+
+    const trialExpired = await prisma.user.count({
+      where: { trialUsed: true, trialExpiredAt: { not: null }, trialConvertedAt: null },
+    });
+
+    const completedTrials = trialConverted + trialExpired;
+    const trialConversionRate = completedTrials > 0 ? (trialConverted / completedTrials) * 100 : 0;
+
     return NextResponse.json({
       users: {
         total: totalUsers,
@@ -176,6 +197,13 @@ export async function GET() {
         conversionRate: Math.round(conversionRate * 10) / 10,
         paidUsers: paidUsersCount,
         churnedThisMonth,
+      },
+      trial: {
+        totalTrialists,
+        activeTrials,
+        converted: trialConverted,
+        expired: trialExpired,
+        conversionRate: Math.round(trialConversionRate * 10) / 10,
       },
     });
   } catch (error) {

@@ -33,7 +33,15 @@ model User {
   trialEndsAt         DateTime?
   trialUsed           Boolean  @default(false)
 
+  // Trial conversion tracking
+  trialConvertedAt    DateTime?  // When user converted from trial to paid
+  trialExpiredAt      DateTime?  // When trial expired without conversion
+  acquisitionSource   String?    // utm_source or channel: "meta_ad", "google", "organic", etc.
+  acquisitionCampaign String?    // utm_campaign for ad tracking
+  acquisitionMedium   String?    // utm_medium
+
   dreams        Dream[]
+  trialEvents   TrialEvent[]
   settings      UserSettings?
   accounts      Account[]
   sessions      Session[]
@@ -149,5 +157,18 @@ model UserSymbol {
 
   @@unique([userId, name])
   @@index([userId])
+}
+
+model TrialEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     String   // "trial_started" | "trial_expired" | "trial_converted" | "trial_cancelled"
+  metadata  String?  // JSON: tier converted to, features used during trial, etc.
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([event])
+  @@index([createdAt])
 }
 

@@ -3,6 +3,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
+import { cookies } from "next/headers";
 import { prisma } from "./db";
 import { sendNewRegistrationEmail } from "./email";
 
@@ -84,6 +85,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (dbUser) {
             const isNewUser = (Date.now() - dbUser.createdAt.getTime()) < 60000 && !dbUser.trialUsed;
 
+            // Read UTM params from cookies (set by UTMCapture component)
+            let utmSource: string | null = null;
+            let utmCampaign: string | null = null;
+            let utmMedium: string | null = null;
+
+            if (isNewUser) {
+              try {
+                const cookieStore = await cookies();
+                utmSource = cookieStore.get("utm_source")?.value || null;
+                utmCampaign = cookieStore.get("utm_campaign")?.value || null;
+                utmMedium = cookieStore.get("utm_medium")?.value || null;
+              } catch {
+                // cookies() may fail in some contexts, ignore
+              }
+            }
+
             await prisma.user.update({
               where: { id: user.id },
               data: {
@@ -93,12 +110,30 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                   subscriptionTier: "PREMIUM",
                   trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                   trialUsed: true,
+                  acquisitionSource: utmSource,
+                  acquisitionCampaign: utmCampaign,
+                  acquisitionMedium: utmMedium,
                 } : {}),
               },
             });
 
-            // Notify admin of new Google OAuth registration (fire-and-forget)
+            // Log trial started event for Google OAuth users
             if (isNewUser) {
+              await prisma.trialEvent.create({
+                data: {
+                  userId: user.id,
+                  event: "trial_started",
+                  metadata: JSON.stringify({
+                    tier: "PREMIUM",
+                    provider: "google",
+                    source: utmSource || "organic",
+                    campaign: utmCampaign || null,
+                    medium: utmMedium || null,
+                  }),
+                },
+              });
+
+              // Notify admin of new Google OAuth registration (fire-and-forget)
               sendNewRegistrationEmail(user.name || null, user.email!, 'Google OAuth').catch(() => {});
             }
           }
