@@ -29,7 +29,7 @@ export default function MentionsLegalesPage() {
             <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="text-sm sm:text-base">Retour</span>
           </Link>
-          <h1 className="text-lg sm:text-xl font-cinzel text-primary">DreamOracle</h1>
+          <span className="text-lg sm:text-xl font-cinzel text-primary">DreamOracle</span>
         </div>
       </header>
 

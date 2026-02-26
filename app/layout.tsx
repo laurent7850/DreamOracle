@@ -4,6 +4,7 @@ import { Cinzel, Raleway, Philosopher } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import MetaPixel from "@/components/tracking/MetaPixel";
 import { UTMCapture } from "@/components/shared/UTMCapture";
+import { OrganizationJsonLd, WebApplicationJsonLd } from "@/components/seo/JsonLd";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -68,6 +69,9 @@ export const metadata: Metadata = {
       'facebook-domain-verification': ['4xr036cnukndb2ka47owqlhs6g8vhm'],
     },
   },
+  alternates: {
+    canonical: "https://dreamoracle.eu",
+  },
   openGraph: {
     type: "website",
     locale: "fr_FR",
@@ -93,6 +97,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="dark">
+      <head>
+        <OrganizationJsonLd />
+        <WebApplicationJsonLd />
+      </head>
       <body
         className={`${cinzel.variable} ${raleway.variable} ${philosopher.variable} antialiased min-h-screen`}
       >
