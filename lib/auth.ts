@@ -134,7 +134,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               });
 
               // Notify admin of new Google OAuth registration (fire-and-forget)
-              sendNewRegistrationEmail(user.name || null, user.email!, 'Google OAuth').catch(() => {});
+              sendNewRegistrationEmail(user.name || null, user.email!, 'Google OAuth').catch((err) => {
+                console.error('Failed to send registration notification:', err);
+              });
             }
           }
         } catch {

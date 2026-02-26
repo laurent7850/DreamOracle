@@ -94,7 +94,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Notify admin (fire-and-forget)
-    sendNewRegistrationEmail(name, email, 'credentials').catch(() => {});
+    sendNewRegistrationEmail(name, email, 'credentials').catch((err) => {
+      console.error('Failed to send registration notification:', err);
+    });
 
     return NextResponse.json(
       {
