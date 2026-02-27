@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { Cinzel, Raleway, Philosopher } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Toaster } from "@/components/ui/sonner";
 import MetaPixel from "@/components/tracking/MetaPixel";
 import { UTMCapture } from "@/components/shared/UTMCapture";
@@ -105,6 +106,9 @@ export default function RootLayout({
         className={`${cinzel.variable} ${raleway.variable} ${philosopher.variable} antialiased min-h-screen`}
       >
         <MetaPixel />
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
         <Suspense fallback={null}>
           <UTMCapture />
         </Suspense>

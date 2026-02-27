@@ -35,6 +35,7 @@ services:
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID}
     volumes:
       - dreamoracle_app:/app
     depends_on:

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Sparkles, Loader2, RefreshCw, Moon, MessageCircle, Lightbulb, Eye } from "lucide-react";
+import { trackGAInterpretation } from "@/lib/ga-events";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -53,6 +54,7 @@ export function DreamInterpretation({
 
       setInterpretation(data.interpretation);
       setCurrentStyle(styleToUse);
+      trackGAInterpretation(styleToUse);
       toast.success("L'Oracle a révélé le sens de votre rêve !");
       router.refresh();
     } catch {
