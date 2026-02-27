@@ -107,7 +107,7 @@ export function DreamForm() {
       }
 
       toast.success("Rêve enregistré avec succès !");
-      router.push(`/dreams/${result.id}`);
+      router.push(`/dreams/${result.id}?interpret=true`);
     } catch {
       toast.error("Une erreur est survenue");
     } finally {

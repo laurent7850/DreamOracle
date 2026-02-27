@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
@@ -248,10 +249,12 @@ export default async function DreamDetailPage({
       </Card>
 
       {/* Interpretation Section */}
-      <DreamInterpretation
-        dreamId={dream.id}
-        existingInterpretation={dream.interpretation}
-      />
+      <Suspense>
+        <DreamInterpretation
+          dreamId={dream.id}
+          existingInterpretation={dream.interpretation}
+        />
+      </Suspense>
     </div>
   );
 }

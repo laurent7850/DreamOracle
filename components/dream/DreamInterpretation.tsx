@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Sparkles, Loader2, RefreshCw, Moon, MessageCircle, Lightbulb, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,10 +26,12 @@ export function DreamInterpretation({
   existingInterpretation,
 }: DreamInterpretationProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [style, setStyle] = useState<"spiritual" | "psychological" | "balanced">("balanced");
   const [currentStyle, setCurrentStyle] = useState<"spiritual" | "psychological" | "balanced" | null>(null);
   const [interpretation, setInterpretation] = useState<InterpretationType | null>(null);
+  const autoInterpretTriggered = useRef(false);
 
   const requestInterpretation = async (requestedStyle?: "spiritual" | "psychological" | "balanced") => {
     const styleToUse = requestedStyle || style;
@@ -59,6 +61,20 @@ export function DreamInterpretation({
       setIsLoading(false);
     }
   };
+
+  // Auto-trigger interpretation when coming from dream creation
+  useEffect(() => {
+    if (
+      searchParams.get("interpret") === "true" &&
+      !existingInterpretation &&
+      !interpretation &&
+      !isLoading &&
+      !autoInterpretTriggered.current
+    ) {
+      autoInterpretTriggered.current = true;
+      requestInterpretation();
+    }
+  }, [searchParams, existingInterpretation, interpretation, isLoading]);
 
   // Get style label
   const getStyleLabel = (styleValue: string) => {
