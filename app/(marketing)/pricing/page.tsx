@@ -89,6 +89,13 @@ function PricingContent() {
             <Moon className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-400" />
             <span className="text-lg sm:text-xl font-bold text-white">DreamOracle</span>
           </Link>
+          <div className="flex items-center gap-4 sm:gap-6">
+            <Link
+              href="/blog"
+              className="hidden sm:block text-sm sm:text-base text-slate-300 hover:text-white transition-colors"
+            >
+              Blog
+            </Link>
           {session ? (
             <Link
               href="/dashboard"
@@ -104,6 +111,7 @@ function PricingContent() {
               Se connecter
             </Link>
           )}
+          </div>
         </nav>
       </header>
 

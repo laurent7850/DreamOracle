@@ -47,6 +47,11 @@ export default function LandingPage() {
               Tarifs
             </Button>
           </Link>
+          <Link href="/blog" className="hidden sm:block">
+            <Button variant="ghost" className="text-lunar hover:text-mystic-300 hover:bg-mystic-900/30 text-sm sm:text-base px-2 sm:px-4">
+              Blog
+            </Button>
+          </Link>
           <Link href="/login">
             <Button variant="ghost" className="text-lunar hover:text-mystic-300 hover:bg-mystic-900/30 text-sm sm:text-base px-2 sm:px-4">
               Connexion
@@ -350,6 +355,7 @@ export default function LandingPage() {
             <Link href="/terms" className="hover:text-mystic-300">CGU</Link>
             <Link href="/cgv" className="hover:text-mystic-300">CGV</Link>
             <Link href="/mentions-legales" className="hover:text-mystic-300">Mentions légales</Link>
+            <Link href="/blog" className="hover:text-mystic-300">Blog</Link>
             <Link href="/pricing" className="hover:text-mystic-300">Tarifs</Link>
             <a href="mailto:support@dreamoracle.eu" className="hover:text-mystic-300">Contact</a>
           </div>
