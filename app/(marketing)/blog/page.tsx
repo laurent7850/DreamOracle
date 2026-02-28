@@ -1,6 +1,6 @@
 import Link from "next/link"
 import type { Metadata } from "next"
-import { prisma } from "@/lib/prisma"
+import { prisma } from "@/lib/db"
 import { Moon, Calendar, Clock, ArrowRight, BookOpen } from "lucide-react"
 
 export const dynamic = "force-dynamic"

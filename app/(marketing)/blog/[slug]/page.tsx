@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { prisma } from "@/lib/prisma"
+import { prisma } from "@/lib/db"
 import { Moon, ArrowLeft, Calendar, Clock } from "lucide-react"
 import type { Metadata } from "next"
 

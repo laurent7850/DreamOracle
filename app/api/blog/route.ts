@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { prisma } from "@/lib/db"
 
 const WEBHOOK_SECRET = process.env.BLOG_WEBHOOK_SECRET || "seopilot-dreamoracle-secret-2026"
 
