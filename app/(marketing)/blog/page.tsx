@@ -100,9 +100,19 @@ export default async function BlogPage() {
                   href={`/blog/${post.slug}`}
                   className="group flex flex-col rounded-2xl border border-mystic-900/30 bg-night-light transition-all hover:-translate-y-1 hover:border-mystic-700/50 hover:shadow-lg hover:shadow-mystic-900/20"
                 >
-                  <div className="flex h-48 items-center justify-center rounded-t-2xl bg-gradient-to-br from-mystic-950 to-night-light">
-                    <Moon className="h-16 w-16 text-mystic-800 transition-colors group-hover:text-mystic-500" />
-                  </div>
+                  {post.featuredImage ? (
+                    <div className="h-48 overflow-hidden rounded-t-2xl">
+                      <img
+                        src={post.featuredImage}
+                        alt={post.title}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex h-48 items-center justify-center rounded-t-2xl bg-gradient-to-br from-mystic-950 to-night-light">
+                      <Moon className="h-16 w-16 text-mystic-800 transition-colors group-hover:text-mystic-500" />
+                    </div>
+                  )}
 
                   <div className="flex flex-1 flex-col p-6">
                     <h2 className="font-display text-lg font-semibold text-lunar transition-colors group-hover:text-mystic-300 line-clamp-2">

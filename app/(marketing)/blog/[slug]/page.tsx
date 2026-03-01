@@ -36,6 +36,7 @@ export async function generateMetadata({
       description: post.metaDescription || undefined,
       type: "article",
       publishedTime: post.publishedAt?.toISOString(),
+      ...(post.featuredImage ? { images: [post.featuredImage] } : {}),
     },
   }
 }
@@ -116,6 +117,17 @@ export default async function BlogPostPage({
               )}
             </div>
           </header>
+
+          {post.featuredImage && (
+            <div className="mb-8 overflow-hidden rounded-2xl">
+              <img
+                src={post.featuredImage}
+                alt={post.title}
+                className="w-full object-cover"
+                style={{ maxHeight: '400px' }}
+              />
+            </div>
+          )}
 
           <div className="border-t border-mystic-900/20 pt-8">
             <div

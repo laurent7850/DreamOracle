@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { title, slug, content, metaTitle, metaDescription, wordCount } = body
+    const { title, slug, content, metaTitle, metaDescription, wordCount, featuredImage } = body
 
     if (!title || !slug || !content) {
       return NextResponse.json(
@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
         metaTitle: metaTitle || null,
         metaDescription: metaDescription || null,
         wordCount: wordCount || 0,
+        featuredImage: featuredImage || null,
         status: "PUBLISHED",
       },
       create: {
@@ -53,6 +54,7 @@ export async function POST(request: NextRequest) {
         metaTitle: metaTitle || null,
         metaDescription: metaDescription || null,
         wordCount: wordCount || 0,
+        featuredImage: featuredImage || null,
         status: "PUBLISHED",
         publishedAt: new Date(),
       },
