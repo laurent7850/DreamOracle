@@ -31,8 +31,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
-    console.log(`Stripe webhook received: ${event.type}`);
-
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
@@ -66,7 +64,7 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        break;
     }
 
     return NextResponse.json({ received: true });
@@ -121,10 +119,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         }),
       },
     });
-    console.log(`🎉 Trial conversion for user ${userId}`);
   }
-
-  console.log(`Checkout completed for user ${userId}`);
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
@@ -180,7 +175,6 @@ async function updateUserSubscription(
     },
   });
 
-  console.log(`Updated subscription for user ${userId}: ${tier} (${status})`);
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
@@ -205,7 +199,6 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     },
   });
 
-  console.log(`Subscription deleted for user ${user.id}, downgraded to FREE`);
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
@@ -227,7 +220,6 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
     },
   });
 
-  console.log(`Payment failed for user ${user.id}`);
 }
 
 async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
@@ -250,7 +242,6 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
       },
     });
 
-    console.log(`Payment succeeded, restored active status for user ${user.id}`);
   }
 
   // Forward Stripe invoice PDF to factures@distr-action.com
@@ -301,7 +292,6 @@ async function forwardStripeInvoice(
   }
 
   const pdfBuffer = Buffer.from(await pdfResponse.arrayBuffer());
-  console.log(`Downloaded Stripe invoice PDF (${pdfBuffer.length} bytes) for ${stripeInvoiceNumber}`);
 
   // Format the amount
   const amountFormatted = new Intl.NumberFormat('fr-BE', {
@@ -336,9 +326,7 @@ async function forwardStripeInvoice(
     ],
   });
 
-  if (sent) {
-    console.log(`Invoice copy sent to factures@distr-action.com for ${stripeInvoiceNumber}`);
-  } else {
+  if (!sent) {
     console.error(`Failed to send invoice copy for ${stripeInvoiceNumber}`);
   }
 }

@@ -17,7 +17,6 @@ import {
   Loader2,
   Mic,
   Brain,
-  Shield,
 } from "lucide-react";
 import { TIERS, formatPrice, SubscriptionTier } from "@/lib/subscription";
 
@@ -60,8 +59,7 @@ function PricingContent() {
       } else {
         alert(data.error || "Erreur lors de la création de la session de paiement");
       }
-    } catch (error) {
-      console.error("Error:", error);
+    } catch {
       alert("Une erreur est survenue");
     } finally {
       setLoadingTier(null);

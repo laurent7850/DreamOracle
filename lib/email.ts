@@ -52,7 +52,6 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
       })),
     });
 
-    console.log(`Email sent to ${options.to}: ${options.subject}`);
     return true;
   } catch (error) {
     console.error('Failed to send email:', error);

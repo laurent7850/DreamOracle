@@ -9,9 +9,11 @@
  * - dream_interpretation → interprétation d'un rêve par l'Oracle
  */
 
-type GAPlan = "ESSENTIAL" | "PREMIUM";
+import type { SubscriptionTier } from "./subscription";
 
-const PLAN_PRICES: Record<GAPlan, number> = {
+type PaidTier = Exclude<SubscriptionTier, "FREE">;
+
+const PLAN_PRICES: Record<PaidTier, number> = {
   ESSENTIAL: 7.99,
   PREMIUM: 13.99,
 };
@@ -50,7 +52,7 @@ export function trackGARegistration(
 // ═══════════════════════════════════════
 // Début d'essai gratuit (Oracle+ 7 jours)
 // ═══════════════════════════════════════
-export function trackGATrialStart(plan: GAPlan) {
+export function trackGATrialStart(plan: PaidTier) {
   trackGAEvent("trial_start", {
     content_name: plan,
     currency: "EUR",
@@ -61,7 +63,7 @@ export function trackGATrialStart(plan: GAPlan) {
 // ═══════════════════════════════════════
 // Abonnement payant confirmé
 // ═══════════════════════════════════════
-export function trackGASubscription(plan: GAPlan) {
+export function trackGASubscription(plan: PaidTier) {
   trackGAEvent("purchase", {
     currency: "EUR",
     value: PLAN_PRICES[plan],

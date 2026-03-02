@@ -11,14 +11,16 @@
  * - FirstInterpretation  → custom event, première interprétation
  */
 
-type MetaPlan = 'ESSENTIAL' | 'PREMIUM';
+import type { SubscriptionTier } from './subscription';
 
-const PLAN_PRICES: Record<MetaPlan, number> = {
+type PaidTier = Exclude<SubscriptionTier, 'FREE'>;
+
+const PLAN_PRICES: Record<PaidTier, number> = {
   ESSENTIAL: 7.99,
   PREMIUM: 13.99,
 };
 
-const PLAN_LTV: Record<MetaPlan, number> = {
+const PLAN_LTV: Record<PaidTier, number> = {
   ESSENTIAL: 47.94,
   PREMIUM: 83.94,
 };
@@ -45,7 +47,7 @@ export function trackRegistration(method: 'credentials' | 'google' = 'credential
 // ═══════════════════════════════════════
 // Début d'essai gratuit (Explorateur 7 jours)
 // ═══════════════════════════════════════
-export function trackStartTrial(plan: MetaPlan) {
+export function trackStartTrial(plan: PaidTier) {
   fbq('track', 'StartTrial', {
     content_name: plan,
     currency: 'EUR',
@@ -57,7 +59,7 @@ export function trackStartTrial(plan: MetaPlan) {
 // ═══════════════════════════════════════
 // Abonnement payant confirmé
 // ═══════════════════════════════════════
-export function trackSubscription(plan: MetaPlan) {
+export function trackSubscription(plan: PaidTier) {
   fbq('track', 'Subscribe', {
     content_name: plan,
     currency: 'EUR',
