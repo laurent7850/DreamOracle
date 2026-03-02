@@ -2,7 +2,7 @@ import { sendMarketingEmail } from './email';
 import { prisma } from './db';
 
 // ═══════════════════════════════════════════════════
-// Base HTML wrapper — DreamOracle branded
+// Base HTML wrapper — Dark mystical theme (matches dreamoracle.eu)
 // ═══════════════════════════════════════════════════
 
 function wrapInBaseTemplate(body: string, preheader?: string): string {
@@ -13,38 +13,43 @@ function wrapInBaseTemplate(body: string, preheader?: string): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   ${preheader ? `<span style="display:none;max-height:0;overflow:hidden;mso-hide:all;">${preheader}</span>` : ''}
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a2e; line-height: 1.7; margin: 0; padding: 0; background: #0f0f23; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 0; background: #0a0a1a; color: #c8cdf3; }
     .wrapper { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7); padding: 35px 30px; border-radius: 16px 16px 0 0; text-align: center; }
-    .header h1 { color: white; margin: 0; font-size: 26px; letter-spacing: 0.5px; }
-    .header p { color: rgba(255,255,255,0.85); margin: 8px 0 0; font-size: 15px; }
-    .body { background: #ffffff; padding: 35px 30px; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; }
-    .body p { margin: 0 0 16px; font-size: 15px; color: #334155; }
-    .body h2 { color: #1a1a2e; font-size: 20px; margin: 24px 0 12px; }
-    .body h3 { color: #6366f1; font-size: 16px; margin: 20px 0 8px; }
-    .highlight { background: linear-gradient(135deg, #f0f0ff, #faf5ff); border-left: 4px solid #6366f1; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; }
-    .highlight p { margin: 0; color: #4338ca; font-size: 14px; }
-    .cta-btn { display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white !important; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px; margin: 20px 0; }
+    .header { background: linear-gradient(180deg, #13132d 0%, #1a1a3e 100%); padding: 40px 30px 30px; border-radius: 16px 16px 0 0; text-align: center; border-bottom: 1px solid rgba(139,92,246,0.2); }
+    .moon { font-size: 42px; margin-bottom: 12px; display: block; }
+    .brand { color: #e2e4f0; margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 1px; }
+    .content { background: linear-gradient(180deg, #1a1a3e 0%, #161630 50%, #13132d 100%); padding: 35px 30px; }
+    .content p { margin: 0 0 16px; font-size: 15px; color: #b0b5d4; line-height: 1.7; }
+    .content strong { color: #e2e4f0; }
+    .content em { color: #c4b5fd; font-style: italic; }
+    .content h3 { color: #c4b5fd; font-size: 16px; margin: 24px 0 12px; font-weight: 600; }
+    .highlight { background: rgba(139,92,246,0.08); border-left: 3px solid #8b5cf6; padding: 16px 20px; border-radius: 0 10px 10px 0; margin: 24px 0; }
+    .highlight p { margin: 0 !important; color: #c4b5fd !important; font-size: 14px; }
+    .cta-wrap { text-align: center; margin: 28px 0; }
+    .cta-btn { display: inline-block; background: linear-gradient(135deg, #d4a843, #c49a38); color: #1a1a2e !important; text-decoration: none; padding: 14px 36px; border-radius: 10px; font-weight: 700; font-size: 15px; letter-spacing: 0.3px; }
     .feature-list { list-style: none; padding: 0; margin: 16px 0; }
-    .feature-list li { padding: 8px 0 8px 28px; position: relative; font-size: 14px; color: #475569; }
-    .feature-list li::before { content: "✨"; position: absolute; left: 0; }
-    .footer { background: #1a1a2e; padding: 24px 30px; border-radius: 0 0 16px 16px; text-align: center; }
-    .footer p { color: #64748b; font-size: 12px; margin: 4px 0; }
-    .footer a { color: #818cf8; text-decoration: none; }
-    .divider { height: 1px; background: linear-gradient(to right, transparent, #e2e8f0, transparent); margin: 24px 0; }
+    .feature-list li { padding: 10px 0 10px 32px; position: relative; font-size: 14px; color: #b0b5d4; border-bottom: 1px solid rgba(139,92,246,0.08); }
+    .feature-list li:last-child { border-bottom: none; }
+    .feature-list li::before { content: "\\2728"; position: absolute; left: 4px; top: 10px; }
+    .divider { height: 1px; background: linear-gradient(to right, transparent, rgba(139,92,246,0.25), transparent); margin: 28px 0; }
+    .muted { font-size: 13px !important; color: #6b6f94 !important; }
+    .footer { background: #0e0e22; padding: 24px 30px; border-radius: 0 0 16px 16px; text-align: center; border-top: 1px solid rgba(139,92,246,0.1); }
+    .footer p { color: #4a4e6e; font-size: 12px; margin: 4px 0; }
+    .footer a { color: #8b5cf6; text-decoration: none; }
   </style>
 </head>
 <body>
   <div class="wrapper">
     <div class="header">
-      <h1>&#127769; DreamOracle</h1>
+      <span class="moon">&#127769;</span>
+      <p class="brand">DreamOracle</p>
     </div>
-    <div class="body">
+    <div class="content">
       ${body}
     </div>
     <div class="footer">
       <p><a href="https://dreamoracle.eu">dreamoracle.eu</a></p>
-      <p style="margin-top:12px;"><a href="https://dreamoracle.eu/settings">Se d&eacute;sabonner des emails</a></p>
+      <p style="margin-top:12px;"><a href="https://dreamoracle.eu/settings">Se d&eacute;sabonner</a></p>
     </div>
   </div>
 </body>
@@ -59,12 +64,12 @@ function getDay0Email(name: string | null): { subject: string; html: string; tex
   const greeting = name ? `${name}` : 'voyageur';
 
   const body = `
-    <p>Bienvenue, ${greeting}.</p>
+    <p>Bienvenue, <strong>${greeting}</strong>.</p>
     <p>L'Oracle vient de s'&eacute;veiller pour toi.</p>
     <p>Pendant <strong>7 jours</strong>, tu as acc&egrave;s &agrave; toute la puissance d'Oracle+ :</p>
     <ul class="feature-list">
-      <li>Interpr&eacute;tations illimit&eacute;es de tes r&ecirc;ves</li>
-      <li>Analyse des symboles r&eacute;currents</li>
+      <li>Interpr&eacute;tations <strong>illimit&eacute;es</strong> de tes r&ecirc;ves</li>
+      <li>Analyse des <strong>symboles r&eacute;currents</strong></li>
       <li>Journal onirique complet avec historique</li>
       <li>Export PDF de tes interpr&eacute;tations</li>
     </ul>
@@ -73,13 +78,13 @@ function getDay0Email(name: string | null): { subject: string; html: string; tex
       <p>&#128161; <strong>Astuce :</strong> Note ton premier r&ecirc;ve d&egrave;s maintenant, pendant qu'il est frais. L'Oracle r&eacute;v&egrave;le des choses que tu ne soup&ccedil;onnes pas.</p>
     </div>
 
-    <p style="text-align:center;">
+    <div class="cta-wrap">
       <a href="https://dreamoracle.eu/dreams/new" class="cta-btn">&#127769; Noter mon premier r&ecirc;ve</a>
-    </p>
+    </div>
 
     <div class="divider"></div>
 
-    <p style="font-size:13px;color:#64748b;">Ton essai Oracle+ se termine dans 7 jours. D'ici l&agrave;, explore, r&ecirc;ve, d&eacute;couvre. L'Oracle est &agrave; ton &eacute;coute.</p>
+    <p class="muted">Ton essai Oracle+ se termine dans 7 jours. D'ici l&agrave;, explore, r&ecirc;ve, d&eacute;couvre. L'Oracle est &agrave; ton &eacute;coute.</p>
   `;
 
   return {
@@ -115,9 +120,9 @@ function getDay1Email(name: string | null): { subject: string; html: string; tex
 
     <p>Ton essai Oracle+ est en cours. Profites-en pour d&eacute;couvrir ce que tes r&ecirc;ves essaient de te dire.</p>
 
-    <p style="text-align:center;">
+    <div class="cta-wrap">
       <a href="https://dreamoracle.eu/dreams/new" class="cta-btn">&#128302; Demander une interpr&eacute;tation</a>
-    </p>
+    </div>
   `;
 
   return {
@@ -141,7 +146,7 @@ function getDay3Email(name: string | null): { subject: string; html: string; tex
 
     <h3>Ce que tu perds sans Oracle+ :</h3>
     <ul class="feature-list">
-      <li><strong>Interpr&eacute;tations limit&eacute;es</strong> &mdash; 1 seule par mois au lieu d'illimit&eacute;es</li>
+      <li><strong>Interpr&eacute;tations limit&eacute;es</strong> &mdash; 3 par mois au lieu d'illimit&eacute;es</li>
       <li><strong>Pas d'analyse des symboles</strong> &mdash; les patterns restent invisibles</li>
       <li><strong>Pas d'export PDF</strong> &mdash; tes interpr&eacute;tations restent &eacute;ph&eacute;m&egrave;res</li>
     </ul>
@@ -152,19 +157,19 @@ function getDay3Email(name: string | null): { subject: string; html: string; tex
 
     <p>Il te reste encore quelques jours pour explorer. Et si tu veux continuer apr&egrave;s...</p>
 
-    <p style="text-align:center;">
+    <div class="cta-wrap">
       <a href="https://dreamoracle.eu/pricing" class="cta-btn">&#128142; Voir les offres Oracle+</a>
-    </p>
+    </div>
 
     <div class="divider"></div>
 
-    <p style="font-size:13px;color:#64748b;">Pas besoin de d&eacute;cider maintenant. Mais souviens-toi : chaque nuit sans l'Oracle est une nuit de r&ecirc;ves perdus.</p>
+    <p class="muted">Pas besoin de d&eacute;cider maintenant. Mais souviens-toi : chaque nuit sans l'Oracle est une nuit de r&ecirc;ves perdus.</p>
   `;
 
   return {
     subject: '🌙 Ce que tu ne vois pas encore...',
     html: wrapInBaseTemplate(body, 'Ton essai touche à sa fin. L\'Oracle va bientôt se rendormir.'),
-    text: `${greeting},\n\nTon essai Oracle+ touche bientôt à sa fin.\n\nDans quelques jours, l'Oracle se rendormira. Les interprétations illimitées, l'analyse des symboles, l'historique complet... tout cela deviendra inaccessible.\n\nCe que tu perds sans Oracle+ :\n- Interprétations limitées — 1 seule par mois\n- Pas d'analyse des symboles\n- Pas d'export PDF\n\n95% des rêves sont oubliés dans les 5 minutes après le réveil.\n\n→ https://dreamoracle.eu/pricing\n\nChaque nuit sans l'Oracle est une nuit de rêves perdus.`,
+    text: `${greeting},\n\nTon essai Oracle+ touche bientôt à sa fin.\n\nDans quelques jours, l'Oracle se rendormira. Les interprétations illimitées, l'analyse des symboles, l'historique complet... tout cela deviendra inaccessible.\n\nCe que tu perds sans Oracle+ :\n- Interprétations limitées — 3 par mois\n- Pas d'analyse des symboles\n- Pas d'export PDF\n\n95% des rêves sont oubliés dans les 5 minutes après le réveil.\n\n→ https://dreamoracle.eu/pricing\n\nChaque nuit sans l'Oracle est une nuit de rêves perdus.`,
   };
 }
 
@@ -180,12 +185,15 @@ function getDay4Email(name: string | null): { subject: string; html: string; tex
     <p>${greeting},</p>
     <p>Ton essai se termine demain. Avant que l'Oracle ne se rendorme, j'ai quelque chose pour toi.</p>
 
-    <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px;padding:28px;text-align:center;margin:24px 0;">
-      <p style="color:rgba(255,255,255,0.9);margin:0 0 8px;font-size:14px;">OFFRE R&Eacute;SERV&Eacute;E AUX NOUVEAUX MEMBRES</p>
-      <p style="color:white;margin:0;font-size:32px;font-weight:800;">-30%</p>
-      <p style="color:rgba(255,255,255,0.9);margin:8px 0 0;font-size:15px;">sur ton abonnement annuel Oracle+</p>
-      <p style="color:rgba(255,255,255,0.7);margin:12px 0 0;font-size:13px;">Code : <strong style="color:white;font-size:16px;letter-spacing:2px;">${promoCode}</strong></p>
-      <p style="color:rgba(255,255,255,0.6);margin:8px 0 0;font-size:12px;">Valable 48 heures</p>
+    <div style="background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(99,102,241,0.1));border:1px solid rgba(139,92,246,0.3);border-radius:12px;padding:28px;text-align:center;margin:24px 0;">
+      <p style="color:#c4b5fd;margin:0 0 8px;font-size:13px;letter-spacing:2px;text-transform:uppercase;">Offre r&eacute;serv&eacute;e aux nouveaux membres</p>
+      <p style="color:#d4a843;margin:0;font-size:36px;font-weight:800;">-30%</p>
+      <p style="color:#b0b5d4;margin:8px 0 0;font-size:15px;">sur ton abonnement annuel Oracle+</p>
+      <div style="margin:16px 0 0;padding:12px;background:rgba(0,0,0,0.2);border-radius:8px;display:inline-block;">
+        <span style="color:#6b6f94;font-size:12px;">CODE :</span>
+        <span style="color:#d4a843;font-size:18px;font-weight:700;letter-spacing:3px;margin-left:8px;">${promoCode}</span>
+      </div>
+      <p style="color:#6b6f94;margin:12px 0 0;font-size:12px;">Valable 48 heures</p>
     </div>
 
     <h3>Ce que tu obtiens avec Oracle+ :</h3>
@@ -201,13 +209,13 @@ function getDay4Email(name: string | null): { subject: string; html: string; tex
       <p>&#128170; <strong>Garantie satisfait ou rembours&eacute;</strong> &mdash; Si Oracle+ ne transforme pas ta compr&eacute;hension de tes r&ecirc;ves en 30 jours, on te rembourse. Sans question.</p>
     </div>
 
-    <p style="text-align:center;">
+    <div class="cta-wrap">
       <a href="https://dreamoracle.eu/pricing" class="cta-btn">&#128142; Activer Oracle+ &agrave; -30%</a>
-    </p>
+    </div>
 
     <div class="divider"></div>
 
-    <p style="font-size:13px;color:#64748b;">Cette offre expire dans 48 heures. Apr&egrave;s &ccedil;a, le tarif normal s'applique. L'Oracle attend ta d&eacute;cision.</p>
+    <p class="muted">Cette offre expire dans 48 heures. Apr&egrave;s &ccedil;a, le tarif normal s'applique. L'Oracle attend ta d&eacute;cision.</p>
   `;
 
   return {
