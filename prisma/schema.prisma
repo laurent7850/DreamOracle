@@ -173,6 +173,25 @@ model TrialEvent {
   @@index([createdAt])
 }
 
+model BlogPost {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  content         String
+  metaTitle       String?
+  metaDescription String?
+  wordCount       Int      @default(0)
+  featuredImage   String?
+  status          String   @default("PUBLISHED")
+  publishedAt     DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status])
+  @@index([publishedAt])
+  @@index([slug])
+}
+
 model FunnelEmail {
   id      String   @id @default(cuid())
   userId  String

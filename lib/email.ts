@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-// SMTP transporter for Hostinger
+// SMTP transporter for Hostinger (admin/invoices)
 let _transporter: nodemailer.Transporter | null = null;
 
 function getTransporter(): nodemailer.Transporter {
@@ -18,6 +18,24 @@ function getTransporter(): nodemailer.Transporter {
   return _transporter;
 }
 
+// SMTP transporter for marketing/funnel emails (info@dreamoracle.eu)
+let _funnelTransporter: nodemailer.Transporter | null = null;
+
+function getFunnelTransporter(): nodemailer.Transporter {
+  if (!_funnelTransporter) {
+    _funnelTransporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+      port: parseInt(process.env.SMTP_PORT || '465'),
+      secure: true,
+      auth: {
+        user: process.env.FUNNEL_SMTP_USER || 'info@dreamoracle.eu',
+        pass: process.env.FUNNEL_SMTP_PASSWORD,
+      },
+    });
+  }
+  return _funnelTransporter;
+}
+
 export interface EmailAttachment {
   filename: string;
   content: Buffer;
@@ -31,6 +49,36 @@ export interface SendEmailOptions {
   text?: string;
   attachments?: EmailAttachment[];
   bcc?: string;
+}
+
+export interface SendMarketingEmailOptions {
+  to: string;
+  subject: string;
+  html: string;
+  text?: string;
+}
+
+/**
+ * Send a marketing/funnel email via info@dreamoracle.eu
+ */
+export async function sendMarketingEmail(options: SendMarketingEmailOptions): Promise<boolean> {
+  try {
+    const transporter = getFunnelTransporter();
+    const fromEmail = process.env.FUNNEL_SMTP_USER || 'info@dreamoracle.eu';
+
+    await transporter.sendMail({
+      from: `"DreamOracle" <${fromEmail}>`,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+      text: options.text,
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Failed to send marketing email:', error);
+    return false;
+  }
 }
 
 export async function sendEmail(options: SendEmailOptions): Promise<boolean> {

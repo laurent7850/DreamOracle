@@ -1,4 +1,4 @@
-import { sendEmail } from './email';
+import { sendMarketingEmail } from './email';
 import { prisma } from './db';
 
 // ═══════════════════════════════════════════════════
@@ -247,7 +247,7 @@ export async function sendDay0FunnelEmail(
   try {
     const { subject, html, text } = getDay0Email(name);
 
-    const success = await sendEmail({ to: email, subject, html, text });
+    const success = await sendMarketingEmail({ to: email, subject, html, text });
 
     // Record in DB (catch P2002 for duplicate safety)
     try {
@@ -277,7 +277,7 @@ export async function sendFunnelEmail(
   try {
     const { subject, html, text } = getFunnelEmailContent(step, name);
 
-    const success = await sendEmail({ to: email, subject, html, text });
+    const success = await sendMarketingEmail({ to: email, subject, html, text });
 
     try {
       await prisma.funnelEmail.create({

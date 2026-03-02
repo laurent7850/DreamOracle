@@ -36,6 +36,8 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID}
+      - FUNNEL_SMTP_USER=${FUNNEL_SMTP_USER:-info@dreamoracle.eu}
+      - FUNNEL_SMTP_PASSWORD=${FUNNEL_SMTP_PASSWORD}
       - FUNNEL_PROMO_CODE=${FUNNEL_PROMO_CODE:-ORACLE2026}
     volumes:
       - dreamoracle_app:/app
