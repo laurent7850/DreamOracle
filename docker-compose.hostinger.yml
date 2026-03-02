@@ -36,6 +36,7 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID}
+      - FUNNEL_PROMO_CODE=${FUNNEL_PROMO_CODE:-ORACLE2026}
     volumes:
       - dreamoracle_app:/app
     depends_on:
@@ -122,6 +123,33 @@ services:
           memory: 1G
         reservations:
           memory: 512M
+
+  cron:
+    image: alpine:3.19
+    restart: always
+    depends_on:
+      - dreamoracle
+    environment:
+      - CRON_SECRET=${CRON_SECRET}
+    command: >
+      sh -c "
+        apk add --no-cache curl &&
+        echo '
+        # Funnel emails — daily at 8:00 AM (Europe/Paris)
+        0 7 * * * curl -sf -X POST http://dreamoracle:3000/api/emails/funnel -H \"Authorization: Bearer '\"$$CRON_SECRET\"'\" >> /var/log/cron.log 2>&1
+        # Trial expiration — daily at 2:00 AM
+        0 1 * * * curl -sf -X POST http://dreamoracle:3000/api/trial/expire -H \"Authorization: Bearer '\"$$CRON_SECRET\"'\" >> /var/log/cron.log 2>&1
+        # Push reminders — every minute
+        * * * * * curl -sf -X POST http://dreamoracle:3000/api/notifications/send-reminders -H \"Authorization: Bearer '\"$$CRON_SECRET\"'\" >> /var/log/cron.log 2>&1
+        ' | crontab - &&
+        crond -f -l 8
+      "
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+        reservations:
+          memory: 16M
 
 networks:
   traefik:

@@ -29,6 +29,17 @@
 - Trial lifecycle events dans table `TrialEvent` : trial_started → trial_converted | trial_expired
 - CRON expiration trial : POST `/api/trial/expire` (protégé par CRON_SECRET)
 
+## Email Funnel (Trial Nurturing)
+
+- Séquence 4 emails automatiques pour convertir les utilisateurs trial → payants
+- Templates + logique d'envoi : `lib/funnel-emails.ts`
+- Modèle `FunnelEmail` en DB : `@@unique([userId, step])` anti-duplicatas
+- **Jour 0** : envoyé inline à l'inscription (credentials + Google OAuth) — fire-and-forget
+- **Jours 1, 3, 4** : envoyés par CRON quotidien POST `/api/emails/funnel` (protégé par CRON_SECRET)
+- Jour 4 contient code promo -30% annuel (`FUNNEL_PROMO_CODE` env var, défaut: `ORACLE2026`)
+- Les emails ne sont envoyés qu'aux users en trial (pas encore convertis en payants)
+- Toute modification trial/inscription doit aussi vérifier l'impact sur le funnel
+
 ## Admin CRM
 
 - Page admin : `app/(admin)/admin/page.tsx` — stats cards, revenue, trial funnel, users table

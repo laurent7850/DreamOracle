@@ -48,6 +48,7 @@ model User {
   usageLogs     UsageLog[]
   pushSubscriptions PushSubscription[]
   symbols       UserSymbol[]
+  funnelEmails  FunnelEmail[]
 }
 
 model Dream {
@@ -170,5 +171,18 @@ model TrialEvent {
   @@index([userId])
   @@index([event])
   @@index([createdAt])
+}
+
+model FunnelEmail {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  step    Int      // 0, 1, 3, 4 (day number)
+  sentAt  DateTime @default(now())
+  success Boolean  @default(true)
+
+  @@unique([userId, step])
+  @@index([userId])
+  @@index([step])
 }
 

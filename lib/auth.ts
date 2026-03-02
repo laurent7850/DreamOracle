@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { prisma } from "./db";
 import { sendNewRegistrationEmail } from "./email";
+import { sendDay0FunnelEmail } from "./funnel-emails";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -136,6 +137,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               // Notify admin of new Google OAuth registration (fire-and-forget)
               sendNewRegistrationEmail(user.name || null, user.email!, 'Google OAuth').catch((err) => {
                 console.error('Failed to send registration notification:', err);
+              });
+
+              // Send Day 0 funnel welcome email (fire-and-forget)
+              sendDay0FunnelEmail(user.id, user.email!, user.name || null).catch((err) => {
+                console.error('Failed to send funnel Day 0 email:', err);
               });
             }
           }

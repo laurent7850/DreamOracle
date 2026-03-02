@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { sendNewRegistrationEmail } from "@/lib/email";
+import { sendDay0FunnelEmail } from "@/lib/funnel-emails";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -96,6 +97,11 @@ export async function POST(request: NextRequest) {
     // Notify admin (fire-and-forget)
     sendNewRegistrationEmail(name, email, 'credentials').catch((err) => {
       console.error('Failed to send registration notification:', err);
+    });
+
+    // Send Day 0 funnel welcome email (fire-and-forget)
+    sendDay0FunnelEmail(user.id, email, name).catch((err) => {
+      console.error('Failed to send funnel Day 0 email:', err);
     });
 
     return NextResponse.json(
