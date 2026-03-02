@@ -44,7 +44,6 @@ function wrapInBaseTemplate(body: string, preheader?: string): string {
     </div>
     <div class="footer">
       <p><a href="https://dreamoracle.eu">dreamoracle.eu</a></p>
-      <p>Distr'action SPRL &bull; Chauss&eacute;e Brunehault 27, 7041 Givry (B)</p>
       <p style="margin-top:12px;"><a href="https://dreamoracle.eu/settings">Se d&eacute;sabonner des emails</a></p>
     </div>
   </div>
