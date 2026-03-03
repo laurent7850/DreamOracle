@@ -95,6 +95,50 @@ function getDay0Email(name: string | null): { subject: string; html: string; tex
 }
 
 // ═══════════════════════════════════════════════════
+// Day 0.5 (step 2) — Ghost user nudge
+// Sent ~12-24h after registration to users with 0 dreams
+// ═══════════════════════════════════════════════════
+
+function getGhostNudgeEmail(name: string | null): { subject: string; html: string; text: string } {
+  const greeting = name ? `${name}` : 'Voyageur';
+
+  const body = `
+    <p>${greeting},</p>
+    <p>As-tu r&ecirc;v&eacute; cette nuit ?</p>
+    <p>M&ecirc;me si tu ne t'en souviens que vaguement &mdash; un lieu, une sensation, un visage &mdash; c'est <strong>suffisant</strong> pour l'Oracle.</p>
+
+    <div class="highlight">
+      <p>&#128161; <strong>Le savais-tu ?</strong> Tu oublies 95% de tes r&ecirc;ves dans les 5 premi&egrave;res minutes apr&egrave;s le r&eacute;veil. Plus tu attends, plus les d&eacute;tails s'effacent.</p>
+    </div>
+
+    <p>Il te suffit de 30 secondes pour noter l'essentiel. L'Oracle fera le reste.</p>
+
+    <h3>Pas besoin d'un r&ecirc;ve complet :</h3>
+    <ul class="feature-list">
+      <li><em>&laquo; J'&eacute;tais dans une for&ecirc;t sombre... &raquo;</em></li>
+      <li><em>&laquo; Je volais au-dessus de l'eau... &raquo;</em></li>
+      <li><em>&laquo; Mon chat me parlait... &raquo;</em></li>
+    </ul>
+
+    <p>Un fragment de r&ecirc;ve, c'est d&eacute;j&agrave; une porte ouverte vers ton inconscient. <strong>Essaie maintenant</strong> &mdash; tu seras surpris par ce que l'Oracle y d&eacute;couvre.</p>
+
+    <div class="cta-wrap">
+      <a href="https://dreamoracle.eu/dreams/new" class="cta-btn">&#127769; Raconter mon r&ecirc;ve (30 sec)</a>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="muted">Tu peux aussi dicter ton r&ecirc;ve &agrave; voix haute gr&acirc;ce &agrave; la transcription vocale int&eacute;gr&eacute;e. Pratique au r&eacute;veil, les yeux encore ferm&eacute;s.</p>
+  `;
+
+  return {
+    subject: '🌙 As-tu rêvé cette nuit ?',
+    html: wrapInBaseTemplate(body, 'Un simple fragment suffit. L\'Oracle fera le reste.'),
+    text: `${greeting},\n\nAs-tu rêvé cette nuit ?\n\nMême si tu ne t'en souviens que vaguement — un lieu, une sensation, un visage — c'est suffisant pour l'Oracle.\n\nLe savais-tu ? Tu oublies 95% de tes rêves dans les 5 premières minutes après le réveil.\n\nIl te suffit de 30 secondes pour noter l'essentiel. L'Oracle fera le reste.\n\nPas besoin d'un rêve complet :\n- « J'étais dans une forêt sombre... »\n- « Je volais au-dessus de l'eau... »\n- « Mon chat me parlait... »\n\n→ https://dreamoracle.eu/dreams/new\n\nTu peux aussi dicter ton rêve à voix haute grâce à la transcription vocale intégrée.`,
+  };
+}
+
+// ═══════════════════════════════════════════════════
 // Day 1 — Storytelling / Depth
 // ═══════════════════════════════════════════════════
 
@@ -236,6 +280,7 @@ export function getFunnelEmailContent(step: number, name: string | null) {
   switch (step) {
     case 0: return getDay0Email(name);
     case 1: return getDay1Email(name);
+    case 2: return getGhostNudgeEmail(name);
     case 3: return getDay3Email(name);
     case 4: return getDay4Email(name);
     default: throw new Error(`Unknown funnel step: ${step}`);

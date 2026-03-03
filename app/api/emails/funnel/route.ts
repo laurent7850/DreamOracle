@@ -23,9 +23,40 @@ export async function POST(request: NextRequest) {
     const results: Record<string, number> = {};
     const now = new Date();
 
+    // ── Ghost user nudge (step 2) ──
+    // Target: users registered 6-30 hours ago who have 0 dreams
+    // This catches users who signed up but never created a dream
+    {
+      const nudgeWindowStart = new Date(now.getTime() - 30 * 60 * 60 * 1000); // 30h ago
+      const nudgeWindowEnd = new Date(now.getTime() - 6 * 60 * 60 * 1000);    // 6h ago
+
+      const ghostUsers = await prisma.user.findMany({
+        where: {
+          createdAt: { gte: nudgeWindowStart, lt: nudgeWindowEnd },
+          trialUsed: true,
+          stripeSubscriptionId: null,
+          trialConvertedAt: null,
+          dreams: { none: {} },                    // zero dreams
+          funnelEmails: { none: { step: 2 } },     // haven't received nudge
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      });
+
+      let sent = 0;
+      for (const user of ghostUsers) {
+        const success = await sendFunnelEmail(user.id, user.email, user.name, 2);
+        if (success) sent++;
+      }
+      results.ghost_nudge = sent;
+    }
+
+    // ── Regular funnel steps (1, 3, 4) ──
     for (const { step, daysAfter } of FUNNEL_STEPS) {
-      // Window: users who registered between daysAfter-1 and daysAfter days ago
-      // e.g., for Day 1: registered between 24h and 48h ago
+      // Window: users who registered between daysAfter and daysAfter+1 days ago
       const windowStart = new Date(now.getTime() - (daysAfter + 1) * 24 * 60 * 60 * 1000);
       const windowEnd = new Date(now.getTime() - daysAfter * 24 * 60 * 60 * 1000);
 

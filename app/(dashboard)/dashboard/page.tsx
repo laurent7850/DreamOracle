@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardUsage } from "@/components/subscription";
 import TrackWelcome from "@/components/tracking/TrackWelcome";
+import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -45,6 +46,12 @@ export default async function DashboardPage() {
       <Suspense fallback={null}>
         <TrackWelcome />
       </Suspense>
+
+      {/* Onboarding modal for new users */}
+      <WelcomeModal
+        userName={session?.user?.name || ""}
+        hasDreams={dreamCount > 0}
+      />
       {/* Welcome Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
         <div>

@@ -57,3 +57,6 @@ prisma/dev.db
 .env.production.local
 
 certificates
+
+# Claude Code local settings (may contain secrets in permission rules)
+.claude/settings.local.json
