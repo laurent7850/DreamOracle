@@ -47,7 +47,7 @@ export interface UserSettings {
   interpretationStyle: "spiritual" | "psychological" | "balanced";
   language: string;
   notificationsEnabled: boolean;
-  reminderTime: string;
+  reminderTime: string | null;
   theme: "dark" | "midnight" | "aurora";
 }
 
