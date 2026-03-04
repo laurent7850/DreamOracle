@@ -56,7 +56,7 @@ model UserSettings {
   interpretationStyle   String  @default("balanced")
   language              String  @default("fr")
   notificationsEnabled  Boolean @default(true)
-  reminderTime          String?
+  reminderTime          String  @default("07:00")
   theme                 String  @default("dark")
 }
 

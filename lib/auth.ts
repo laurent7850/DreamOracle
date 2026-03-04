@@ -134,6 +134,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 },
               });
 
+              // Create default user settings (with reminder at 07:00)
+              await prisma.userSettings.create({
+                data: { userId: user.id, reminderTime: "07:00" },
+              }).catch(() => { /* ignore if already exists */ });
+
               // Notify admin of new Google OAuth registration (fire-and-forget)
               sendNewRegistrationEmail(user.name || null, user.email!, 'Google OAuth').catch((err) => {
                 console.error('Failed to send registration notification:', err);

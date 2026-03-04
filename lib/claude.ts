@@ -27,13 +27,25 @@ const STYLE_PROMPTS = {
 export async function interpretDream(
   dreamContent: string,
   emotions: string[],
-  style: "spiritual" | "psychological" | "balanced" = "balanced"
+  style: "spiritual" | "psychological" | "balanced" = "balanced",
+  isFirstInterpretation: boolean = false
 ): Promise<DreamInterpretation> {
   const stylePrompt = STYLE_PROMPTS[style];
 
+  // Enhanced prompt for first-time users — deeper, more impressive
+  const firstTimeBoost = isFirstInterpretation
+    ? `\n\nATTENTION SPÉCIALE : C'est la PREMIÈRE interprétation de cet utilisateur. Tu dois l'impressionner et lui montrer toute la profondeur de l'Oracle.
+- Fournis 5-6 symboles avec des significations détaillées et personnalisées (pas génériques)
+- Le mainMessage doit être percutant, personnel et mémorable (4-5 phrases)
+- Ajoute des connexions inattendues entre les symboles
+- Les questions de réflexion doivent toucher des cordes sensibles
+- Le conseil pratique doit être concret et actionnable
+- Utilise un ton qui donne envie de revenir noter d'autres rêves`
+    : '';
+
   const userPrompt = `Analyse ce rêve avec une approche ${style === "spiritual" ? "spirituelle" : style === "psychological" ? "psychologique" : "équilibrée"}.
 
-${stylePrompt}
+${stylePrompt}${firstTimeBoost}
 
 Rêve:
 ${dreamContent}
@@ -53,7 +65,7 @@ Réponds avec un JSON valide uniquement.`;
       },
       body: JSON.stringify({
         model: "anthropic/claude-sonnet-4",
-        max_tokens: 1500,
+        max_tokens: isFirstInterpretation ? 2500 : 1500,
         messages: [
           {
             role: "system",

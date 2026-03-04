@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardUsage } from "@/components/subscription";
 import TrackWelcome from "@/components/tracking/TrackWelcome";
 import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
+import { DashboardStreak } from "@/components/dashboard/DashboardStreak";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -40,6 +41,50 @@ export default async function DashboardPage() {
       dreamDate: { gte: startOfMonth },
     },
   });
+
+  // Calculate streak for dashboard widget
+  const startOfWeek = new Date();
+  startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const dreamsThisWeek = await prisma.dream.count({
+    where: {
+      userId: session?.user?.id,
+      dreamDate: { gte: startOfWeek },
+    },
+  });
+
+  // Calculate current streak and longest streak
+  let currentStreak = 0;
+  let longestStreak = 0;
+  if (recentDreams.length > 0) {
+    const allDreamDates = await prisma.dream.findMany({
+      where: { userId: session?.user?.id },
+      select: { dreamDate: true },
+      orderBy: { dreamDate: "desc" },
+    });
+    const uniqueDates = [...new Set(allDreamDates.map(d => new Date(d.dreamDate).toISOString().split("T")[0]))].sort().reverse();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < uniqueDates.length; i++) {
+      const dreamDate = new Date(uniqueDates[i]);
+      dreamDate.setHours(0, 0, 0, 0);
+      const diffDays = Math.floor((today.getTime() - dreamDate.getTime()) / (1000 * 60 * 60 * 24));
+      if (diffDays <= i + 1) currentStreak++;
+      else break;
+    }
+
+    let streak = 1;
+    for (let i = 1; i < uniqueDates.length; i++) {
+      const prev = new Date(uniqueDates[i - 1]);
+      const curr = new Date(uniqueDates[i]);
+      const diff = Math.floor((prev.getTime() - curr.getTime()) / (1000 * 60 * 60 * 24));
+      if (diff === 1) { streak++; }
+      else { longestStreak = Math.max(longestStreak, streak); streak = 1; }
+    }
+    longestStreak = Math.max(longestStreak, streak, currentStreak);
+  }
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 px-1">
@@ -97,6 +142,15 @@ export default async function DashboardPage() {
           description="Interprétation"
         />
       </div>
+
+      {/* Streak Widget */}
+      {dreamCount > 0 && (
+        <DashboardStreak
+          currentStreak={currentStreak}
+          longestStreak={longestStreak}
+          dreamsThisWeek={dreamsThisWeek}
+        />
+      )}
 
       {/* Recent Dreams */}
       <Card className="glass-card border-mystic-700/30">

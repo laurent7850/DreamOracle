@@ -270,6 +270,48 @@ function getDay4Email(name: string | null): { subject: string; html: string; tex
 }
 
 // ═══════════════════════════════════════════════════
+// Step 5 — Win-back for ghost users (registered 2+ days ago, 0 dreams)
+// One-time send via backfill endpoint
+// ═══════════════════════════════════════════════════
+
+function getWinBackEmail(name: string | null): { subject: string; html: string; text: string } {
+  const greeting = name ? `${name}` : 'Voyageur';
+
+  const body = `
+    <p>${greeting},</p>
+    <p>On ne s'est pas encore vraiment rencontr&eacute;s.</p>
+    <p>Tu t'es inscrit sur DreamOracle, mais l'Oracle attend toujours ton premier r&ecirc;ve. Et cette nuit, <strong>tu as r&ecirc;v&eacute;</strong>. Tout le monde r&ecirc;ve, chaque nuit.</p>
+
+    <div class="highlight">
+      <p>&#127769; <strong>Le r&ecirc;ve n'a pas besoin d'&ecirc;tre complet.</strong> Un fragment, une sensation, un lieu &mdash; l'Oracle peut tout interpr&eacute;ter. Essaie avec juste 2 phrases.</p>
+    </div>
+
+    <p>Voici ce que d'autres ont d&eacute;couvert d&egrave;s leur premier r&ecirc;ve :</p>
+    <ul class="feature-list">
+      <li><em>&laquo; Je ne savais pas que r&ecirc;ver de voler parlait de libert&eacute; &eacute;motionnelle &raquo;</em></li>
+      <li><em>&laquo; L'Oracle a vu des choses que je n'aurais jamais soup&ccedil;onn&eacute;es &raquo;</em></li>
+      <li><em>&laquo; J'ai compris pourquoi ce r&ecirc;ve revenait sans cesse &raquo;</em></li>
+    </ul>
+
+    <p><strong>30 secondes</strong>, c'est tout ce qu'il faut. Dicte-le &agrave; voix haute ou &eacute;cris-le.</p>
+
+    <div class="cta-wrap">
+      <a href="https://dreamoracle.eu/dreams/new" class="cta-btn">&#127769; Raconter mon premier r&ecirc;ve</a>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="muted">Ton essai Oracle+ est peut-&ecirc;tre encore actif. Profites-en avant qu'il ne soit trop tard.</p>
+  `;
+
+  return {
+    subject: '🌙 L\'Oracle attend toujours ton premier rêve',
+    html: wrapInBaseTemplate(body, 'Tu as rêvé cette nuit. 30 secondes suffisent pour le noter.'),
+    text: `${greeting},\n\nOn ne s'est pas encore vraiment rencontrés.\n\nTu t'es inscrit sur DreamOracle, mais l'Oracle attend toujours ton premier rêve. Et cette nuit, tu as rêvé. Tout le monde rêve, chaque nuit.\n\nLe rêve n'a pas besoin d'être complet. Un fragment, une sensation, un lieu — l'Oracle peut tout interpréter.\n\nCe que d'autres ont découvert :\n- « Je ne savais pas que rêver de voler parlait de liberté émotionnelle »\n- « L'Oracle a vu des choses que je n'aurais jamais soupçonnées »\n- « J'ai compris pourquoi ce rêve revenait sans cesse »\n\n30 secondes, c'est tout ce qu'il faut.\n\n→ https://dreamoracle.eu/dreams/new`,
+  };
+}
+
+// ═══════════════════════════════════════════════════
 // Public API
 // ═══════════════════════════════════════════════════
 
@@ -283,6 +325,7 @@ export function getFunnelEmailContent(step: number, name: string | null) {
     case 2: return getGhostNudgeEmail(name);
     case 3: return getDay3Email(name);
     case 4: return getDay4Email(name);
+    case 5: return getWinBackEmail(name);
     default: throw new Error(`Unknown funnel step: ${step}`);
   }
 }

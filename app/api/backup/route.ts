@@ -269,7 +269,7 @@ export async function POST(request: NextRequest) {
           ...(data.settings.notificationsEnabled !== undefined && {
             notificationsEnabled: data.settings.notificationsEnabled,
           }),
-          ...(data.settings.reminderTime !== undefined && {
+          ...(data.settings.reminderTime && {
             reminderTime: data.settings.reminderTime,
           }),
         },
@@ -279,7 +279,7 @@ export async function POST(request: NextRequest) {
           language: data.settings.language || "fr",
           theme: data.settings.theme || "dark",
           notificationsEnabled: data.settings.notificationsEnabled ?? true,
-          reminderTime: data.settings.reminderTime || null,
+          reminderTime: data.settings.reminderTime || "07:00",
         },
       });
       results.settingsUpdated = true;

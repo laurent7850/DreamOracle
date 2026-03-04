@@ -66,9 +66,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
 
+    // Check if this is the user's first interpretation (for enhanced wow effect)
+    const previousInterpretations = await prisma.dream.count({
+      where: {
+        userId: session.user.id,
+        interpretation: { not: null },
+      },
+    });
+    const isFirstInterpretation = previousInterpretations === 0;
+
     // Get interpretation from Claude
     const emotions = JSON.parse(dream.emotions as string) as string[];
-    const interpretation = await interpretDream(dream.content, emotions, style);
+    const interpretation = await interpretDream(dream.content, emotions, style, isFirstInterpretation);
 
     // Format interpretation as text for storage
     const interpretationText = formatInterpretationAsText(interpretation);

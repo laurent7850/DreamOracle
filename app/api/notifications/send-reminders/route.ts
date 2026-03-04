@@ -36,6 +36,16 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Rotating morning messages for engagement
+    const morningMessages = [
+      "As-tu rêvé cette nuit ? Note-le avant qu'il s'efface...",
+      "Un rêve t'attendait cette nuit. L'Oracle est prêt à l'interpréter.",
+      "Chaque rêve oublié est un message perdu. Note le tien maintenant !",
+      "Ferme les yeux 3 secondes... que reste-t-il de ta nuit ?",
+      "Ton subconscient t'a parlé cette nuit. Qu'a-t-il dit ?",
+    ];
+    const todayMessage = morningMessages[new Date().getDay() % morningMessages.length];
+
     let sent = 0;
     let failed = 0;
     const invalidSubscriptions: string[] = [];
@@ -53,8 +63,8 @@ export async function POST(request: NextRequest) {
               },
             },
             {
-              title: "🌙 DreamOracle",
-              body: "Bonjour ! N'oubliez pas de noter votre rêve de cette nuit.",
+              title: "🌙 As-tu rêvé cette nuit ?",
+              body: todayMessage,
               icon: "/icons/icon-192x192.png",
               badge: "/icons/icon-72x72.png",
               tag: "dream-reminder",

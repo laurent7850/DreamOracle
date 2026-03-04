@@ -8,7 +8,7 @@ const updateSettingsSchema = z.object({
   language: z.enum(["fr", "en"]).optional(),
   notificationsEnabled: z.boolean().optional(),
   theme: z.enum(["dark", "midnight", "aurora", "cosmic", "ocean", "sunset"]).optional(),
-  reminderTime: z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
+  reminderTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
 });
 
 export async function PATCH(request: NextRequest) {
@@ -42,7 +42,7 @@ export async function PATCH(request: NextRequest) {
           notificationsEnabled: data.notificationsEnabled,
         }),
         ...(data.theme && { theme: data.theme }),
-        ...(data.reminderTime !== undefined && {
+        ...(data.reminderTime && {
           reminderTime: data.reminderTime,
         }),
       },
@@ -52,7 +52,7 @@ export async function PATCH(request: NextRequest) {
         language: data.language || "fr",
         notificationsEnabled: data.notificationsEnabled ?? true,
         theme: data.theme || "dark",
-        reminderTime: data.reminderTime,
+        reminderTime: data.reminderTime || "07:00",
       },
     });
 
