@@ -1,0 +1,30 @@
+# DreamOracle
+
+> Journal de rêves intelligent avec interprétation par intelligence artificielle.
+
+DreamOracle est une application web (PWA) qui permet aux utilisateurs d'enregistrer leurs rêves, de les faire interpréter par une IA avancée, et de suivre leur vie onirique au fil du temps.
+
+## Fonctionnalités principales
+
+- Journal de rêves : enregistrez vos rêves par écrit ou par dictée vocale
+- Interprétation IA : analyse symbolique personnalisée de chaque rêve par intelligence artificielle
+- Dictionnaire des symboles : explorez la signification de centaines de symboles oniriques
+- Calendrier onirique : visualisez vos rêves sur un calendrier interactif
+- Biorythme : suivez vos cycles naturels et leur influence sur vos rêves
+- Coach onirique : un assistant IA pour approfondir la compréhension de vos rêves
+- Blog : articles sur l'interprétation des rêves et le monde onirique
+
+## Informations
+
+- URL : https://dreamoracle.eu
+- Langue : Français
+- Type : Application web progressive (PWA)
+- Créateur : DreamOracle
+- Thème : Interprétation des rêves, psychologie, symbolisme onirique
+
+## Pages principales
+
+- https://dreamoracle.eu/ — Page d'accueil
+- https://dreamoracle.eu/blog — Articles sur les rêves
+- https://dreamoracle.eu/symbols — Dictionnaire des symboles oniriques
+- https://dreamoracle.eu/pricing — Abonnements et tarifs

@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     template: "%s | DreamOracle",
   },
   description:
-    "Explorez les mystères de vos rêves avec DreamOracle. Enregistrez, analysez et interprétez vos rêves grâce à l'Oracle.",
+    "Explorez les mystères de vos rêves avec DreamOracle. Journal de rêves intelligent avec interprétation IA, symboles oniriques et suivi personnalisé.",
   keywords: [
     "rêves",
     "interprétation",
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
     url: "https://dreamoracle.eu",
     siteName: "DreamOracle",
     title: "DreamOracle - Interprète de Rêves",
-    description: "Explorez les mystères de vos rêves avec l'Oracle",
+    description: "Explorez les mystères de vos rêves avec DreamOracle. Journal de rêves intelligent avec interprétation IA, symboles oniriques et suivi personnalisé.",
   },
 };
 
