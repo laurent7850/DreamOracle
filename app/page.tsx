@@ -12,28 +12,30 @@ export default function LandingPage() {
       {/* Hero Background Image - Mobile */}
       <div className="absolute inset-0 z-0 md:hidden">
         <Image
-          src="/images/hero-mobile.jpg"
+          src="/images/hero-mobile.webp"
           alt="DreamOracle - Portail onirique"
           fill
+          sizes="100vw"
           className="object-cover object-center"
           priority
-          quality={90}
+          quality={80}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-night/60 via-night/40 to-night" />
       </div>
       {/* Hero Background Image - Desktop */}
       <div className="absolute inset-0 z-0 hidden md:block">
         <Image
-          src="/images/hero-bg.png"
+          src="/images/hero-bg.webp"
           alt="DreamOracle - Portail onirique"
           fill
+          sizes="100vw"
           className="object-cover object-center"
           priority
-          quality={90}
+          quality={80}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-night/70 via-night/50 to-night" />
       </div>
-      <StarField count={80} />
+      <StarField count={40} />
 
       {/* Navigation */}
       <nav className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 md:px-12 lg:px-20">
@@ -42,13 +44,13 @@ export default function LandingPage() {
           <span className="font-display text-lg sm:text-xl text-lunar">DreamOracle</span>
         </Link>
         <div className="flex items-center gap-2 sm:gap-4">
-          <Link href="/pricing" className="hidden sm:block">
-            <Button variant="ghost" className="text-lunar hover:text-mystic-300 hover:bg-mystic-900/30 text-sm sm:text-base px-2 sm:px-4">
+          <Link href="/pricing">
+            <Button variant="ghost" className="text-lunar hover:text-mystic-300 hover:bg-mystic-900/30 text-xs sm:text-base px-2 sm:px-4">
               Tarifs
             </Button>
           </Link>
-          <Link href="/blog" className="hidden sm:block">
-            <Button variant="ghost" className="text-lunar hover:text-mystic-300 hover:bg-mystic-900/30 text-sm sm:text-base px-2 sm:px-4">
+          <Link href="/blog">
+            <Button variant="ghost" className="text-lunar hover:text-mystic-300 hover:bg-mystic-900/30 text-xs sm:text-base px-2 sm:px-4">
               Blog
             </Button>
           </Link>
@@ -76,8 +78,8 @@ export default function LandingPage() {
         </div>
 
         <h1 className="font-display text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl text-lunar mb-4 sm:mb-6 max-w-4xl px-2">
-          Explorez les <span className="text-gradient-mystic">Mystères</span> de vos{" "}
-          <span className="text-gradient-gold">Rêves</span>
+          <span className="text-gradient-mystic">Interprétation</span> de vos{" "}
+          <span className="text-gradient-gold">Rêves</span> par IA
         </h1>
 
         <p className="font-mystical text-sm sm:text-base md:text-lg lg:text-xl text-mystic-300 mb-4 sm:mb-6 md:mb-8 max-w-2xl px-2">
@@ -351,12 +353,13 @@ export default function LandingPage() {
             <span className="font-display text-sm sm:text-base text-lunar">DreamOracle</span>
           </div>
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-mystic-400">
+            <Link href="/blog" className="hover:text-mystic-300">Blog</Link>
+            <Link href="/symbols" className="hover:text-mystic-300">Symboles</Link>
+            <Link href="/pricing" className="hover:text-mystic-300">Tarifs</Link>
             <Link href="/privacy" className="hover:text-mystic-300">Confidentialité</Link>
             <Link href="/terms" className="hover:text-mystic-300">CGU</Link>
             <Link href="/cgv" className="hover:text-mystic-300">CGV</Link>
             <Link href="/mentions-legales" className="hover:text-mystic-300">Mentions légales</Link>
-            <Link href="/blog" className="hover:text-mystic-300">Blog</Link>
-            <Link href="/pricing" className="hover:text-mystic-300">Tarifs</Link>
             <a href="mailto:support@dreamoracle.eu" className="hover:text-mystic-300">Contact</a>
           </div>
           <p className="text-mystic-500 text-xs sm:text-sm text-center">

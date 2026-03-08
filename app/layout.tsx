@@ -30,18 +30,25 @@ const philosopher = Philosopher({
 export const metadata: Metadata = {
   metadataBase: new URL("https://dreamoracle.eu"),
   title: {
-    default: "DreamOracle - Interprète de Rêves",
+    default: "DreamOracle - Interprétation des Rêves par IA",
     template: "%s | DreamOracle",
   },
   description:
-    "Explorez les mystères de vos rêves avec DreamOracle. Journal de rêves intelligent avec interprétation IA, symboles oniriques et suivi personnalisé.",
+    "Interprétation des rêves par IA. Journal de rêves, signification des symboles oniriques, rêves lucides et analyse personnalisée. Essai gratuit 7 jours.",
   keywords: [
-    "rêves",
-    "interprétation",
-    "oracle",
-    "symbolisme",
+    "interprétation des rêves",
+    "signification des rêves",
     "journal de rêves",
+    "rêves lucides",
+    "symbolisme des rêves",
+    "analyse des rêves",
+    "signification des cauchemars",
+    "rêves récurrents",
+    "psychologie des rêves",
+    "rêves prophétiques",
+    "interprétation spirituelle des rêves",
     "analyse onirique",
+    "oracle des rêves",
   ],
   authors: [{ name: "DreamOracle" }],
   creator: "DreamOracle",
@@ -78,8 +85,8 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     url: "https://dreamoracle.eu",
     siteName: "DreamOracle",
-    title: "DreamOracle - Interprète de Rêves",
-    description: "Explorez les mystères de vos rêves avec DreamOracle. Journal de rêves intelligent avec interprétation IA, symboles oniriques et suivi personnalisé.",
+    title: "DreamOracle - Interprétation des Rêves par IA",
+    description: "Interprétation des rêves par IA. Journal de rêves, signification des symboles oniriques, rêves lucides et analyse personnalisée. Essai gratuit 7 jours.",
   },
 };
 
@@ -99,6 +106,8 @@ export default function RootLayout({
   return (
     <html lang="fr" className="dark">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <OrganizationJsonLd />
         <WebApplicationJsonLd />
       </head>

@@ -69,6 +69,78 @@ export function WebApplicationJsonLd() {
   );
 }
 
+export function ArticleJsonLd({
+  title,
+  description,
+  url,
+  publishedTime,
+  modifiedTime,
+  image,
+}: {
+  title: string;
+  description?: string;
+  url: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  image?: string;
+}) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: title,
+    ...(description && { description }),
+    url,
+    ...(publishedTime && { datePublished: publishedTime }),
+    ...(modifiedTime && { dateModified: modifiedTime }),
+    ...(image && { image }),
+    author: {
+      "@type": "Organization",
+      name: "DreamOracle",
+      url: "https://dreamoracle.eu",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "DreamOracle",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://dreamoracle.eu/icons/icon-512x512.png",
+      },
+    },
+    inLanguage: "fr",
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  );
+}
+
+export function BreadcrumbJsonLd({
+  items,
+}: {
+  items: { name: string; url: string }[];
+}) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  );
+}
+
 export function FAQPageJsonLd({
   questions,
 }: {

@@ -28,3 +28,11 @@ DreamOracle est une application web (PWA) qui permet aux utilisateurs d'enregist
 - https://dreamoracle.eu/blog — Articles sur les rêves
 - https://dreamoracle.eu/symbols — Dictionnaire des symboles oniriques
 - https://dreamoracle.eu/pricing — Abonnements et tarifs
+
+## Contenu principal
+### Articles sur l'interprétation des rêves
+- [Vos rêves, une réalité ? Découvrez leur signification](https://dreamoracle.eu/vos-reves-une-realite-decouvrez-leur-signification): Découvrez si vos rêves peuvent devenir réalité et apprenez à les interpréter. Plongez dans le monde fascinant des rêves.
+- [Comprendre le Biorythme : Clé de l'Interprétation des Rêves](https://dreamoracle.eu/comprendre-biorythme-cle-interpretation-reves): Découvrez comment le biorythme influence l'interprétation des rêves et améliorez votre compréhension personnelle.
+
+## A propos
+Dreamoracle est une plateforme en ligne dédiée à l'exploration et à l'analyse des rêves. En fournissant des articles instructifs et des ressources précieuses, le site vise à aider chacun à découvrir le potentiel caché de ses rêves.

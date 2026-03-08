@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { prisma } from "@/lib/db"
 import { Moon, ArrowLeft, Calendar, Clock } from "lucide-react"
 import type { Metadata } from "next"
+import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd"
 
 export const dynamic = "force-dynamic"
 
@@ -31,11 +33,15 @@ export async function generateMetadata({
   return {
     title: post.metaTitle || post.title,
     description: post.metaDescription || undefined,
+    alternates: {
+      canonical: `https://dreamoracle.eu/blog/${slug}`,
+    },
     openGraph: {
       title: post.metaTitle || post.title,
       description: post.metaDescription || undefined,
       type: "article",
       publishedTime: post.publishedAt?.toISOString(),
+      url: `https://dreamoracle.eu/blog/${slug}`,
       ...(post.featuredImage ? { images: [post.featuredImage] } : {}),
     },
   }
@@ -55,6 +61,21 @@ export default async function BlogPostPage({
 
   return (
     <div className="min-h-screen bg-night">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Accueil", url: "https://dreamoracle.eu" },
+          { name: "Blog", url: "https://dreamoracle.eu/blog" },
+          { name: post.title, url: `https://dreamoracle.eu/blog/${slug}` },
+        ]}
+      />
+      <ArticleJsonLd
+        title={post.title}
+        description={post.metaDescription || undefined}
+        url={`https://dreamoracle.eu/blog/${slug}`}
+        publishedTime={post.publishedAt?.toISOString()}
+        modifiedTime={post.updatedAt?.toISOString()}
+        image={post.featuredImage || undefined}
+      />
       {/* Navigation */}
       <nav className="border-b border-mystic-900/30 bg-night/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
@@ -119,12 +140,14 @@ export default async function BlogPostPage({
           </header>
 
           {post.featuredImage && (
-            <div className="mb-8 overflow-hidden rounded-2xl">
-              <img
+            <div className="relative mb-8 overflow-hidden rounded-2xl" style={{ maxHeight: '400px' }}>
+              <Image
                 src={post.featuredImage}
                 alt={post.title}
+                width={768}
+                height={400}
                 className="w-full object-cover"
-                style={{ maxHeight: '400px' }}
+                sizes="(max-width: 768px) 100vw, 768px"
               />
             </div>
           )}
@@ -137,7 +160,7 @@ export default async function BlogPostPage({
           </div>
         </article>
 
-        <div className="mt-12 border-t border-mystic-900/20 pt-8">
+        <div className="mt-12 border-t border-mystic-900/20 pt-8 flex flex-wrap items-center justify-between gap-4">
           <Link
             href="/blog"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-mystic-400 transition-colors hover:text-mystic-300"
@@ -145,6 +168,20 @@ export default async function BlogPostPage({
             <ArrowLeft className="h-4 w-4" />
             Voir tous les articles
           </Link>
+          <div className="flex items-center gap-4 text-sm">
+            <Link
+              href="/symbols"
+              className="text-mystic-400 transition-colors hover:text-mystic-300"
+            >
+              Dictionnaire des symboles
+            </Link>
+            <Link
+              href="/register"
+              className="rounded-lg bg-mystic-600 px-4 py-2 text-white transition-colors hover:bg-mystic-500"
+            >
+              Essayer gratuitement
+            </Link>
+          </div>
         </div>
       </main>
 

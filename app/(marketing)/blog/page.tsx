@@ -1,14 +1,19 @@
 import Link from "next/link"
+import Image from "next/image"
 import type { Metadata } from "next"
 import { prisma } from "@/lib/db"
 import { Moon, Calendar, Clock, ArrowRight, BookOpen } from "lucide-react"
+import { BreadcrumbJsonLd } from "@/components/seo/JsonLd"
 
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
-  title: "Blog - DreamOracle",
+  title: "Blog sur l'Interprétation des Rêves | Guides & Symbolisme Onirique",
   description:
-    "Articles, guides et insights sur l'interpretation des reves, la symbolique onirique et le developpement personnel.",
+    "Articles et guides sur l'interprétation des rêves, la signification des symboles oniriques, les rêves lucides et la psychologie des rêves.",
+  alternates: {
+    canonical: "https://dreamoracle.eu/blog",
+  },
 }
 
 async function getPublishedPosts() {
@@ -29,6 +34,12 @@ export default async function BlogPage() {
 
   return (
     <div className="min-h-screen bg-night">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Accueil", url: "https://dreamoracle.eu" },
+          { name: "Blog", url: "https://dreamoracle.eu/blog" },
+        ]}
+      />
       {/* Navigation */}
       <nav className="border-b border-mystic-900/30 bg-night/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
@@ -69,14 +80,15 @@ export default async function BlogPage() {
               Blog
             </div>
             <h1 className="font-display text-4xl font-bold tracking-tight text-lunar sm:text-5xl">
-              Explorez le monde des{" "}
+              Interprétation des{" "}
               <span className="bg-gradient-to-r from-mystic-400 to-mystic-300 bg-clip-text text-transparent">
-                reves
-              </span>
+                rêves
+              </span>{" "}
+              &amp; symbolisme onirique
             </h1>
             <p className="mt-6 font-body text-lg leading-8 text-lunar/60">
-              Articles et guides sur l&apos;interpretation des reves, la
-              symbolique onirique et le developpement personnel.
+              Articles et guides sur la signification des rêves, la
+              psychologie onirique et le développement personnel.
             </p>
           </div>
         </div>
@@ -101,11 +113,13 @@ export default async function BlogPage() {
                   className="group flex flex-col rounded-2xl border border-mystic-900/30 bg-night-light transition-all hover:-translate-y-1 hover:border-mystic-700/50 hover:shadow-lg hover:shadow-mystic-900/20"
                 >
                   {post.featuredImage ? (
-                    <div className="h-48 overflow-hidden rounded-t-2xl">
-                      <img
+                    <div className="relative h-48 overflow-hidden rounded-t-2xl">
+                      <Image
                         src={post.featuredImage}
                         alt={post.title}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     </div>
                   ) : (
@@ -162,9 +176,15 @@ export default async function BlogPage() {
 
       {/* Footer */}
       <footer className="border-t border-mystic-900/20 bg-night-dark py-8">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="font-body text-sm text-lunar/40">
-            &copy; {new Date().getFullYear()} DreamOracle. Tous droits reserves.
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-center gap-6 mb-4 text-sm text-mystic-400">
+            <Link href="/" className="hover:text-mystic-300">Accueil</Link>
+            <Link href="/symbols" className="hover:text-mystic-300">Dictionnaire des symboles</Link>
+            <Link href="/pricing" className="hover:text-mystic-300">Tarifs</Link>
+            <Link href="/register" className="hover:text-mystic-300">Essai gratuit</Link>
+          </div>
+          <p className="font-body text-sm text-lunar/40 text-center">
+            &copy; {new Date().getFullYear()} DreamOracle. Tous droits réservés.
           </p>
         </div>
       </footer>
