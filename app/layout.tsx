@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     telephone: false,
   },
   verification: {
-    google: 'htOEvHTfK9SYV3eIalOY3znpu2JpPqrZBYpsvhZWAl0',
+    google: 'bdMA8WYrqmUygfDAZw98G8dO10FAJhMX0DfqedMmXcY',
     other: {
       'facebook-domain-verification': ['4xr036cnukndb2ka47owqlhs6g8vhm'],
     },
