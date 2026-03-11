@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Conditions Générales d'Utilisation",
   description:
-    "Conditions générales d'utilisation de DreamOracle. Règles d'utilisation du service d'interprétation de rêves par IA.",
+    "Conditions générales d'utilisation de DreamOracle. Règles d'utilisation du service d'interprétation de rêves par IA, abonnements, propriété intellectuelle et droit applicable.",
   alternates: {
     canonical: "https://dreamoracle.eu/terms",
   },

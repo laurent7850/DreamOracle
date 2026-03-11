@@ -284,6 +284,16 @@ function RegisterForm() {
           Se connecter
         </Link>
       </p>
+
+      <div className="flex flex-wrap justify-center gap-3 mt-4 text-xs text-mystic-500">
+        <Link href="/pricing" className="hover:text-mystic-300 transition-colors">Tarifs</Link>
+        <span>·</span>
+        <Link href="/blog" className="hover:text-mystic-300 transition-colors">Blog</Link>
+        <span>·</span>
+        <Link href="/terms" className="hover:text-mystic-300 transition-colors">CGU</Link>
+        <span>·</span>
+        <Link href="/privacy" className="hover:text-mystic-300 transition-colors">Confidentialité</Link>
+      </div>
     </div>
   );
 }
