@@ -8,9 +8,9 @@ import { BreadcrumbJsonLd } from "@/components/seo/JsonLd"
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
-  title: "Blog sur l'Interprétation des Rêves | Guides & Symbolisme Onirique",
+  title: "Blog Rêves : Interprétation & Symbolisme",
   description:
-    "Articles et guides complets sur l'interprétation des rêves, la signification des symboles oniriques, les rêves lucides, la psychologie des rêves et les techniques d'analyse onirique.",
+    "Articles et guides sur l'interprétation des rêves, la signification des symboles oniriques, les rêves lucides et la psychologie des rêves.",
   alternates: {
     canonical: "https://dreamoracle.eu/blog",
   },
