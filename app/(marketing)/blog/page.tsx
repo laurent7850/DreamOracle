@@ -94,6 +94,45 @@ export default async function BlogPage() {
         </div>
       </section>
 
+      {/* Introduction SEO */}
+      <section className="border-b border-mystic-900/10 bg-night-dark/50">
+        <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="grid gap-6 sm:grid-cols-3 text-center">
+            <div>
+              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-mystic-400">
+                Symboles oniriques
+              </h2>
+              <p className="mt-2 font-body text-sm text-lunar/50">
+                Découvrez la signification des symboles qui peuplent vos rêves :
+                eau, vol, chute, animaux, maisons et bien d&apos;autres. Chaque symbole
+                porte un message de votre inconscient que nos guides vous aident à décoder.
+              </p>
+            </div>
+            <div>
+              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-mystic-400">
+                Rêves lucides
+              </h2>
+              <p className="mt-2 font-body text-sm text-lunar/50">
+                Apprenez les techniques pour devenir conscient dans vos rêves et
+                prendre le contrôle de vos aventures nocturnes. Du test de réalité
+                à la méthode MILD, explorez le monde fascinant des rêves lucides.
+              </p>
+            </div>
+            <div>
+              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-mystic-400">
+                Psychologie des rêves
+              </h2>
+              <p className="mt-2 font-body text-sm text-lunar/50">
+                De Freud à Jung en passant par les neurosciences modernes, comprenez
+                pourquoi nous rêvons et comment nos rêves reflètent nos émotions,
+                nos peurs et nos désirs les plus profonds. Le biorythme influence
+                également la qualité et l&apos;intensité de nos rêves.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Articles grid */}
       <section className="py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

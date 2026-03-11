@@ -62,6 +62,49 @@ export default function PricingLayout({
   return (
     <>
       <FAQPageJsonLd questions={faqQuestions} />
+      <noscript>
+        <div style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
+          <h1>Tarifs et Abonnements DreamOracle</h1>
+          <p>
+            Découvrez nos plans pour l&apos;interprétation de vos rêves par intelligence artificielle.
+            DreamOracle propose trois formules adaptées à chaque explorateur onirique.
+          </p>
+          <h2>Plan Rêveur — Gratuit</h2>
+          <p>
+            Le plan Rêveur vous offre un accès gratuit et illimité à votre journal de rêves personnel.
+            Enregistrez jusqu&apos;à 3 rêves par mois avec interprétation basique par IA, accédez à
+            votre historique complet et découvrez les symboles récurrents de vos songes.
+          </p>
+          <h2>Plan Explorateur — 4,99€/mois</h2>
+          <p>
+            Le plan Explorateur débloque 15 interprétations mensuelles par IA avancée, la transcription
+            vocale pour enregistrer vos rêves au réveil, et des analyses détaillées de symboles oniriques.
+            Idéal pour ceux qui souhaitent approfondir la compréhension de leurs rêves.
+          </p>
+          <h2>Plan Oracle+ — 9,99€/mois</h2>
+          <p>
+            Notre plan premium Oracle+ offre des interprétations illimitées, le Dream Coach personnel
+            qui analyse vos tendances oniriques, le suivi du biorythme, des statistiques avancées et
+            un accès prioritaire aux nouvelles fonctionnalités. Essai gratuit de 7 jours sans engagement.
+          </p>
+          <h2>Questions fréquentes</h2>
+          <p>
+            Comment fonctionne l&apos;essai gratuit ? Chaque nouvel inscrit bénéficie de 7 jours d&apos;accès
+            complet à Oracle+ sans carte bancaire. La transcription vocale permet de dicter vos rêves
+            au réveil. Le Dream Coach analyse votre journal pour identifier des patterns récurrents.
+            Vous pouvez changer de plan ou annuler à tout moment, sans engagement.
+          </p>
+          <nav>
+            <a href="/">Accueil DreamOracle</a> |{" "}
+            <a href="/blog">Blog interprétation des rêves</a> |{" "}
+            <a href="/register">Inscription gratuite</a> |{" "}
+            <a href="/login">Connexion</a> |{" "}
+            <a href="/terms">CGU</a> |{" "}
+            <a href="/privacy">Confidentialité</a> |{" "}
+            <a href="/cgv">CGV</a>
+          </nav>
+        </div>
+      </noscript>
       {children}
     </>
   );
