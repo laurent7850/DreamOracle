@@ -4,6 +4,36 @@ Tous les changements notables de DreamOracle sont documentés dans ce fichier.
 
 ## [Unreleased]
 
+## [2026-08-13] - RGPD : retrait du Meta Pixel
+
+### Conformité
+
+#### Meta Pixel retiré du layout
+- **Fichier** : `app/layout.tsx`
+- **Constat** : mesuré dans un navigateur vierge, sans interaction — le site déposait
+  `_fbp` (cookie publicitaire Meta) ainsi que `_ga` et `_ga_43MDBYPN9M`, sans aucune
+  bannière de consentement.
+- **Après** : `<MetaPixel />` retiré. Le composant `components/tracking/MetaPixel.tsx`
+  est conservé pour être remonté derrière la future bannière.
+- **Impact** : aucun code appelant à modifier — `lib/meta-events.ts` protège déjà ses
+  appels par `typeof window.fbq === 'function'`, les callsites deviennent des no-op.
+- **Attention** : si des campagnes Meta tournent, le suivi de conversion et les
+  audiences de retargeting s'arrêtent.
+
+#### Dette restante
+- **Google Analytics reste chargé sans consentement** (`_ga`, `_ga_43MDBYPN9M`).
+  Non conforme ePrivacy. Chantier complet décrit dans `RGPD-BRIEF.md` : store de
+  consentement, bannière, modal préférences, mise à jour de la page privacy.
+
+### Documentation
+
+#### Section déploiement corrigée
+- **Fichier** : `CLAUDE.md`
+- **Avant** : « merger `develop` → `master` et push »
+- **Après** : la production se construit depuis `develop`. Le `docker-compose.yml` du
+  VPS fait `git clone` sans `-b` et prend la branche par défaut du dépôt, qui est
+  `develop`. Merger vers `master` n'avait aucun effet sur le site en ligne.
+
 ## [2026-02-09] - Security & UX Improvements
 
 ### Sécurité
