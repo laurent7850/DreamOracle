@@ -7,9 +7,17 @@
 
 ## Déploiement Production
 
-1. Merger `develop` → `master` et push
+**La production se construit depuis `develop`, pas depuis `master`.** Le
+`docker-compose.yml` du VPS fait `git clone` sans `-b`, ce qui prend la branche par
+défaut du dépôt — et celle-ci est `develop` (`origin/HEAD -> origin/develop`).
+Merger vers `master` n'a donc aucun effet sur le site en ligne. Vérifié le 13/08/2026.
+
+1. Push sur `develop` — tout ce qui y est poussé partira au prochain déploiement
 2. Redéployer via : `VPS_updateProjectV1(virtualMachineId: 767464, projectName: "dreamoracle")`
 3. Vérifier les logs : `VPS_getProjectLogsV1(virtualMachineId: 767464, projectName: "dreamoracle")`
+
+Le container reconstruit tout au démarrage (`npm ci` + `next build`) : compter
+plusieurs minutes d'indisponibilité à chaque déploiement.
 
 ## Stack
 
@@ -51,6 +59,20 @@
 - `useSearchParams()` requiert `<Suspense>` boundary sinon build fail (prerender error)
 - `cookies()` de `next/headers` est async (requiert `await`)
 - Prisma dev : `npx prisma db push` (pas migrate dev — SQLite)
+
+## RGPD — dette ouverte (13/08/2026)
+
+Le Meta Pixel a été retiré de `app/layout.tsx` le 13/08/2026 : il déposait le cookie
+publicitaire `_fbp` dès la première visite, sans consentement.
+
+**Reste non conforme** : `GoogleAnalytics` est toujours chargé sans consentement, et
+dépose `_ga` / `_ga_43MDBYPN9M` dès l'arrivée sur le site. Aucune bannière n'existe.
+
+À faire — voir `RGPD-BRIEF.md` à la racine pour le détail et la vérification :
+- store de consentement (catégories `necessary` / `analytics` / `marketing`)
+- bannière + modal préférences, refus aussi accessible que l'acceptation
+- remonter `MetaPixel` (conservé dans `components/tracking/`) derrière le consentement
+- mettre à jour `app/(marketing)/privacy/page.tsx` avec la liste réelle des traceurs
 
 ## Conventions
 

@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { Cinzel, Raleway, Philosopher } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Toaster } from "@/components/ui/sonner";
-import MetaPixel from "@/components/tracking/MetaPixel";
 import { UTMCapture } from "@/components/shared/UTMCapture";
 import { OrganizationJsonLd, WebApplicationJsonLd } from "@/components/seo/JsonLd";
 import "./globals.css";
@@ -115,7 +114,20 @@ export default function RootLayout({
       <body
         className={`${cinzel.variable} ${raleway.variable} ${philosopher.variable} antialiased min-h-screen`}
       >
-        <MetaPixel />
+        {/*
+          Meta Pixel retire le 13/08/2026 : il deposait le cookie publicitaire
+          _fbp des la premiere visite, sans consentement prealable — interdit
+          par la directive ePrivacy, et d'autant plus expose sur un service
+          traitant des recits de reves. Voir RGPD-BRIEF.md.
+
+          Ne pas le remonter ici tel quel : il devra etre conditionne au
+          consentement, comme GoogleAnalytics ci-dessous doit l'etre aussi.
+          Le composant components/tracking/MetaPixel.tsx est conserve pour
+          etre reutilise derriere la future banniere de consentement.
+
+          SECURITY: GoogleAnalytics reste charge sans consentement — dette
+          connue et assumee, traitee dans le chantier complet du brief.
+        */}
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
