@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-export function StarField({ count = 80 }: { count?: number }) {
+export function StarField({ count = 50 }: { count?: number }) {
   // Generate stars once at mount using useMemo (no useEffect + setState re-render)
   const stars = useMemo(() => {
     const result = [];
