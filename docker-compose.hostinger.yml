@@ -134,18 +134,19 @@ services:
       - dreamoracle
     environment:
       - CRON_SECRET=${CRON_SECRET}
-    command: >
-      sh -c "
-        echo '
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        cat <<'CRONTAB' | crontab -
         # Funnel emails — daily at 8:00 AM (Europe/Paris)
-        0 7 * * * curl -sf --max-time 300 -X POST http://dreamoracle:3000/api/emails/funnel -H \"Authorization: Bearer '\"$$CRON_SECRET\"'\" >> /var/log/cron.log 2>&1
+        0 7 * * * curl -sf --max-time 300 -X POST http://dreamoracle:3000/api/emails/funnel -H "Authorization: Bearer $$CRON_SECRET" >> /var/log/cron.log 2>&1
         # Trial expiration — daily at 2:00 AM
-        0 1 * * * curl -sf --max-time 300 -X POST http://dreamoracle:3000/api/trial/expire -H \"Authorization: Bearer '\"$$CRON_SECRET\"'\" >> /var/log/cron.log 2>&1
+        0 1 * * * curl -sf --max-time 300 -X POST http://dreamoracle:3000/api/trial/expire -H "Authorization: Bearer $$CRON_SECRET" >> /var/log/cron.log 2>&1
         # Push reminders — every minute
-        * * * * * curl -sf --max-time 50 -X POST http://dreamoracle:3000/api/notifications/send-reminders -H \"Authorization: Bearer '\"$$CRON_SECRET\"'\" >> /var/log/cron.log 2>&1
-        ' | crontab - &&
-        crond -f -l 8
-      "
+        * * * * * curl -sf --max-time 50 -X POST http://dreamoracle:3000/api/notifications/send-reminders -H "Authorization: Bearer $$CRON_SECRET" >> /var/log/cron.log 2>&1
+        CRONTAB
+        exec crond -f -l 8
     deploy:
       resources:
         limits:
