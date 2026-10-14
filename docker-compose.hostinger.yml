@@ -127,7 +127,8 @@ services:
           memory: 512M
 
   cron:
-    image: alpine:3.19
+    build: ./docker/cron
+    init: true
     restart: always
     depends_on:
       - dreamoracle
@@ -135,14 +136,13 @@ services:
       - CRON_SECRET=${CRON_SECRET}
     command: >
       sh -c "
-        apk add --no-cache curl &&
         echo '
         # Funnel emails — daily at 8:00 AM (Europe/Paris)
-        0 7 * * * curl -sf -X POST http://dreamoracle:3000/api/emails/funnel -H \"Authorization: Bearer '\"$$CRON_SECRET\"'\" >> /var/log/cron.log 2>&1
+        0 7 * * * curl -sf --max-time 300 -X POST http://dreamoracle:3000/api/emails/funnel -H \"Authorization: Bearer '\"$$CRON_SECRET\"'\" >> /var/log/cron.log 2>&1
         # Trial expiration — daily at 2:00 AM
-        0 1 * * * curl -sf -X POST http://dreamoracle:3000/api/trial/expire -H \"Authorization: Bearer '\"$$CRON_SECRET\"'\" >> /var/log/cron.log 2>&1
+        0 1 * * * curl -sf --max-time 300 -X POST http://dreamoracle:3000/api/trial/expire -H \"Authorization: Bearer '\"$$CRON_SECRET\"'\" >> /var/log/cron.log 2>&1
         # Push reminders — every minute
-        * * * * * curl -sf -X POST http://dreamoracle:3000/api/notifications/send-reminders -H \"Authorization: Bearer '\"$$CRON_SECRET\"'\" >> /var/log/cron.log 2>&1
+        * * * * * curl -sf --max-time 50 -X POST http://dreamoracle:3000/api/notifications/send-reminders -H \"Authorization: Bearer '\"$$CRON_SECRET\"'\" >> /var/log/cron.log 2>&1
         ' | crontab - &&
         crond -f -l 8
       "
