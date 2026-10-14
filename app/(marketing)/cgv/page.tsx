@@ -17,7 +17,7 @@ import { StarField } from "@/components/shared/StarField";
 export default function CGVPage() {
   return (
     <div className="min-h-screen relative">
-      <StarField count={50} />
+      <StarField />
 
       {/* Header */}
       <header className="relative z-10 border-b border-primary/20 bg-background/80 backdrop-blur-sm sticky top-0">
