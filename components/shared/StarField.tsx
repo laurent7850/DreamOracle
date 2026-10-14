@@ -1,23 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
-interface Star {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-  delay: number;
-  duration: number;
-}
-
-export function StarField({ count = 100 }: { count?: number }) {
-  const [stars, setStars] = useState<Star[]>([]);
-
-  useEffect(() => {
-    const generatedStars: Star[] = [];
+export function StarField({ count = 80 }: { count?: number }) {
+  // Generate stars once at mount using useMemo (no useEffect + setState re-render)
+  const stars = useMemo(() => {
+    const result = [];
     for (let i = 0; i < count; i++) {
-      generatedStars.push({
+      result.push({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100,
@@ -26,7 +16,7 @@ export function StarField({ count = 100 }: { count?: number }) {
         duration: Math.random() * 3 + 2,
       });
     }
-    setStars(generatedStars);
+    return result;
   }, [count]);
 
   return (
