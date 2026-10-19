@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { checkCredits, logUsage } from "@/lib/credits";
+import type { Dream } from "@prisma/client";
 
 /** Strip HTML tags from a string to prevent XSS in contexts where content is rendered outside React */
 function stripHtml(str: string): string {
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Parse JSON strings for SQLite
-    const parsedDreams = dreams.map((dream) => ({
+    const parsedDreams = dreams.map((dream: Dream) => ({
       ...dream,
       emotions: JSON.parse(dream.emotions as string),
       symbols: JSON.parse(dream.symbols as string),

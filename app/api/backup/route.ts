@@ -3,7 +3,9 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { hasFeatureAccess } from "@/lib/subscription";
 import { generateBackupPDF } from "@/lib/backup-pdf";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
+import type { Dream, UserSymbol } from "@prisma/client";
 
 // GET - Export user data as PDF backup (or JSON with ?format=json)
 export async function GET(request: NextRequest) {
@@ -11,6 +13,12 @@ export async function GET(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Rate limit: max 5 backups per minute
+    const rl = checkRateLimit(`backup:${session.user.id}`, { maxRequests: 5, windowSeconds: 60 });
+    if (!rl.allowed) {
+      return NextResponse.json({ error: "Trop de requêtes. Réessayez plus tard." }, { status: 429 });
     }
 
     // Check premium access
@@ -63,7 +71,7 @@ export async function GET(request: NextRequest) {
             theme: settings.theme,
           }
         : null,
-      dreams: dreams.map((d) => ({
+      dreams: dreams.map((d: Dream) => ({
         title: d.title,
         content: d.content,
         dreamDate: d.dreamDate,
@@ -77,7 +85,7 @@ export async function GET(request: NextRequest) {
         sleepQuality: d.sleepQuality,
         createdAt: d.createdAt,
       })),
-      symbols: symbols.map((s) => ({
+      symbols: symbols.map((s: UserSymbol) => ({
         name: s.name,
         meaning: s.meaning,
         personalNote: s.personalNote,

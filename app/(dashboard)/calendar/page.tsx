@@ -5,6 +5,12 @@ import { Calendar, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DreamCalendar } from "@/components/calendar";
+import type { Dream as PrismaDream } from "@prisma/client";
+
+type CalendarDream = Pick<
+  PrismaDream,
+  "id" | "title" | "dreamDate" | "interpretation" | "mood" | "lucidity"
+>;
 
 export const metadata = {
   title: "Calendrier | DreamOracle",
@@ -33,25 +39,25 @@ export default async function CalendarPage() {
   });
 
   // Convert dates to strings for serialization
-  const serializedDreams = dreams.map((dream) => ({
+  const serializedDreams = dreams.map((dream: CalendarDream) => ({
     ...dream,
     dreamDate: dream.dreamDate.toISOString(),
   }));
 
   // Calculate stats
   const totalDreams = dreams.length;
-  const interpretedDreams = dreams.filter((d) => d.interpretation).length;
+  const interpretedDreams = dreams.filter((d: CalendarDream) => d.interpretation).length;
 
   // Count unique days with dreams
   const uniqueDays = new Set(
-    dreams.map((d) => d.dreamDate.toISOString().split("T")[0])
+    dreams.map((d: CalendarDream) => d.dreamDate.toISOString().split("T")[0])
   ).size;
 
   // Calculate current month stats
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const dreamsThisMonth = dreams.filter(
-    (d) => new Date(d.dreamDate) >= startOfMonth
+    (d: CalendarDream) => new Date(d.dreamDate) >= startOfMonth
   ).length;
 
   return (

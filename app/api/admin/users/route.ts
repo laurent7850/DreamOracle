@@ -3,6 +3,28 @@ import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/admin";
 import { z } from "zod";
 
+type AdminUserListItem = {
+  id: string;
+  email: string | null;
+  name: string | null;
+  image: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  lastLoginAt: Date | null;
+  role: string | null;
+  subscriptionTier: string | null;
+  subscriptionStatus: string | null;
+  subscriptionEnds: Date | null;
+  stripeCustomerId: string | null;
+  stripeSubscriptionId: string | null;
+  creditsResetAt: Date | null;
+  _count: {
+    dreams: number;
+    usageLogs: number;
+    sessions: number;
+  };
+};
+
 // GET - List all users with pagination and filters
 export async function GET(request: NextRequest) {
   try {
@@ -81,7 +103,7 @@ export async function GET(request: NextRequest) {
     const usageStats = await prisma.usageLog.groupBy({
       by: ["userId", "action"],
       where: {
-        userId: { in: users.map((u) => u.id) },
+        userId: { in: users.map((u: { id: string }) => u.id) },
         createdAt: { gte: startOfMonth },
       },
       _count: true,
@@ -89,7 +111,7 @@ export async function GET(request: NextRequest) {
 
     // Map usage stats to users
     const usageByUser = usageStats.reduce(
-      (acc, stat) => {
+      (acc: Record<string, Record<string, number>>, stat: { userId: string; action: string; _count: number }) => {
         if (!acc[stat.userId]) {
           acc[stat.userId] = {};
         }
@@ -103,21 +125,21 @@ export async function GET(request: NextRequest) {
     const interpretedCounts = await prisma.dream.groupBy({
       by: ["userId"],
       where: {
-        userId: { in: users.map((u) => u.id) },
+        userId: { in: users.map((u: { id: string }) => u.id) },
         interpretation: { not: null },
       },
       _count: true,
     });
 
     const interpretedByUser = interpretedCounts.reduce(
-      (acc, stat) => {
+      (acc: Record<string, number>, stat: { userId: string; _count: number }) => {
         acc[stat.userId] = stat._count;
         return acc;
       },
       {} as Record<string, number>
     );
 
-    const enrichedUsers = users.map((user) => ({
+    const enrichedUsers = users.map((user: AdminUserListItem) => ({
       ...user,
       monthlyUsage: usageByUser[user.id] || {},
       interpretedDreams: interpretedByUser[user.id] || 0,

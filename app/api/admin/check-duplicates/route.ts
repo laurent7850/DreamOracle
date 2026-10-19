@@ -93,9 +93,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       duplicates: {
-        emails: duplicateEmails.map(d => ({ email: d.email, count: Number(d.count) })),
-        settings: duplicateSettings.map(d => ({ userId: d.userId, count: Number(d.count) })),
-        pushSubscriptions: duplicatePushSubs.map(d => ({ endpoint: d.endpoint.substring(0, 50) + "...", count: Number(d.count) })),
+        emails: duplicateEmails.map((d: { email: string; count: bigint }) => ({ email: d.email, count: Number(d.count) })),
+        settings: duplicateSettings.map((d: { userId: string; count: bigint }) => ({ userId: d.userId, count: Number(d.count) })),
+        pushSubscriptions: duplicatePushSubs.map((d: { endpoint: string; count: bigint }) => ({ endpoint: d.endpoint.substring(0, 50) + "...", count: Number(d.count) })),
       },
       orphanedRecords: {
         settings: orphanedSettings.length,
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
         pushSubscriptions: orphanedPushSubs.length,
         usageLogs: orphanedUsageLogs.length,
       },
-      users: users.map(u => ({
+      users: users.map((u: { id: string; email: string | null; name: string | null; createdAt: Date; _count: { dreams: number; accounts: number; pushSubscriptions: number; usageLogs: number } }) => ({
         id: u.id,
         email: u.email,
         name: u.name,

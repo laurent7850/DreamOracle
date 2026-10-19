@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     // Transform dreams for context
     const dreamContext = {
       userName: user.name || undefined,
-      recentDreams: recentDreams.map((d) => ({
+      recentDreams: recentDreams.map((d: { title: string; content: string; dreamDate: Date; interpretation: string | null; symbols: string }) => ({
         title: d.title,
         content: d.content,
         dreamDate: d.dreamDate,

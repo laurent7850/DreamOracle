@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
+interface TrialExpireUser {
+  id: string;
+  acquisitionSource: string | null;
+  acquisitionCampaign: string | null;
+  _count: { dreams: number; usageLogs: number };
+}
+
 // POST /api/trial/expire - Expire finished Oracle+ trials
 // Protected by CRON_SECRET — should be called daily
 export async function POST(request: NextRequest) {
@@ -31,7 +38,7 @@ export async function POST(request: NextRequest) {
       // Batch update: downgrade all expired trials
       await prisma.user.updateMany({
         where: {
-          id: { in: usersToExpire.map((u) => u.id) },
+          id: { in: usersToExpire.map((u: TrialExpireUser) => u.id) },
         },
         data: {
           subscriptionTier: "FREE",
@@ -42,7 +49,7 @@ export async function POST(request: NextRequest) {
 
       // Log trial expiration events for each user
       await prisma.trialEvent.createMany({
-        data: usersToExpire.map((user) => ({
+        data: usersToExpire.map((user: TrialExpireUser) => ({
           userId: user.id,
           event: "trial_expired",
           metadata: JSON.stringify({

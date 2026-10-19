@@ -94,7 +94,7 @@ export async function GET(
     return NextResponse.json({
       user,
       monthlyUsage: monthlyUsage.reduce(
-        (acc, stat) => {
+        (acc: Record<string, number>, stat: { action: string; _count: number }) => {
           acc[stat.action] = stat._count;
           return acc;
         },

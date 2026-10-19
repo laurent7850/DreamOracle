@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { stripe, getOrCreateStripeCustomer, createCheckoutSession, STRIPE_PRODUCTS } from '@/lib/stripe';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { z } from 'zod';
 
 const checkoutSchema = z.object({
@@ -12,6 +13,12 @@ const checkoutSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
+    if (session?.user?.id) {
+      const rl = checkRateLimit(`checkout:${session.user.id}`, { maxRequests: 5, windowSeconds: 60 });
+      if (!rl.allowed) {
+        return NextResponse.json({ error: 'Trop de tentatives. Réessayez plus tard.' }, { status: 429 });
+      }
+    }
 
     if (!session?.user?.id || !session?.user?.email) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
@@ -30,7 +37,7 @@ export async function POST(request: NextRequest) {
     let customerId = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { stripeCustomerId: true },
-    }).then(user => user?.stripeCustomerId);
+    }).then((user: { stripeCustomerId: string | null } | null) => user?.stripeCustomerId);
 
     if (!customerId) {
       customerId = await getOrCreateStripeCustomer(

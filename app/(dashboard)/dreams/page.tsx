@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DreamCard } from "@/components/dream/DreamCard";
 import type { Dream } from "@/types";
+import type { Dream as PrismaDreamRow } from "@prisma/client";
 
 export const metadata = {
   title: "Mes rêves",
@@ -43,7 +44,7 @@ export default async function DreamsPage({
   ]);
 
   // Parse JSON fields
-  const dreams: Dream[] = dreamsRaw.map((dream) => ({
+  const dreams: Dream[] = dreamsRaw.map((dream: PrismaDreamRow) => ({
     ...dream,
     emotions: JSON.parse(dream.emotions),
     symbols: JSON.parse(dream.symbols),

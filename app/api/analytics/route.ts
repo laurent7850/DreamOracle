@@ -33,9 +33,9 @@ export async function GET() {
 
     // Basic counts
     const totalDreams = dreams.length;
-    const interpretedDreams = dreams.filter((d) => d.interpretation).length;
-    const lucidDreams = dreams.filter((d) => d.lucidity >= 3).length;
-    const recurringDreams = dreams.filter((d) => d.isRecurring).length;
+    const interpretedDreams = dreams.filter((d: DreamData) => d.interpretation).length;
+    const lucidDreams = dreams.filter((d: DreamData) => d.lucidity >= 3).length;
+    const recurringDreams = dreams.filter((d: DreamData) => d.isRecurring).length;
 
     // Calculate streaks
     const streakData = calculateStreaks(dreams);

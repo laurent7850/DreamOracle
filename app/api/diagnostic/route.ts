@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
+/** Shape returned by the diagnostic user query (Prisma select). */
+interface DiagnosticUser {
+  id: string;
+  name: string | null;
+  email: string;
+  createdAt: Date;
+  lastLoginAt: Date | null;
+  trialEndsAt: Date | null;
+  trialConvertedAt: Date | null;
+  trialExpiredAt: Date | null;
+  subscriptionTier: string;
+  stripeSubscriptionId: string | null;
+  acquisitionSource: string | null;
+  _count: { dreams: number; usageLogs: number };
+}
+
 // GET /api/admin/diagnostic — Quick diagnostic stats (protected by CRON_SECRET)
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
@@ -12,7 +28,7 @@ export async function GET(request: NextRequest) {
   const now = new Date();
 
   // All users with dream count
-  const users = await prisma.user.findMany({
+  const users: DiagnosticUser[] = await prisma.user.findMany({
     select: {
       id: true,
       name: true,

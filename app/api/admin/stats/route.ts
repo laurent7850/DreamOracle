@@ -92,7 +92,7 @@ export async function GET() {
 
     // Process daily signups into a chart-friendly format
     const signupsByDay: Record<string, number> = {};
-    dailySignups.forEach((entry) => {
+    dailySignups.forEach((entry: { createdAt: Date; _count: number }) => {
       const date = new Date(entry.createdAt).toISOString().split("T")[0];
       signupsByDay[date] = (signupsByDay[date] || 0) + entry._count;
     });
@@ -110,7 +110,7 @@ export async function GET() {
     });
 
     // MRR based on monthly prices (7.99€ ESSENTIAL, 13.99€ PREMIUM)
-    const mrr = paidSubscribers.reduce((sum, u) => {
+    const mrr = paidSubscribers.reduce((sum: number, u: { subscriptionTier: string }) => {
       return sum + (u.subscriptionTier === "ESSENTIAL" ? 799 : 1399);
     }, 0);
 
@@ -159,14 +159,14 @@ export async function GET() {
       },
       subscriptions: {
         byTier: subscriptionStats.reduce(
-          (acc, s) => {
+          (acc: Record<string, number>, s: { subscriptionTier: string; _count: number }) => {
             acc[s.subscriptionTier] = s._count;
             return acc;
           },
           {} as Record<string, number>
         ),
         byStatus: subscriptionStatusStats.reduce(
-          (acc, s) => {
+          (acc: Record<string, number>, s: { subscriptionStatus: string; _count: number }) => {
             acc[s.subscriptionStatus] = s._count;
             return acc;
           },
@@ -184,7 +184,7 @@ export async function GET() {
         month: interpretationsMonth,
       },
       usage: usageBreakdown.reduce(
-        (acc, u) => {
+        (acc: Record<string, number>, u: { action: string; _count: number }) => {
           acc[u.action] = u._count;
           return acc;
         },

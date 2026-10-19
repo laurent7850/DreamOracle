@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         exportDate: new Date().toISOString(),
         totalDreams: dreams.length,
-        dreams: dreams.map((d) => ({
+        dreams: dreams.map((d: { id: string; title: string; content: string; dreamDate: Date; interpretation: string | null; emotions: string; symbols: string; tags: string; lucidity: number; mood: string | null; sleepQuality: number | null; isRecurring: boolean; createdAt: Date }) => ({
           ...d,
           emotions: JSON.parse(d.emotions || "[]"),
           symbols: JSON.parse(d.symbols || "[]"),

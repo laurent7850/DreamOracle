@@ -2,6 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import type { Metadata } from "next"
 import { prisma } from "@/lib/db"
+import type { BlogPost } from "@prisma/client"
 import { Moon, Calendar, Clock, ArrowRight, BookOpen } from "lucide-react"
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd"
 
@@ -145,7 +146,7 @@ export default async function BlogPage() {
             </div>
           ) : (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post) => (
+              {posts.map((post: BlogPost) => (
                 <Link
                   key={post.id}
                   href={`/blog/${post.slug}`}

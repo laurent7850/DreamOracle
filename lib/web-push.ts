@@ -14,7 +14,14 @@ if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
     );
   }
 } else {
-  webPush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+  try {
+    webPush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+  } catch {
+    console.warn(
+      "⚠️ VAPID keys are invalid. Push notifications will not work. " +
+      "Generate keys with: npx web-push generate-vapid-keys"
+    );
+  }
 }
 
 export interface PushSubscriptionData {

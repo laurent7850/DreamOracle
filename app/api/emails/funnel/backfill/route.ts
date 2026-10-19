@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       const daysSinceRegistration = Math.floor(
         (now.getTime() - user.createdAt.getTime()) / (24 * 60 * 60 * 1000)
       );
-      const sentSteps = new Set(user.funnelEmails.map((fe) => fe.step));
+      const sentSteps = new Set(user.funnelEmails.map((fe: { step: number }) => fe.step));
 
       // Determine which steps this user should receive based on their registration age
       const stepsToSend: number[] = [];

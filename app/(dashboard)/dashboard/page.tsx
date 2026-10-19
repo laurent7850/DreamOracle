@@ -9,6 +9,7 @@ import { DashboardUsage } from "@/components/subscription";
 import TrackWelcome from "@/components/tracking/TrackWelcome";
 import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
 import { DashboardStreak } from "@/components/dashboard/DashboardStreak";
+import type { Dream as PrismaDream } from "@prisma/client";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -63,12 +64,12 @@ export default async function DashboardPage() {
       select: { dreamDate: true },
       orderBy: { dreamDate: "desc" },
     });
-    const uniqueDates = [...new Set(allDreamDates.map(d => new Date(d.dreamDate).toISOString().split("T")[0]))].sort().reverse();
+    const uniqueDates = [...new Set(allDreamDates.map((d: { dreamDate: Date }) => new Date(d.dreamDate).toISOString().split("T")[0]))].sort().reverse();
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     for (let i = 0; i < uniqueDates.length; i++) {
-      const dreamDate = new Date(uniqueDates[i]);
+      const dreamDate = new Date(uniqueDates[i]!);
       dreamDate.setHours(0, 0, 0, 0);
       const diffDays = Math.floor((today.getTime() - dreamDate.getTime()) / (1000 * 60 * 60 * 24));
       if (diffDays <= i + 1) currentStreak++;
@@ -77,8 +78,8 @@ export default async function DashboardPage() {
 
     let streak = 1;
     for (let i = 1; i < uniqueDates.length; i++) {
-      const prev = new Date(uniqueDates[i - 1]);
-      const curr = new Date(uniqueDates[i]);
+      const prev = new Date(uniqueDates[i - 1]!);
+      const curr = new Date(uniqueDates[i]!);
       const diff = Math.floor((prev.getTime() - curr.getTime()) / (1000 * 60 * 60 * 24));
       if (diff === 1) { streak++; }
       else { longestStreak = Math.max(longestStreak, streak); streak = 1; }
@@ -181,7 +182,7 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-3 sm:space-y-4">
-              {recentDreams.map((dream) => (
+              {recentDreams.map((dream: PrismaDream) => (
                 <Link key={dream.id} href={`/dreams/${dream.id}`}>
                   <div className="p-3 sm:p-4 rounded-lg bg-mystic-900/30 border border-mystic-700/30 hover:border-mystic-600/50 transition-all cursor-pointer">
                     <div className="flex justify-between items-start gap-2 mb-1.5 sm:mb-2">
