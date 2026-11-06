@@ -1,9 +1,9 @@
-import nodemailer from 'nodemailer';
+import nodemailer, { type Transporter } from 'nodemailer';
 
 // SMTP transporter for Hostinger (admin/invoices)
-let _transporter: nodemailer.Transporter | null = null;
+let _transporter: Transporter | null = null;
 
-function getTransporter(): nodemailer.Transporter {
+function getTransporter(): Transporter {
   if (!_transporter) {
     _transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.hostinger.com',
@@ -19,9 +19,9 @@ function getTransporter(): nodemailer.Transporter {
 }
 
 // SMTP transporter for marketing/funnel emails (info@dreamoracle.eu)
-let _funnelTransporter: nodemailer.Transporter | null = null;
+let _funnelTransporter: Transporter | null = null;
 
-function getFunnelTransporter(): nodemailer.Transporter {
+function getFunnelTransporter(): Transporter {
   if (!_funnelTransporter) {
     _funnelTransporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.hostinger.com',
