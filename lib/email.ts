@@ -84,7 +84,10 @@ export async function sendMarketingEmail(options: SendMarketingEmailOptions): Pr
 export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
   try {
     const transporter = getTransporter();
-    const fromEmail = process.env.SMTP_USER || 'factures@distr-action.com';
+    // SMTP_FROM is the display sender (typically an alias such as factures@…),
+    // separate from SMTP_USER which is the real mailbox used for authentication.
+    // Falls back to SMTP_USER for backward compatibility.
+    const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || 'factures@distr-action.com';
 
     await transporter.sendMail({
       from: `"DreamOracle - Distr'action" <${fromEmail}>`,
