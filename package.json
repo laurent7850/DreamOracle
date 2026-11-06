@@ -34,7 +34,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.29.0",
     "jspdf": "^4.1.0",
-    "lucide-react": "^0.563.0",
+    "lucide-react": "^1.67.0",
     "next": "16.4.3",
     "next-auth": "^5.0.0-beta.30",
     "next-pwa": "^5.6.0",
