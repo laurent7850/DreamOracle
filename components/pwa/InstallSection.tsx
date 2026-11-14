@@ -38,12 +38,10 @@ export function InstallSection() {
     const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
     );
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration
     setIsMobile(isMobileDevice);
 
     // Check if iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration
     setIsIOS(isIOSDevice);
 
     // For Android/Desktop, listen for beforeinstallprompt

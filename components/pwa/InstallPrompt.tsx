@@ -30,7 +30,6 @@ export function InstallPrompt() {
 
     // Check if iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration
     setIsIOS(isIOSDevice);
 
     // Check if we've already dismissed the prompt

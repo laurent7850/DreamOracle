@@ -42,7 +42,6 @@ export function InstallButton({ variant = "default", className }: InstallButtonP
 
     // Check if iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration
     setIsIOS(isIOSDevice);
 
     // For Android/Desktop, listen for beforeinstallprompt

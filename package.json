@@ -67,6 +67,9 @@
   "overrides": {
     "nodemailer": "$nodemailer",
     "deepmerge-ts": "^8.0.2",
-    "serialize-javascript": "^7.1.4"
+    "serialize-javascript": "^7.1.4",
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.1"
+    }
   }
 }
