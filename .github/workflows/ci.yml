@@ -27,8 +27,9 @@ jobs:
       - run: npm ci
       - name: Typecheck
         run: npx tsc --noEmit
-      # `npm run lint` n'est pas lancé : 32 erreurs préexistantes (surtout no-require-imports).
-      # À ajouter ici une fois ces erreurs corrigées.
+      # Bloque sur les erreurs ; les avertissements restent affichés sans faire échouer la CI.
+      - name: Lint
+        run: npm run lint
       - name: Build
         run: npm run build
         env:
