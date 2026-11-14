@@ -229,7 +229,7 @@ export default function SymbolsPage() {
             </h1>
             <p className="text-mystic-300 mb-6 max-w-md mx-auto">
               Accède à la bibliothèque des symboles oniriques et crée ton dictionnaire personnel.
-              Disponible avec l'abonnement Oracle+.
+              Disponible avec l&apos;abonnement Oracle+.
             </p>
 
             <div className="bg-mystic-900/50 rounded-lg p-6 mb-6 text-left">
@@ -240,7 +240,7 @@ export default function SymbolsPage() {
               <ul className="space-y-2 text-mystic-300">
                 <li className="flex items-center gap-2">
                   <Library className="w-4 h-4 text-mystic-400" />
-                  {DEFAULT_SYMBOLS.length}+ symboles dans la bibliothèque de l'Oracle
+                  {DEFAULT_SYMBOLS.length}+ symboles dans la bibliothèque de l&apos;Oracle
                 </li>
                 <li className="flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-mystic-400" />
@@ -295,7 +295,7 @@ export default function SymbolsPage() {
           }`}
         >
           <Library className="w-4 h-4" />
-          Bibliothèque de l'Oracle
+          Bibliothèque de l&apos;Oracle
         </button>
         <button
           onClick={() => setActiveTab("personal")}
@@ -412,7 +412,7 @@ export default function SymbolsPage() {
           {filteredDefaultSymbols.length === 0 && (
             <Card className="glass-card border-mystic-700/30">
               <CardContent className="py-12 text-center text-mystic-400">
-                Aucun symbole trouvé pour "{search}"
+                Aucun symbole trouvé pour &quot;{search}&quot;
               </CardContent>
             </Card>
           )}
@@ -537,7 +537,7 @@ export default function SymbolsPage() {
                 <CardContent className="py-12 text-center">
                   {search ? (
                     <p className="text-mystic-400">
-                      Aucun symbole trouvé pour "{search}"
+                      Aucun symbole trouvé pour &quot;{search}&quot;
                     </p>
                   ) : (
                     <div className="space-y-4">
@@ -545,7 +545,7 @@ export default function SymbolsPage() {
                         Ton dictionnaire est vide.
                       </p>
                       <p className="text-mystic-500 text-sm">
-                        Explore la <button onClick={() => setActiveTab("library")} className="text-gold hover:underline">Bibliothèque de l'Oracle</button> pour découvrir la signification des symboles et les ajouter à ton dictionnaire personnel.
+                        Explore la <button onClick={() => setActiveTab("library")} className="text-gold hover:underline">Bibliothèque de l&apos;Oracle</button> pour découvrir la signification des symboles et les ajouter à ton dictionnaire personnel.
                       </p>
                     </div>
                   )}

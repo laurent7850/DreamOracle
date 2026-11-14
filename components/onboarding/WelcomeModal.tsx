@@ -56,6 +56,7 @@ export function WelcomeModal({ userName, hasDreams }: WelcomeModalProps) {
 
         <div className="relative bg-gradient-to-b from-mystic-900/95 to-night/95 border border-mystic-700/40 rounded-2xl overflow-hidden">
           {/* Decorative stars */}
+          {/* eslint-disable react-hooks/purity -- decorative random positions */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             {[...Array(20)].map((_, i) => (
               <div
@@ -70,6 +71,7 @@ export function WelcomeModal({ userName, hasDreams }: WelcomeModalProps) {
               />
             ))}
           </div>
+          {/* eslint-enable react-hooks/purity */}
 
           {step === 0 ? (
             /* Step 1: Welcome */

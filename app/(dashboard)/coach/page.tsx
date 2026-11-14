@@ -188,7 +188,7 @@ Pose-moi une question sur tes rêves, ou choisis une suggestion ci-dessous !`,
             </h1>
             <p className="text-mystic-300 mb-6 max-w-md mx-auto">
               Ton guide personnel pour explorer et comprendre tes rêves.
-              Disponible exclusivement avec l'abonnement Oracle+.
+              Disponible exclusivement avec l&apos;abonnement Oracle+.
             </p>
 
             <div className="bg-mystic-900/50 rounded-lg p-6 mb-6 text-left">

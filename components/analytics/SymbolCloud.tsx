@@ -37,7 +37,7 @@ export function SymbolCloud({ data }: SymbolCloudProps) {
     return "opacity-100";
   };
 
-  // Shuffle for visual variety
+  // eslint-disable-next-line react-hooks/purity -- decorative shuffle, pure render not required
   const shuffled = [...data].sort(() => Math.random() - 0.5);
 
   return (

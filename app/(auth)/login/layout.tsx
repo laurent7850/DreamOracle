@@ -33,12 +33,14 @@ export default function LoginLayout({
             songes au réveil grâce à la transcription vocale, recevez des interprétations personnalisées
             et suivez votre évolution onirique au fil du temps grâce à des statistiques détaillées.
           </p>
+          {/* eslint-disable @next/next/no-html-link-for-pages -- noscript: Link requires JS */}
           <nav>
             <a href="/register">Pas encore de compte ? S&apos;inscrire gratuitement</a> |{" "}
             <a href="/pricing">Tarifs</a> |{" "}
             <a href="/blog">Blog</a> |{" "}
             <a href="/">Accueil</a>
           </nav>
+          {/* eslint-enable @next/next/no-html-link-for-pages */}
         </div>
       </noscript>
       {children}

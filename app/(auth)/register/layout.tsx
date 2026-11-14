@@ -34,6 +34,7 @@ export default function RegisterLayout({
             Après votre essai gratuit, choisissez le plan qui vous convient : Rêveur (gratuit),
             Explorateur (4,99€/mois) ou Oracle+ (9,99€/mois). Changez ou annulez à tout moment.
           </p>
+          {/* eslint-disable @next/next/no-html-link-for-pages -- noscript: Link requires JS */}
           <nav>
             <a href="/login">Déjà un compte ? Se connecter</a> |{" "}
             <a href="/pricing">Voir les tarifs</a> |{" "}
@@ -42,6 +43,7 @@ export default function RegisterLayout({
             <a href="/terms">CGU</a> |{" "}
             <a href="/privacy">Confidentialité</a>
           </nav>
+          {/* eslint-enable @next/next/no-html-link-for-pages */}
         </div>
       </noscript>
       {children}

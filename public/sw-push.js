@@ -85,7 +85,7 @@ self.addEventListener("notificationclick", (event) => {
   );
 });
 
-self.addEventListener("notificationclose", (event) => {
+self.addEventListener("notificationclose", (_event) => {
   console.log("[SW Push] Notification closed");
 });
 

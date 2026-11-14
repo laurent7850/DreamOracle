@@ -35,12 +35,14 @@ export function InstallButton({ variant = "default", className }: InstallButtonP
       // @ts-expect-error - iOS Safari specific
       window.navigator.standalone === true;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration: these values depend on window
     setIsStandalone(isInStandaloneMode);
 
     if (isInStandaloneMode) return;
 
     // Check if iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration
     setIsIOS(isIOSDevice);
 
     // For Android/Desktop, listen for beforeinstallprompt

@@ -27,6 +27,11 @@ export function showToast(toast: Omit<Toast, "id">) {
   }, 4000);
 }
 
+function dismissToast(id: string) {
+  currentToasts = currentToasts.filter((t) => t.id !== id);
+  toastListeners.forEach((l) => l(currentToasts));
+}
+
 export function Toaster() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -36,11 +41,6 @@ export function Toaster() {
       toastListeners = toastListeners.filter((l) => l !== setToasts);
     };
   }, []);
-
-  const dismiss = (id: string) => {
-    currentToasts = currentToasts.filter((t) => t.id !== id);
-    toastListeners.forEach((l) => l(currentToasts));
-  };
 
   if (toasts.length === 0) return null;
 
@@ -73,7 +73,7 @@ export function Toaster() {
               )}
             </div>
             <button
-              onClick={() => dismiss(toast.id)}
+              onClick={() => dismissToast(toast.id)}
               className="text-mystic-400 hover:text-mystic-200 p-1"
             >
               <X className="w-4 h-4" />

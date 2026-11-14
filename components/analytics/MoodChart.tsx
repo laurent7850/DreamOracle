@@ -31,14 +31,12 @@ export function MoodChart({ data }: MoodChartProps) {
       <div className="flex justify-center">
         <div className="relative w-40 h-40">
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-            {(() => {
-              let offset = 0;
-              return data.map((item) => {
+            {data.map((item, index) => {
                 const percentage = (item.count / total) * 100;
                 const circumference = 2 * Math.PI * 40;
                 const strokeDasharray = `${(percentage / 100) * circumference} ${circumference}`;
+                const offset = data.slice(0, index).reduce((sum, d) => sum + (d.count / total) * 100, 0);
                 const strokeDashoffset = -(offset / 100) * circumference;
-                offset += percentage;
 
                 const config = moodConfig[item.mood] || { bgColor: "bg-mystic-500" };
                 const strokeColor = config.bgColor.replace("bg-", "").replace("-500", "");
@@ -63,8 +61,7 @@ export function MoodChart({ data }: MoodChartProps) {
                     )}
                   />
                 );
-              });
-            })()}
+            })}
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">

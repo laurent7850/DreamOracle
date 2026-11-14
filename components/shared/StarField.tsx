@@ -7,6 +7,7 @@ export function StarField({ count = 50 }: { count?: number }) {
   const stars = useMemo(() => {
     const result = [];
     for (let i = 0; i < count; i++) {
+      /* eslint-disable react-hooks/purity -- decorative random positions, generated once via useMemo */
       result.push({
         id: i,
         x: Math.random() * 100,
@@ -15,6 +16,7 @@ export function StarField({ count = 50 }: { count?: number }) {
         delay: Math.random() * 5,
         duration: Math.random() * 3 + 2,
       });
+      /* eslint-enable react-hooks/purity */
     }
     return result;
   }, [count]);

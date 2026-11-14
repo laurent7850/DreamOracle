@@ -94,6 +94,7 @@ export default function PricingLayout({
             au réveil. Le Dream Coach analyse votre journal pour identifier des patterns récurrents.
             Vous pouvez changer de plan ou annuler à tout moment, sans engagement.
           </p>
+          {/* eslint-disable @next/next/no-html-link-for-pages -- noscript: Link requires JS */}
           <nav>
             <a href="/">Accueil DreamOracle</a> |{" "}
             <a href="/blog">Blog interprétation des rêves</a> |{" "}
@@ -103,6 +104,7 @@ export default function PricingLayout({
             <a href="/privacy">Confidentialité</a> |{" "}
             <a href="/cgv">CGV</a>
           </nav>
+          {/* eslint-enable @next/next/no-html-link-for-pages */}
         </div>
       </noscript>
       {children}
