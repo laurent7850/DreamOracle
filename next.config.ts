@@ -16,23 +16,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-// PWA configuration - conditionally applied
-const withPWA = (config: NextConfig): NextConfig => {
-  if (process.env.NODE_ENV === "production") {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const withPWAInit = require("next-pwa").default;
-      return withPWAInit({
-        dest: "public",
-        register: true,
-        skipWaiting: true,
-      })(config);
-    } catch {
-      // PWA package not available, return config as-is
-      return config;
-    }
-  }
-  return config;
-};
-
-export default withPWA(nextConfig);
+export default nextConfig;

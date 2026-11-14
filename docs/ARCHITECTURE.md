@@ -8,7 +8,7 @@ DreamOracle est une Progressive Web App (PWA) de journal de rêves avec interpr�
 ┌─────────────────────────────────────────────────────────────────┐
 │                         FRONTEND                                 │
 │  Next.js 16 + React 19 + Tailwind CSS + shadcn/ui              │
-│  ├── PWA (next-pwa)                                            │
+│  ├── PWA (manifest + sw-push.js)                               │
 │  ├── Framer Motion (animations)                                │
 │  └── Zustand (state management)                                │
 ├─────────────────────────────────────────────────────────────────┤
@@ -86,7 +86,7 @@ dream-oracle/
 ├── public/
 │   ├── icons/                    # Icônes PWA
 │   ├── manifest.json             # PWA manifest
-│   └── sw.js                     # Service Worker
+│   └── sw-push.js                # Service Worker (notifications push)
 └── docs/                         # Documentation
 ```
 

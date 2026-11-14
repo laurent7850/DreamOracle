@@ -61,7 +61,7 @@
 | **IA** | OpenRouter API (Claude) |
 | **Voix** | ElevenLabs API |
 | **Paiements** | Stripe |
-| **PWA** | next-pwa, Web Push |
+| **PWA** | Manifest, service worker `sw-push.js`, Web Push |
 | **Déploiement** | Docker, Traefik, Hostinger VPS |
 
 ---
