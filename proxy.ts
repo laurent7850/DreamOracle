@@ -69,7 +69,7 @@ function addSecurityHeaders(response: NextResponse) {
   return response;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip public static routes — still add security headers
@@ -112,11 +112,14 @@ export async function middleware(request: NextRequest) {
   );
 
   if (isProtectedPage || isProtectedApi) {
-    // Use JWT token check (Edge-compatible, no Prisma needed)
-    // NextAuth v5 uses "authjs.session-token" cookie name (or __Secure- prefix in HTTPS)
-    const isSecure = request.nextUrl.protocol === "https:";
-    const cookieName = isSecure
-      ? "__Secure-authjs.session-token"
+    // NextAuth v5 names the cookie "__Secure-authjs.session-token" over HTTPS and
+    // "authjs.session-token" otherwise; the cookie name is also the JWT salt.
+    // Read the cookie actually sent: behind Traefik the request protocol can be http.
+    const secureName = "__Secure-authjs.session-token";
+    const cookieName = request.cookies
+      .getAll()
+      .some((c) => c.name === secureName || c.name.startsWith(`${secureName}.`))
+      ? secureName
       : "authjs.session-token";
 
     const token = await getToken({
